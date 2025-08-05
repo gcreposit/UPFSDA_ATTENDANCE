@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head}">
+    <title>Dashboard - UPFSDA Attendance System</title>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
+
+    <!-- Header -->
+    <header th:replace="~{fragments/layout :: header}"></header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Grid Layout -->
+        <div class="dashboard-grid">
+            <!-- Left Column -->
+            <div class="dashboard-left">
+                <!-- Attendance Card -->
+                <div class="attendance-card">
+                    <div class="attendance-header">
+                        <h6>Attendance</h6>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+
+                    <!-- Circular Progress -->
+                    <div class="circular-progress">
+                        <div class="progress-circle" id="workingHoursCircle">
+                            <div class="progress-content">
+                                <div class="working-hours" id="todayWorkingHours">10:-18:-34</div>
+                                <div class="working-label">Working Hours</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Punch Times -->
+                    <div class="punch-times">
+                        <div class="punch-time">
+                            <span class="punch-label">Punch In</span>
+                            <span class="punch-value" id="punchInTime">10:05</span>
+                        </div>
+                        <div class="punch-time">
+                            <span class="punch-label">Punch Out</span>
+                            <span class="punch-value" id="punchOutTime">00:00</span>
+                        </div>
+                    </div>
+
+                    <!-- Punch Button -->
+                    <button class="punch-btn-main" id="mainPunchBtn"
+                        th:data-action="${user?.attendanceToday?.punchIn != null and user?.attendanceToday?.punchOut == null} ? 'punch-out' : 'punch-in'">
+                        <i
+                            th:class="${user?.attendanceToday?.punchIn != null and user?.attendanceToday?.punchOut == null} ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'"></i>
+                        <span
+                            th:text="${user?.attendanceToday?.punchIn != null and user?.attendanceToday?.punchOut == null} ? 'Punch Out' : 'Punch In'">Punch
+                            In</span>
+                    </button>
+                </div>
+
+
+            </div>
+
+            <!-- Center Column -->
+            <div class="dashboard-center">
+                <!-- Welcome Card -->
+                <div class="welcome-card">
+                    <div class="welcome-content">
+                        <h3>Hi, <span th:text="${user?.name} ?: 'Lokesh Kumar'">Lokesh Kumar</span></h3>
+                        <p>Good Morning</p>
+                        <small>Have a good day</small>
+                    </div>
+                    <div class="welcome-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Grid -->
+                <div class="quick-stats">
+                    <!-- Project Card -->
+                    <div class="stat-card-small project-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Project</div>
+                            <div class="stat-subtitle">Active: <span id="activeProjectsCount">2</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Leave Card -->
+                    <div class="stat-card-small leave-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-times"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Leave</div>
+                            <div class="stat-subtitle">Last: <span class="text-danger">Denied</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Holiday Card -->
+                    <div class="stat-card-small holiday-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Holiday</div>
+                            <div class="stat-subtitle">Next: Christmas</div>
+                        </div>
+                    </div>
+
+                    <!-- Meeting Card -->
+                    <div class="stat-card-small meeting-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Meeting</div>
+                            <div class="stat-subtitle">Today: <span class="text-primary">2</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="dashboard-right">
+
+                <!-- Simple Calendar Widget -->
+                <div class="simple-calendar-card">
+                    <div class="simple-calendar-header">
+                        <button class="simple-nav" id="simplePrevMonth">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="simple-month-year" id="simpleCurrentMonth">August 2025</span>
+                        <button class="simple-nav" id="simpleNextMonth">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="simple-calendar-grid" id="simpleCalendarGrid">
+                        <!-- Calendar will be generated by JavaScript -->
+                    </div>
+                </div>
+                <!-- Leave Balance Card -->
+                <div class="leave-balance-card">
+                    <div class="leave-balance-header">
+                        <h6>Leave Balance</h6>
+                    </div>
+                    <div class="leave-balance-circle">
+                        <div class="balance-progress">
+                            <div class="balance-number" th:text="${user?.leaveBalance?.remaining} ?: '16'">16</div>
+                            <div class="balance-label">Days Left</div>
+                        </div>
+                    </div>
+                    <div class="leave-balance-details">
+                        <div class="balance-row">
+                            <span>Total</span>
+                            <span th:text="${user?.leaveBalance?.total} ?: '20'">20</span>
+                        </div>
+                        <div class="balance-row">
+                            <span>Used</span>
+                            <span th:text="${user?.leaveBalance?.used} ?: '4'">4</span>
+                        </div>
+                        <div class="balance-row">
+                            <span>Remaining</span>
+                            <span class="text-warning" th:text="${user?.leaveBalance?.remaining} ?: '16'">16</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            loadDashboardData();
+            updateAttendanceDisplay();
+            initializeCalendar();
+            setupPunchButton();
+        });
+
+        async function loadDashboardData() {
+            try {
+                // Load user's projects for the active projects count
+                const userRole = /*[[${userRole}]]*/ 'employee';
+                const userId = /*[[${user?.id}]]*/ 1;
+
+                const projectsResult = await mockAPI.getProjects(userRole === 'employee' ? userId : null);
+                if (projectsResult.success) {
+                    updateActiveProjectsCount(projectsResult.data);
+                }
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        function updateActiveProjectsCount(projects) {
+            const activeProjects = projects.filter(p => p.status === 'In Progress' || p.status === 'Ongoing');
+            document.getElementById('activeProjectsCount').textContent = activeProjects.length;
+        }
+
+        function updateAttendanceDisplay() {
+            const user = /*[[${user}]]*/ null;
+            if (user && user.attendanceToday) {
+                const punchInElement = document.getElementById('punchInTime');
+                const punchOutElement = document.getElementById('punchOutTime');
+                const workingHoursElement = document.getElementById('todayWorkingHours');
+
+                if (user.attendanceToday.punchIn) {
+                    punchInElement.textContent = user.attendanceToday.punchIn;
+
+                    if (user.attendanceToday.punchOut) {
+                        punchOutElement.textContent = user.attendanceToday.punchOut;
+                        workingHoursElement.textContent = user.attendanceToday.workingHours;
+                    } else {
+                        punchOutElement.textContent = '00:00';
+                        // Update working hours in real-time
+                        updateWorkingHoursLive(user.attendanceToday.punchIn);
+                    }
+                }
+            }
+        }
+
+        function updateWorkingHoursLive(punchInTime) {
+            const workingHoursElement = document.getElementById('todayWorkingHours');
+
+            function updateTime() {
+                const now = new Date();
+                const punchIn = new Date();
+                const [hours, minutes] = punchInTime.split(':');
+                punchIn.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+                const diffMs = now - punchIn;
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+                workingHoursElement.textContent = `${diffHours}:-${diffMinutes.toString().padStart(2, '0')}:-${diffSeconds.toString().padStart(2, '0')}`;
+            }
+
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        function setupPunchButton() {
+            const punchBtn = document.getElementById('mainPunchBtn');
+            if (punchBtn) {
+                console.log('Punch button setup, current action:', punchBtn.dataset.action);
+
+                punchBtn.addEventListener('click', function () {
+                    const action = this.dataset.action;
+                    const employeeId = /*[[${user?.id}]]*/ 1;
+
+                    console.log('Punch button clicked, action:', action, 'employeeId:', employeeId);
+
+                    if (action === 'punch-in') {
+                        handlePunchIn(employeeId);
+                    } else {
+                        handlePunchOut(employeeId);
+                    }
+                });
+            } else {
+                console.error('Punch button not found!');
+            }
+        }
+
+        async function handlePunchIn(employeeId) {
+            try {
+                const result = await mockAPI.punchIn(employeeId);
+                if (result.success) {
+                    attendanceUtils.showNotification('Success', 'Punched in successfully!', 'success');
+
+                    // Update UI immediately without page reload
+                    updatePunchButton('punch-out');
+                    updateAttendanceDisplayAfterPunch(result.data);
+
+                    // Start live timer
+                    updateWorkingHoursLive(result.data.punchIn);
+                }
+            } catch (error) {
+                attendanceUtils.showNotification('Error', 'Failed to punch in', 'error');
+            }
+        }
+
+        async function handlePunchOut(employeeId) {
+            try {
+                const result = await mockAPI.punchOut(employeeId);
+                if (result.success) {
+                    attendanceUtils.showNotification('Success', 'Punched out successfully!', 'success');
+
+                    // Update UI immediately without page reload
+                    updatePunchButton('punch-in');
+                    updateAttendanceDisplayAfterPunch(result.data);
+                }
+            } catch (error) {
+                attendanceUtils.showNotification('Error', 'Failed to punch out', 'error');
+            }
+        }
+
+        function updateAttendanceDisplayAfterPunch(attendanceData) {
+            const punchInElement = document.getElementById('punchInTime');
+            const punchOutElement = document.getElementById('punchOutTime');
+            const workingHoursElement = document.getElementById('todayWorkingHours');
+
+            if (attendanceData.punchIn) {
+                punchInElement.textContent = attendanceData.punchIn;
+            }
+
+            if (attendanceData.punchOut) {
+                punchOutElement.textContent = attendanceData.punchOut;
+                workingHoursElement.textContent = attendanceData.workingHours;
+            } else {
+                punchOutElement.textContent = '00:00';
+            }
+        }
+
+        function updatePunchButton(action) {
+            const punchBtn = document.getElementById('mainPunchBtn');
+            if (action === 'punch-in') {
+                punchBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Punch In';
+                punchBtn.dataset.action = 'punch-in';
+            } else {
+                punchBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Punch Out';
+                punchBtn.dataset.action = 'punch-out';
+            }
+        }
+
+        function initializeCalendar() {
+            const currentDate = new Date();
+            let currentMonth = currentDate.getMonth();
+            let currentYear = currentDate.getFullYear();
+
+            // Sample events for demonstration
+            const sampleEvents = {
+                [`${currentYear}-${currentMonth + 1}-15`]: 'Meeting',
+                [`${currentYear}-${currentMonth + 1}-22`]: 'Project Deadline',
+                [`${currentYear}-${currentMonth + 1}-28`]: 'Team Review'
+            };
+
+            function renderCalendar() {
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+                const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+                document.getElementById('currentMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+                const calendarGrid = document.getElementById('calendarGrid');
+                calendarGrid.innerHTML = '';
+
+                // Add weekday headers
+                weekdays.forEach(day => {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-weekday';
+                    dayElement.textContent = day;
+                    calendarGrid.appendChild(dayElement);
+                });
+
+                // Get first day of month and number of days
+                const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+                // Add previous month's trailing days
+                for (let i = firstDay - 1; i >= 0; i--) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day other-month';
+                    dayElement.textContent = daysInPrevMonth - i;
+                    calendarGrid.appendChild(dayElement);
+                }
+
+                // Add current month's days
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = day;
+
+                    // Check for events
+                    const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
+                    if (sampleEvents[dateKey]) {
+                        dayElement.classList.add('has-event');
+                        dayElement.title = sampleEvents[dateKey];
+                    }
+
+                    // Highlight today
+                    if (currentYear === currentDate.getFullYear() &&
+                        currentMonth === currentDate.getMonth() &&
+                        day === currentDate.getDate()) {
+                        dayElement.classList.add('today');
+                    }
+
+                    // Add click event for day selection
+                    dayElement.addEventListener('click', () => {
+                        // Remove previous selection
+                        document.querySelectorAll('.calendar-day.selected').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+                        // Add selection to clicked day
+                        if (!dayElement.classList.contains('other-month')) {
+                            dayElement.classList.add('selected');
+                        }
+                    });
+
+                    calendarGrid.appendChild(dayElement);
+                }
+
+                // Add next month's leading days to fill the grid
+                const totalCells = calendarGrid.children.length - 7; // Subtract weekday headers
+                const remainingCells = Math.ceil(totalCells / 7) * 7 - totalCells;
+                for (let day = 1; day <= remainingCells && calendarGrid.children.length < 49; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day other-month';
+                    dayElement.textContent = day;
+                    calendarGrid.appendChild(dayElement);
+                }
+            }
+
+            // Simple calendar navigation
+            document.getElementById('simplePrevMonth').addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderSimpleCalendar();
+            });
+
+            document.getElementById('simpleNextMonth').addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                renderSimpleCalendar();
+            });
+
+            function renderSimpleCalendar() {
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+                const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+                document.getElementById('simpleCurrentMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+                const calendarGrid = document.getElementById('simpleCalendarGrid');
+                calendarGrid.innerHTML = '';
+
+                // Add weekday headers
+                weekdays.forEach(day => {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'simple-weekday';
+                    dayElement.textContent = day;
+                    calendarGrid.appendChild(dayElement);
+                });
+
+                // Get first day of month and number of days
+                const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+                // Add previous month's trailing days
+                for (let i = firstDay - 1; i >= 0; i--) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'simple-day other-month';
+                    dayElement.textContent = daysInPrevMonth - i;
+                    calendarGrid.appendChild(dayElement);
+                }
+
+                // Add current month's days
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'simple-day';
+                    dayElement.textContent = day;
+
+                    // Check for events
+                    const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
+                    const sampleEvents = {
+                        '2025-8-3': { type: 'orange', title: 'Project Meeting' },
+                        '2025-8-16': { type: 'blue', title: 'Team Review' },
+                        '2025-8-18': { type: 'blue', title: 'Client Call' },
+                        '2025-8-19': { type: 'orange', title: 'Deadline' },
+                        '2025-8-21': { type: 'yellow', title: 'Training' },
+                        '2025-8-26': { type: 'gray', title: 'Holiday' }
+                    };
+
+                    if (sampleEvents[dateKey]) {
+                        dayElement.classList.add('has-event', `event-${sampleEvents[dateKey].type}`);
+                        dayElement.title = sampleEvents[dateKey].title;
+                    }
+
+                    // Highlight today
+                    const currentDate = new Date();
+                    if (currentYear === currentDate.getFullYear() &&
+                        currentMonth === currentDate.getMonth() &&
+                        day === currentDate.getDate()) {
+                        dayElement.classList.add('today');
+                    }
+
+                    calendarGrid.appendChild(dayElement);
+                }
+
+                // Add next month's leading days to fill the grid
+                const totalCells = calendarGrid.children.length - 7; // Subtract weekday headers
+                const remainingCells = 42 - totalCells; // 6 rows × 7 days
+                for (let day = 1; day <= remainingCells; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'simple-day other-month';
+                    dayElement.textContent = day;
+                    calendarGrid.appendChild(dayElement);
+                }
+            }
+
+            // Initial render
+            renderSimpleCalendar();
+        }
+    </script>
+
+
+</body>
+
+</html>

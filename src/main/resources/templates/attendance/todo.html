@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}">
+    <title>To-Do List - UPFSDA</title>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
+    
+    <!-- Header -->
+    <header th:replace="~{fragments/layout :: header}"></header>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+            <div class="container-fluid">
+                <!-- Page Header -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="page-header">
+                            <h1 class="page-title">
+                                <i class="fas fa-tasks me-2"></i>
+                                To-Do List
+                            </h1>
+                            <p class="page-subtitle">Manage your daily tasks and stay organized</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Task Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Add New Task
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="addTaskForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="taskTitle" class="form-label">Task Title *</label>
+                                            <input type="text" class="form-control" id="taskTitle" placeholder="Enter task title" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="taskPriority" class="form-label">Priority</label>
+                                            <select class="form-select" id="taskPriority">
+                                                <option value="low">Low</option>
+                                                <option value="medium" selected>Medium</option>
+                                                <option value="high">High</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <label for="taskDescription" class="form-label">Description</label>
+                                            <textarea class="form-control" id="taskDescription" rows="3" placeholder="Enter task description (optional)"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="taskDueDate" class="form-label">Due Date</label>
+                                            <input type="date" class="form-control" id="taskDueDate">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="taskCategory" class="form-label">Category</label>
+                                            <select class="form-select" id="taskCategory">
+                                                <option value="work">Work</option>
+                                                <option value="personal">Personal</option>
+                                                <option value="urgent">Urgent</option>
+                                                <option value="meeting">Meeting</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>
+                                        Add Task
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Filters -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="btn-group" role="group" id="taskFilters">
+                                            <input type="radio" class="btn-check" name="taskFilter" id="filterAll" value="all" checked>
+                                            <label class="btn btn-outline-primary" for="filterAll">All Tasks</label>
+
+                                            <input type="radio" class="btn-check" name="taskFilter" id="filterPending" value="pending">
+                                            <label class="btn btn-outline-primary" for="filterPending">Pending</label>
+
+                                            <input type="radio" class="btn-check" name="taskFilter" id="filterCompleted" value="completed">
+                                            <label class="btn btn-outline-primary" for="filterCompleted">Completed</label>
+
+                                            <input type="radio" class="btn-check" name="taskFilter" id="filterOverdue" value="overdue">
+                                            <label class="btn btn-outline-danger" for="filterOverdue">Overdue</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <div class="input-group" style="max-width: 300px; margin-left: auto;">
+                                            <input type="text" class="form-control" id="taskSearch" placeholder="Search tasks...">
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-primary">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="totalTasks">0</h3>
+                                <p>Total Tasks</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-warning">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="pendingTasks">0</h3>
+                                <p>Pending</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-success">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="completedTasks">0</h3>
+                                <p>Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="overdueTasks">0</h3>
+                                <p>Overdue</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tasks List -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-list me-2"></i>
+                                    My Tasks
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="tasksList" class="tasks-container">
+                                    <!-- Tasks will be dynamically loaded here -->
+                                </div>
+                                <div id="noTasksMessage" class="text-center py-5" style="display: none;">
+                                    <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No tasks found</h5>
+                                    <p class="text-muted">Add your first task to get started!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </main>
+
+    <!-- Task Detail Modal -->
+    <div class="modal fade" id="taskDetailModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Task Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="taskDetailContent">
+                        <!-- Task details will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="deleteTaskBtn">
+                        <i class="fas fa-trash me-2"></i>Delete Task
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Common JS -->
+    <script th:src="@{/js/common.js}"></script>
+    <!-- Mock Data -->
+    <script th:src="@{/js/mock.js}"></script>
+    <!-- Todo JS -->
+    <script th:src="@{/js/todo.js}"></script>
+</body>
+</html>

@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head}">
+    <title>Team Management - UPFSDA Attendance System</title>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
+
+    <!-- Header -->
+    <header th:replace="~{fragments/layout :: header}"></header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="page-title">
+                        <i class="fas fa-users me-2"></i>Team Management
+                    </h2>
+                    <p class="page-subtitle text-muted">
+                        Manage team members, attendance, and performance
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                        <i class="fas fa-user-plus me-2"></i>Add Employee
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value" id="totalEmployees">0</div>
+                    <div class="stat-label">Total Employees</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-value" id="presentToday">0</div>
+                    <div class="stat-label">Present Today</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <div class="stat-value" id="onLeave">0</div>
+                    <div class="stat-label">On Leave</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value" id="avgWorkingHours">0h</div>
+                    <div class="stat-label">Avg Working Hours</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-content">
+                <div class="quick-actions">
+                    <button class="btn btn-success" onclick="exportAttendance()">
+                        <i class="fas fa-download me-2"></i>Export Attendance
+                    </button>
+                    <button class="btn btn-info" onclick="generateReport()">
+                        <i class="fas fa-chart-bar me-2"></i>Generate Report
+                    </button>
+                    <button class="btn btn-warning" onclick="sendReminders()">
+                        <i class="fas fa-bell me-2"></i>Send Reminders
+                    </button>
+                    <button class="btn btn-secondary" onclick="bulkActions()">
+                        <i class="fas fa-tasks me-2"></i>Bulk Actions
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-content">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <label for="departmentFilter" class="form-label">Filter by Department</label>
+                        <select id="departmentFilter" class="form-control">
+                            <option value="">All Departments</option>
+                            <option value="Design">Design</option>
+                            <option value="Development">Development</option>
+                            <option value="Management">Management</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="statusFilter" class="form-label">Filter by Status</label>
+                        <select id="statusFilter" class="form-control">
+                            <option value="">All Status</option>
+                            <option value="Working">Working</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Absent">Absent</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="searchEmployee" class="form-label">Search Employees</label>
+                        <input type="text" id="searchEmployee" class="form-control"
+                            placeholder="Search by name or role...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button class="btn btn-secondary" onclick="clearFilters()">
+                                <i class="fas fa-times me-2"></i>Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Members -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>Team Members
+                </h5>
+            </div>
+            <div class="card-content">
+                <div id="teamMembersList" class="team-members-container">
+                    <!-- Team members will be loaded here via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Employee Modal -->
+    <div class="modal fade" id="addEmployeeModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content bg-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Employee</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEmployeeForm" enctype="multipart/form-data">
+                        <!-- Personal Information Section -->
+                        <div class="form-section mb-4">
+                            <h6 class="section-title mb-3">
+                                <i class="fas fa-user me-2"></i>Personal Information
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="employeeName" class="form-label">Employee Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" id="employeeName" name="name" class="form-control" required>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="dateOfBirth" class="form-label">Date of Birth <span
+                                                class="text-danger">*</span></label>
+                                        <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-control"
+                                            required>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="identityCardNo" class="form-label">Identity Card No. <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" id="identityCardNo" name="identityCardNo"
+                                            class="form-control" required>
+                                        <div class="invalid-feedback"></div>
+                                        <small class="form-text text-muted">Must be unique</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="mobileNumber" class="form-label">Mobile Number</label>
+                                        <input type="tel" id="mobileNumber" name="mobileNumber" class="form-control">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="emailAddress" class="form-label">Email Address</label>
+                                        <input type="email" id="emailAddress" name="emailAddress" class="form-control">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="bloodGroup" class="form-label">Blood Group</label>
+                                        <select id="bloodGroup" name="bloodGroup" class="form-control">
+                                            <option value="">Select Blood Group</option>
+                                            <option value="A+">A+</option>
+                                            <option value="A-">A-</option>
+                                            <option value="B+">B+</option>
+                                            <option value="B-">B-</option>
+                                            <option value="AB+">AB+</option>
+                                            <option value="AB-">AB-</option>
+                                            <option value="O+">O+</option>
+                                            <option value="O-">O-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        <label for="address" class="form-label">Address <span
+                                                class="text-danger">*</span></label>
+                                        <textarea id="address" name="address" class="form-control" rows="3"
+                                            maxlength="1000" required></textarea>
+                                        <div class="invalid-feedback"></div>
+                                        <small class="form-text text-muted">Maximum 1000 characters</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="emergencyContactNo" class="form-label">Emergency Contact No.</label>
+                                        <input type="tel" id="emergencyContactNo" name="emergencyContactNo"
+                                            class="form-control">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="labName" class="form-label">Lab Name</label>
+                                        <input type="text" id="labName" name="labName" class="form-control">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="officeName" class="form-label">Office Name</label>
+                                        <input type="text" id="officeName" name="officeName" class="form-control">
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Assignment Section -->
+                        <div class="form-section mb-4">
+                            <h6 class="section-title mb-3">
+                                <i class="fas fa-map-marker-alt me-2"></i>Location Assignment
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="assignedLocation" class="form-label">Assigned Location/Role <span
+                                                class="text-danger">*</span></label>
+                                        <select id="assignedLocation" name="assignedLocation" class="form-control"
+                                            required>
+                                            <option value="">Select Role</option>
+                                            <option value="Sampler">Sampler</option>
+                                            <option value="Analyst">Analyst</option>
+                                            <option value="Officer">Officer</option>
+                                            <option value="Field Scientist">Field Scientist</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="district" class="form-label">District <span
+                                                class="text-danger">*</span></label>
+                                        <select id="district" name="district" class="form-control" required>
+                                            <option value="">Select District</option>
+                                            <!-- Options will be populated via JavaScript -->
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="tehsil" class="form-label">Tehsil <span
+                                                class="text-danger">*</span></label>
+                                        <select id="tehsil" name="tehsil" class="form-control" required disabled>
+                                            <option value="">Select Tehsil</option>
+                                            <!-- Options will be populated based on district selection -->
+                                        </select>
+                                        <div class="invalid-feedback"></div>
+                                        <small class="form-text text-muted">Select district first</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- File Upload Section -->
+                        <div class="form-section mb-4">
+                            <h6 class="section-title mb-3">
+                                <i class="fas fa-upload me-2"></i>File Uploads
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="uploadFacePhoto" class="form-label">Upload Face Photo <span
+                                                class="text-danger">*</span></label>
+                                        <input type="file" id="uploadFacePhoto" name="uploadFacePhoto"
+                                            class="form-control" accept="image/jpeg,image/png" required>
+                                        <div class="invalid-feedback"></div>
+                                        <small class="form-text text-muted">Accepted formats: JPEG, PNG (Max:
+                                            5MB)</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="uploadSignature" class="form-label">Upload Signature <span
+                                                class="text-danger">*</span></label>
+                                        <input type="file" id="uploadSignature" name="uploadSignature"
+                                            class="form-control" accept="image/jpeg,image/png" required>
+                                        <div class="invalid-feedback"></div>
+                                        <small class="form-text text-muted">Accepted formats: JPEG, PNG (Max:
+                                            5MB)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addEmployee()">
+                        <i class="fas fa-user-plus me-2"></i>Add Employee
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Details Modal -->
+    <div class="modal fade" id="employeeDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content bg-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title">Employee Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="employeeDetailsContent">
+                    <!-- Employee details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+
+    <script>
+        let allEmployees = [];
+        let filteredEmployees = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadTeamMembers();
+            setupEventListeners();
+        });
+
+        async function loadTeamMembers() {
+            try {
+                const result = await mockAPI.getEmployees();
+                if (result.success) {
+                    allEmployees = result.data;
+                    filteredEmployees = [...allEmployees];
+                    displayTeamMembers(filteredEmployees);
+                    updateTeamStats(allEmployees);
+                }
+            } catch (error) {
+                console.error('Error loading team members:', error);
+                attendanceUtils.showNotification('Error', 'Failed to load team members', 'error');
+            }
+        }
+
+        function displayTeamMembers(employees) {
+            const container = document.getElementById('teamMembersList');
+
+            if (!employees || employees.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center py-4">No team members found.</p>';
+                return;
+            }
+
+            const employeesHtml = employees.map(employee => `
+                <div class="team-member-card card mb-3">
+                    <div class="card-content">
+                        <div class="member-header">
+                            <div class="member-basic-info">
+                                <img src="${employee.profileImage}" alt="${employee.name}" class="member-avatar">
+                                <div class="member-details">
+                                    <div class="member-name">${employee.name}</div>
+                                    <div class="member-role">${employee.role}</div>
+                                    <div class="member-department">${employee.department}</div>
+                                </div>
+                            </div>
+                            <div class="member-status">
+                                <div class="status-indicator ${employee.isOnline ? 'online' : 'offline'}"></div>
+                                <span class="status-text">${employee.isOnline ? 'Online' : 'Offline'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="member-attendance">
+                            <div class="attendance-item">
+                                <i class="fas fa-clock me-2"></i>
+                                <span>Punch In: ${employee.attendanceToday.punchIn ? attendanceUtils.formatTime(employee.attendanceToday.punchIn) : 'Not punched in'}</span>
+                            </div>
+                            <div class="attendance-item">
+                                <i class="fas fa-hourglass-half me-2"></i>
+                                <span>Working Hours: ${employee.attendanceToday.workingHours}</span>
+                            </div>
+                            <div class="attendance-item">
+                                <i class="fas fa-briefcase me-2"></i>
+                                <span>Work Mode: ${employee.workMode}</span>
+                            </div>
+                            <div class="attendance-item">
+                                <span class="badge ${attendanceUtils.getStatusBadgeClass(employee.attendanceToday.status)}">${employee.attendanceToday.status}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="member-projects">
+                            <h6>Active Projects (${employee.projects.length})</h6>
+                            <div class="projects-list">
+                                ${employee.projects.slice(0, 2).map(project => `
+                                    <div class="project-item">
+                                        <span class="project-name">${project.name}</span>
+                                        <div class="progress">
+                                            <div class="progress-bar ${attendanceUtils.getProgressBarClass(project.progress)}" 
+                                                 style="width: ${project.progress}%"></div>
+                                        </div>
+                                        <span class="project-progress">${project.progress}%</span>
+                                    </div>
+                                `).join('')}
+                                ${employee.projects.length > 2 ? `<small class="text-muted">+${employee.projects.length - 2} more projects</small>` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="member-actions">
+                            <button class="btn btn-sm btn-primary" onclick="viewEmployeeDetails(${employee.id})">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="editEmployee(${employee.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="sendMessage(${employee.id})">
+                                <i class="fas fa-envelope"></i> Message
+                            </button>
+                            <div class="dropdown d-inline">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="viewAttendanceHistory(${employee.id})">
+                                        <i class="fas fa-history me-2"></i>Attendance History
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="manageLeave(${employee.id})">
+                                        <i class="fas fa-calendar-alt me-2"></i>Manage Leave
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="deactivateEmployee(${employee.id})">
+                                        <i class="fas fa-user-slash me-2"></i>Deactivate
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = employeesHtml;
+        }
+
+        function updateTeamStats(employees) {
+            const totalEmployees = employees.length;
+            const presentToday = employees.filter(emp => emp.attendanceToday.punchIn).length;
+            const onLeave = 0; // This would come from leave requests
+
+            // Calculate average working hours
+            const totalMinutes = employees.reduce((total, emp) => {
+                if (emp.attendanceToday.workingHours) {
+                    const [hours, minutes, seconds] = emp.attendanceToday.workingHours.split(':').map(Number);
+                    return total + (hours * 60) + minutes;
+                }
+                return total;
+            }, 0);
+            const avgHours = Math.floor(totalMinutes / employees.length / 60);
+
+            document.getElementById('totalEmployees').textContent = totalEmployees;
+            document.getElementById('presentToday').textContent = presentToday;
+            document.getElementById('onLeave').textContent = onLeave;
+            document.getElementById('avgWorkingHours').textContent = avgHours + 'h';
+        }
+
+        function setupEventListeners() {
+            document.getElementById('departmentFilter').addEventListener('change', applyFilters);
+            document.getElementById('statusFilter').addEventListener('change', applyFilters);
+            document.getElementById('searchEmployee').addEventListener('input', attendanceUtils.debounce(applyFilters, 300));
+
+            // Setup employee modal event listeners
+            setupEmployeeModalListeners();
+        }
+
+        function setupEmployeeModalListeners() {
+            // Load districts when modal is shown
+            document.getElementById('addEmployeeModal').addEventListener('shown.bs.modal', function () {
+                loadDistricts();
+            });
+
+            // Setup district change listener
+            document.getElementById('district').addEventListener('change', function () {
+                const selectedDistrict = this.value;
+                loadTehsils(selectedDistrict);
+            });
+
+            // Setup form validation
+            const form = document.getElementById('addEmployeeForm');
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                addEmployee();
+            });
+
+            // Setup identity card validation
+            document.getElementById('identityCardNo').addEventListener('blur', function () {
+                validateIdentityCard(this.value);
+            });
+
+            // Setup file validation
+            document.getElementById('uploadFacePhoto').addEventListener('change', function () {
+                validateFile(this, 'Face Photo');
+            });
+
+            document.getElementById('uploadSignature').addEventListener('change', function () {
+                validateFile(this, 'Signature');
+            });
+        }
+
+        async function loadDistricts() {
+            try {
+                const response = await fetch('/api/data/districts');
+
+                if (response.ok) {
+                    const districts = await response.json();
+                    const districtSelect = document.getElementById('district');
+
+                    // Clear existing options except the first one
+                    districtSelect.innerHTML = '<option value="">Select District</option>';
+
+                    // Add district options
+                    districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = district;
+                        districtSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Failed to load districts');
+                    showError('Failed to load districts');
+                }
+            } catch (error) {
+                console.error('Error loading districts:', error);
+                showError('Error loading districts');
+            }
+        }
+
+        async function loadTehsils(district) {
+            const tehsilSelect = document.getElementById('tehsil');
+
+            if (!district) {
+                // Clear and disable tehsil dropdown
+                tehsilSelect.innerHTML = '<option value="">Select Tehsil</option>';
+                tehsilSelect.disabled = true;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/data/tehsils?district=${encodeURIComponent(district)}`);
+                if (response.ok) {
+                    const tehsils = await response.json();
+
+                    // Clear existing options
+                    tehsilSelect.innerHTML = '<option value="">Select Tehsil</option>';
+
+                    // Add tehsil options
+                    tehsils.forEach(tehsil => {
+                        const option = document.createElement('option');
+                        option.value = tehsil;
+                        option.textContent = tehsil;
+                        tehsilSelect.appendChild(option);
+                    });
+
+                    // Enable the dropdown
+                    tehsilSelect.disabled = false;
+                } else {
+                    console.error('Failed to load tehsils');
+                    showError('Failed to load tehsils for selected district');
+                }
+            } catch (error) {
+                console.error('Error loading tehsils:', error);
+                showError('Error loading tehsils');
+            }
+        }
+
+        // IDENTITY CARD KE LIYE FALLBACK CHECK H BUS
+        async function validateIdentityCard(identityCardNo) {
+            if (!identityCardNo || identityCardNo.trim() === '') {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/data/employees/check-identity/${encodeURIComponent(identityCardNo)}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    const input = document.getElementById('identityCardNo');
+                    const feedback = input.nextElementSibling;
+
+                    if (!result.unique) {
+                        input.classList.add('is-invalid');
+                        feedback.textContent = 'Identity card number already exists';
+                    } else {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                        feedback.textContent = '';
+                    }
+                }
+            } catch (error) {
+                console.error('Error validating identity card:', error);
+            }
+        }
+
+        // COMMON FUCNTION FOR FILE VALIDATION
+        function validateFile(input, fileType) {
+            const file = input.files[0];
+            const feedback = input.nextElementSibling;
+
+            if (!file) {
+                return;
+            }
+
+            // Check file size (50MB limit)
+            if (file.size > 50 * 1024 * 1024) {
+                input.classList.add('is-invalid');
+                feedback.textContent = `${fileType} size cannot exceed 50MB`;
+                input.value = '';
+                return;
+            }
+
+            // Check file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                input.classList.add('is-invalid');
+                feedback.textContent = `${fileType} must be a JPEG or PNG image`;
+                input.value = '';
+                return;
+            }
+
+            // File is valid
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+            feedback.textContent = '';
+        }
+
+        // FORM VLAIUDATION YE H
+        function validateForm() {
+            const form = document.getElementById('addEmployeeForm');
+            const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    input.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                }
+            });
+
+            // Validate date format (HTML5 date input returns YYYY-MM-DD format)
+            const dateInput = document.getElementById('dateOfBirth');
+            const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+            if (dateInput.value && !datePattern.test(dateInput.value)) {
+                dateInput.classList.add('is-invalid');
+                dateInput.nextElementSibling.textContent = 'Please select a valid date';
+                isValid = false;
+            } else if (dateInput.value) {
+                dateInput.classList.remove('is-invalid');
+                dateInput.classList.add('is-valid');
+            }
+
+            return isValid;
+        }
+
+        function showError(message) {
+            if (typeof attendanceUtils !== 'undefined' && attendanceUtils.showNotification) {
+                attendanceUtils.showNotification('Error', message, 'error');
+            } else {
+                alert(message);
+            }
+        }
+
+        function showSuccess(message) {
+            if (typeof attendanceUtils !== 'undefined' && attendanceUtils.showNotification) {
+                attendanceUtils.showNotification('Success', message, 'success');
+            } else {
+                alert(message);
+            }
+        }
+
+        function applyFilters() {
+            const departmentFilter = document.getElementById('departmentFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const searchTerm = document.getElementById('searchEmployee').value.toLowerCase();
+
+            filteredEmployees = allEmployees.filter(employee => {
+                const matchesDepartment = !departmentFilter || employee.department === departmentFilter;
+                const matchesStatus = !statusFilter || employee.attendanceToday.status === statusFilter;
+                const matchesSearch = !searchTerm ||
+                    employee.name.toLowerCase().includes(searchTerm) ||
+                    employee.role.toLowerCase().includes(searchTerm);
+
+                return matchesDepartment && matchesStatus && matchesSearch;
+            });
+
+            displayTeamMembers(filteredEmployees);
+        }
+
+        function clearFilters() {
+            document.getElementById('departmentFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('searchEmployee').value = '';
+
+            filteredEmployees = [...allEmployees];
+            displayTeamMembers(filteredEmployees);
+        }
+
+        //----------------------------------------THIS IS THE FUNCTION TO ADD A NEW EMPLOYEE ---------------
+        async function addEmployee() {
+            const form = document.getElementById('addEmployeeForm');
+
+            // Validate form
+            if (!validateForm()) {
+                showError('Please fill in all required fields correctly');
+                return;
+            }
+
+            // Create FormData for multipart submission
+            const formData = new FormData(form);
+
+            try {
+                // Show loading state
+                const submitButton = document.querySelector('#addEmployeeModal .btn-primary');
+                const originalText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Employee...';
+                submitButton.disabled = true;
+
+                const response = await fetch('/api/data/employees', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showSuccess('Employee created successfully!');
+
+                    // Close modal and reset form
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addEmployeeModal'));
+                    modal.hide();
+                    form.reset();
+
+                    // Clear validation classes
+                    form.querySelectorAll('.is-valid, .is-invalid').forEach(el => {
+                        el.classList.remove('is-valid', 'is-invalid');
+                    });
+
+                    // Reload team members to show the new employee
+                    loadTeamMembers();
+
+                } else {
+                    // Handle validation errors
+                    if (result.errors && Array.isArray(result.errors)) {
+                        result.errors.forEach(error => {
+                            const field = document.querySelector(`[name="${error.field}"]`);
+                            if (field) {
+                                field.classList.add('is-invalid');
+                                const feedback = field.nextElementSibling;
+                                if (feedback && feedback.classList.contains('invalid-feedback')) {
+                                    feedback.textContent = error.message;
+                                }
+                            }
+                        });
+                    }
+
+                    showError(result.message || 'Failed to create employee');
+                }
+
+            } catch (error) {
+                console.error('Error creating employee:', error);
+                showError('An error occurred while creating the employee');
+
+            } finally {
+                // Restore button state
+                const submitButton = document.querySelector('#addEmployeeModal .btn-primary');
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            }
+        }
+
+        function viewEmployeeDetails(employeeId) {
+            const employee = allEmployees.find(emp => emp.id === employeeId);
+            if (!employee) return;
+
+            const detailsHtml = `
+                <div class="employee-details">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="employee-profile text-center">
+                                <img src="${employee.profileImage}" alt="${employee.name}" class="profile-image">
+                                <h4 class="mt-3">${employee.name}</h4>
+                                <p class="text-muted">${employee.role}</p>
+                                <div class="status-badge">
+                                    <div class="status-indicator ${employee.isOnline ? 'online' : 'offline'}"></div>
+                                    <span>${employee.isOnline ? 'Online' : 'Offline'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="employee-info">
+                                <h5>Contact Information</h5>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <strong>Email:</strong> ${employee.email}
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Phone:</strong> ${employee.phone}
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Department:</strong> ${employee.department}
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>Work Mode:</strong> ${employee.workMode}
+                                    </div>
+                                </div>
+                                
+                                <h5 class="mt-4">Today's Attendance</h5>
+                                <div class="attendance-details">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="attendance-stat">
+                                                <i class="fas fa-clock"></i>
+                                                <div>
+                                                    <div class="stat-label">Punch In</div>
+                                                    <div class="stat-value">${employee.attendanceToday.punchIn ? attendanceUtils.formatTime(employee.attendanceToday.punchIn) : 'Not punched in'}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="attendance-stat">
+                                                <i class="fas fa-hourglass-half"></i>
+                                                <div>
+                                                    <div class="stat-label">Working Hours</div>
+                                                    <div class="stat-value">${employee.attendanceToday.workingHours}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h5 class="mt-4">Leave Balance</h5>
+                                <div class="leave-balance">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="balance-item">
+                                                <div class="balance-value">${employee.leaveBalance.remaining}</div>
+                                                <div class="balance-label">Remaining</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="balance-item">
+                                                <div class="balance-value">${employee.leaveBalance.used}</div>
+                                                <div class="balance-label">Used</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="balance-item">
+                                                <div class="balance-value">${employee.leaveBalance.total}</div>
+                                                <div class="balance-label">Total</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('employeeDetailsContent').innerHTML = detailsHtml;
+            const modal = new bootstrap.Modal(document.getElementById('employeeDetailsModal'));
+            modal.show();
+        }
+
+        function editEmployee(employeeId) {
+            attendanceUtils.showNotification('Info', `Editing employee ${employeeId}`, 'info');
+        }
+
+        function sendMessage(employeeId) {
+            attendanceUtils.showNotification('Info', `Sending message to employee ${employeeId}`, 'info');
+        }
+
+        function viewAttendanceHistory(employeeId) {
+            attendanceUtils.showNotification('Info', `Viewing attendance history for employee ${employeeId}`, 'info');
+        }
+
+        function manageLeave(employeeId) {
+            attendanceUtils.showNotification('Info', `Managing leave for employee ${employeeId}`, 'info');
+        }
+
+        function deactivateEmployee(employeeId) {
+            if (confirm('Are you sure you want to deactivate this employee?')) {
+                attendanceUtils.showNotification('Success', 'Employee deactivated successfully!', 'success');
+            }
+        }
+
+        function exportAttendance() {
+            attendanceUtils.showNotification('Success', 'Attendance report exported successfully!', 'success');
+        }
+
+        function generateReport() {
+            attendanceUtils.showNotification('Info', 'Generating team performance report...', 'info');
+        }
+
+        function sendReminders() {
+            attendanceUtils.showNotification('Success', 'Attendance reminders sent to all team members!', 'success');
+        }
+
+        function bulkActions() {
+            attendanceUtils.showNotification('Info', 'Bulk actions panel opened', 'info');
+        }
+    </script>
+
+    <style>
+        .team-members-container {
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .team-member-card {
+            background-color: var(--tertiary-black);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .team-member-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .member-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .member-basic-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .member-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .member-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .member-role {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .member-department {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .member-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .status-indicator.online {
+            background-color: var(--success-color);
+        }
+
+        .status-indicator.offline {
+            background-color: var(--text-muted);
+        }
+
+        .status-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .member-attendance {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: var(--secondary-black);
+            border-radius: 8px;
+        }
+
+        .attendance-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .member-projects {
+            margin-bottom: 1rem;
+        }
+
+        .member-projects h6 {
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .projects-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .project-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem;
+            background-color: var(--secondary-black);
+            border-radius: 6px;
+        }
+
+        .project-name {
+            flex: 1;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .project-item .progress {
+            flex: 1;
+            height: 6px;
+        }
+
+        .project-progress {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            min-width: 35px;
+            text-align: right;
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .employee-details .profile-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-orange);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .attendance-details {
+            background-color: var(--tertiary-black);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .attendance-stat {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .attendance-stat i {
+            font-size: 1.5rem;
+            color: var(--primary-orange);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .leave-balance {
+            background-color: var(--tertiary-black);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .balance-item {
+            text-align: center;
+        }
+
+        .balance-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-orange);
+        }
+
+        .balance-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            .member-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .member-attendance {
+                grid-template-columns: 1fr;
+            }
+
+            .member-actions {
+                justify-content: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+
+</html>

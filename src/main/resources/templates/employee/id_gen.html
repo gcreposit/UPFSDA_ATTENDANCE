@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>UPFSDA ID Card Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+</head>
+<body class="bg-gray-100 p-6 font-sans">
+
+<!-- 📝 FORM Section -->
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow mb-6">
+    <h2 class="text-2xl font-bold mb-4">FSDA ID Card Form</h2>
+    <div class="space-y-4">
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="name">Name:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="name" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="id">Identity Card No:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="id" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="designation">Designation:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="designation" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="dob">Date of Birth:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="dob" type="date"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="mobile">Mobile Number:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="mobile" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="blood">Blood Group:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="blood" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="office">Office Address:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="office" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="office">District:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="district" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="office">Lab Name:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="labName" type="text"/>
+        </div>
+
+
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="office">Office</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="officeName" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="office">Tehsil</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="tehsil" type="text"/>
+        </div>
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="office">Assigned Location</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="assignedLocation" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="office">Email Address:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="email" type="email"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="permanent">Permanent Address:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="permanent" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="office">Emergency Contact:</label>
+            <input class="w-full md:w-3/4 border p-2 rounded" id="emergencyNumber" type="text"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="photo">Upload Photo:</label>
+            <input accept="image/*" class="w-full md:w-3/4 border p-2 rounded" id="photo" type="file"/>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center">
+            <label class="w-full md:w-1/4 font-medium" for="signature">Cardholder Signature:</label>
+            <input accept="image/*" class="w-full md:w-3/4 border p-2 rounded" id="signature" type="file"/>
+        </div>
+
+        <!--Commented for now as this will now update from backend-->
+
+        <!--        <div class="flex flex-col md:flex-row items-center">-->
+        <!--            <label class="w-full md:w-1/4 font-medium" for="commissioner">Commissioner Signature:</label>-->
+        <!--            <input accept="image/*" class="w-full md:w-3/4 border p-2 rounded" id="commissioner" type="file"/>-->
+        <!--        </div>-->
+
+        <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onclick="generateIDCard()">
+            Generate ID Card
+        </button>
+    </div>
+</div>
+
+<!-- 🎫 ID CARD Preview -->
+<div class="flex flex-col md:flex-row justify-center gap-6 mt-6">
+
+    <!-- FRONT SIDE -->
+    <div class="w-[600px] h-[350px] bg-white border rounded-xl shadow px-6 py-3 text-[13px]" id="id-card-front">
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-1">
+            <img class="w-12 h-12" src="/image/upgov_logo.png">
+            <div class="text-center leading-tight">
+                <!--                <h2 class="text-red-600 font-bold text-[15px] uppercase">OFFICE OF COMMISSIONER</h2>-->
+                <h2 class="text-red-500 font-bold text-[16px]">FOOD SAFETY & DRUG ADMINISTRATION, U.P. GOVT.</h2>
+            </div>
+            <img class="w-12 h-12" src="/image/upfsda_logo.png">
+        </div>
+
+        <!-- Body -->
+        <div class="flex mt-2">
+            <!-- Photo -->
+            <div class="w-1/4 flex items-center justify-center bg-gray-100">
+                <img class="w-100 h-100 border object-cover" id="preview-photo" src="/image/default_user.png"/>
+            </div>
+
+            <!-- Details -->
+            <div class="w-3/4 pl-4 text-[13px]">
+                <div><span class="font-bold text-blue-700">Identity Card No:</span> <span id="card-id"></span></div>
+                <div><span class="font-bold text-blue-700">Name:</span> <span id="card-name"></span></div>
+                <div><span class="font-bold text-blue-700">Designation:</span> <span id="card-designation"></span></div>
+                <div><span class="font-bold text-blue-700">Date of Birth:</span> <span id="card-dob"></span></div>
+                <div><span class="font-bold text-blue-700">Office Address:</span> <span id="card-office"></span></div>
+                <div><span class="font-bold text-blue-700">Mobile No:</span> <span id="card-mobile"></span></div>
+                <div><span class="font-bold text-blue-700">Blood Group:</span> <span id="card-blood"></span></div>
+                <div><span class="font-bold text-blue-700">Permanent Address:</span> <span id="card-home"></span></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-between items-end mt-2 pt-2 border-t">
+            <div class="text-[12px] text-center">
+                <img alt="Cardholder Signature" class="h-12 mx-auto" id="signature-img"
+                     src="/image/default_sign.png">
+                <div class="font-medium">Signature of Employee</div>
+                <div id="issue_date">Date of Issue: 26 Oct 2024</div>
+            </div>
+            <div class="text-[12px] text-center">
+                <img alt="Commissioner Signature" class="h-12 mx-auto" id="commissioner-img" src="/image/commissioner_sign.png">
+                <div class="font-medium" style="color: red;">Issuing Authority</div>
+                <div class="font-bold" style="color: red;">PRINCIPAL SECRETARY</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BACK SIDE -->
+    <div class="w-[600px] h-[350px] bg-white border rounded-xl shadow px-6 py-3 text-[13px] flex flex-col items-center justify-between "
+         id="id-card-back">
+
+        <div class="flex justify-between gap-x-8">
+            <div>
+                <span class="font-bold text-blue-700">Email Address:</span>
+                <span id="card-email"></span>
+            </div>
+            <div>
+                <span class="font-bold text-blue-700">Emergency Contact:</span>
+                <span id="card-emergencyNumber"></span>
+            </div>
+        </div>
+
+        <!-- Darker horizontal line after Permanent Address -->
+        <hr class="my-2 w-full border-t-2 border-gray-800">
+
+        <div class="text-sm w-full">
+            <div class="font-bold text-red-600 mb-1 text-xl text-center">आवश्यक निर्देश:</div>
+
+            <div class="grid grid-cols-3 gap-4 items-start">
+                <!-- Instructions (left, span 2 columns) -->
+                <div class="col-span-2 text-sm text-black space-y-2">
+                    <div class="flex items-start gap-1">
+                        <span class="font-semibold">1.</span>
+                        <span class="text-justify">यह कार्ड अपरिवर्तनीय है एवं माँगने पर दिखाया जाये।</span>
+                    </div>
+                    <div class="flex items-start gap-1">
+                        <span class="font-semibold">2.</span>
+                        <span class="text-justify">इसका प्रयोग केवल अधिकृत धारक ही कर सकता है।</span>
+                    </div>
+                    <div class="flex items-start gap-1">
+                        <span class="font-semibold">3.</span>
+                        <span class="text-justify">स्थानांतरण, सेवानिर्वृत्त अथवा मान्य अवधि समाप्त होने पर कार्यालय को वापस करना अनिवार्य है।</span>
+                    </div>
+                    <div class="flex items-start gap-1">
+                        <span class="font-semibold">4.</span>
+                        <span class="text-justify">इसके खोने अथवा नष्ट होने की सूचना निकटतम थाने के साथ-साथ निम्न पते पर दें।</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <img id="qr-code" src="/image/no_image.jpg" class="w-32 h-32 border border-gray-300" alt="QR Code"/>
+                </div>
+
+            </div>
+
+            <!-- Horizontal line -->
+            <hr class="my-2 w-full border-t-2 border-gray-800">
+        </div>
+
+        <div>
+            <div class="text-center font-semibold text-red-600 text-xl whitespace-nowrap">
+                FOOD SAFETY & DRUG ADMINISTRATION, U.P.
+            </div>
+            <div class="text-center text-blue-800 font-semibold text-sm">
+                Behind Nehru Vatika Sector-C, Aliganj, Lucknow. Phone: 0522-2320342
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- 🖨️ Download Buttons -->
+<div class="text-center mt-8 flex justify-center gap-4">
+    <button class="bg-green-600 text-white px-4 py-2 rounded"
+            onclick="downloadCard('id-card-front', 'fsda_id_front.png')">
+        Download Front as PNG
+    </button>
+    <button class="bg-green-600 text-white px-4 py-2 rounded"
+            onclick="downloadCard('id-card-back', 'fsda_id_back.png')">
+        Download Back as PNG
+    </button>
+    <button class="bg-red-600 text-white px-4 py-2 rounded" onclick="downloadPDF()">
+        Download PDF (Front + Back)
+    </button>
+
+    <a href="/generatedIdCards" class="bg-blue-600 text-white px-4 py-2 rounded">View Generated ID Cards</a>
+</div>
+
+<!-- 📜 Script -->
+<script>
+
+    let cropper;
+    let imageFileToCrop;
+    let croppedPhotoDataURL = null; // ✅ GLOBAL scope
+
+    document.getElementById("photo").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            imageFileToCrop = file;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.getElementById("cropper-image");
+                img.src = e.target.result;
+                document.getElementById("cropper-modal").classList.remove("hidden");
+
+                // Wait for image to load into DOM before initializing Cropper
+                img.onload = () => {
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(img, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        autoCropArea: 1,
+                        movable: false,
+                        scalable: false,
+                        zoomable: false,
+                    });
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function cropAndSetImage() {
+        const canvas = cropper.getCroppedCanvas({
+            width: 240,
+            height: 300,
+        });
+        const dataURL = canvas.toDataURL("image/png");
+
+        document.getElementById("preview-photo").src = dataURL;
+        document.getElementById("cropper-modal").classList.add("hidden");
+
+        // Save to memory to use in sendToBackend()
+        croppedPhotoDataURL = dataURL;
+    }
+
+    function closeCropperModal() {
+        document.getElementById("cropper-modal").classList.add("hidden");
+        if (cropper) cropper.destroy();
+    }
+
+    // Function to check if the ID card number already exists by calling the backend API
+    async function checkIfIdExists(id) {
+        try {
+            const response = await fetch(`/api/check-idcard/${id}`);
+            if (!response.ok) {
+                throw new Error('Failed to check ID');
+            }
+
+            const data = await response.json();
+            return data.exists;  // Return true if the ID exists, false otherwise
+        } catch (error) {
+            console.error('Error:', error);
+            return false;  // In case of error, assume the ID doesn't exist
+        }
+    }
+
+    async function validateForm() {
+        const name = document.getElementById("name").value;
+        const id = document.getElementById("id").value;
+        const designation = document.getElementById("designation").value;
+        const dob = document.getElementById("dob").value;
+        const mobile = document.getElementById("mobile").value;
+        const blood = document.getElementById("blood").value;
+        const office = document.getElementById("office").value;
+        const email = document.getElementById("email").value;
+        const emergencyNumber = document.getElementById("emergencyNumber").value;
+        const permanent = document.getElementById("permanent").value;
+
+        // Validate text fields
+        if (!name || !id || !designation || !dob || !mobile || !blood || !office || !permanent || !email || !emergencyNumber) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please fill in all the required fields!',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+
+        // Check if the ID already exists
+        const idExists = await checkIfIdExists(id);
+        if (idExists) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: `The ID card number ${id} already exists. Please choose a different one.`,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+
+        // Validate mobile number format (10 digits)
+        const mobilePattern = /^[0-9]{10}$/;
+        if (!mobile.match(mobilePattern)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please enter a valid 10-digit mobile number.',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+
+        // Validate blood group format (A+, A-, B+, B-, AB+, AB-, O+, O-)
+        const bloodPattern = /^(A|B|AB|O)[+-]$/i;
+
+        if (!blood.match(bloodPattern)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please enter a valid blood group (e.g., A+, B-, AB+, O-).',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+
+        if (!croppedPhotoDataURL) {
+            const photo = document.getElementById("photo").files[0];
+            if (photo) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("preview-photo").src = e.target.result;
+                };
+                reader.readAsDataURL(photo);
+            }
+        } else {
+            // Already cropped, use it
+            document.getElementById("preview-photo").src = croppedPhotoDataURL;
+        }
+
+        const signature = document.getElementById("signature").files[0];
+        // const commissioner = document.getElementById("commissioner").files[0];
+
+        const photo = document.getElementById("photo").files[0];
+
+        if (!photo || !signature) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please upload all required images (Photo, Signature).',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+
+        return true;
+    }
+
+    async function generateIDCard() {
+        if (!await validateForm()) return;
+
+        // 1. Fill in the visible card fields
+        document.getElementById("card-id").textContent = document.getElementById("id").value;
+        document.getElementById("card-name").textContent = document.getElementById("name").value;
+        document.getElementById("card-designation").textContent = document.getElementById("designation").value;
+        document.getElementById("card-dob").textContent = document.getElementById("dob").value;
+        document.getElementById("card-mobile").textContent = document.getElementById("mobile").value;
+        document.getElementById("card-blood").textContent = document.getElementById("blood").value;
+        document.getElementById("card-office").textContent = document.getElementById("office").value;
+        document.getElementById("card-home").textContent = document.getElementById("permanent").value;
+        document.getElementById("card-email").textContent = document.getElementById("email").value;
+        document.getElementById("card-emergencyNumber").textContent = document.getElementById("emergencyNumber").value;
+
+        const today = new Date();
+        const options = { day: '2-digit', month: 'short', year: 'numeric' };
+        const formattedDate = today.toLocaleDateString('en-GB', options).replace(/ /g, ' ');
+        document.getElementById("issue_date").textContent = `Date of Issue: ${formattedDate}`;
+
+        // 2. Load photo & signature
+        if (croppedPhotoDataURL) {
+            document.getElementById("preview-photo").src = croppedPhotoDataURL;
+        }
+
+        const signature = document.getElementById("signature").files[0];
+        if (signature) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("signature-img").src = e.target.result;
+            };
+            reader.readAsDataURL(signature);
+        }
+
+        // 3. Generate QR code via backend
+        const result = await sendBasicCardData(); // ONLY sends text data; no front/back images yet
+
+        if (!result?.qrCodeFilename) {
+            Swal.fire("Error", "Failed to generate QR code", "error");
+            return;
+        }
+
+        const qrUrl = `/api/qr/${result.qrCodeFilename}`;
+        const qrImg = document.getElementById("qr-code");
+        qrImg.src = qrUrl;
+
+        // 4. Wait for QR image to load into DOM
+        await new Promise((resolve, reject) => {
+            qrImg.onload = () => resolve();
+            qrImg.onerror = () => reject("QR image failed to load");
+        });
+
+        // ✅ QR is now visible in DOM – capture front and back images
+        const frontCanvas = await html2canvas(document.getElementById("id-card-front"), { scale: 3 });
+        const backCanvas = await html2canvas(document.getElementById("id-card-back"), { scale: 3 });
+
+        const frontBase64 = frontCanvas.toDataURL("image/png");
+        const backBase64 = backCanvas.toDataURL("image/png");
+
+        // 5. Now send front/back images to backend to be saved
+        const finalResult = await sendImagesToBackend(result.cardId, frontBase64, backBase64);
+
+        if (finalResult?.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'ID card has been saved with QR.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+        } else {
+            Swal.fire("Error", "Failed to save card images", "error");
+        }
+    }
+
+    async function sendBasicCardData() {
+        const formData = {
+            idCard: document.getElementById("id").value,
+            name: document.getElementById("name").value,
+            designation: document.getElementById("designation").value,
+            dob: document.getElementById("dob").value,
+            mobile: document.getElementById("mobile").value,
+            blood: document.getElementById("blood").value,
+            officeAddress: document.getElementById("office").value,
+            permanentAddress: document.getElementById("permanent").value,
+            email: document.getElementById("email").value,
+            emergencyNumber: document.getElementById("emergencyNumber").value,
+        };
+
+        const response = await fetch("/api/save-text", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+
+        return await response.json(); // Expects { qrCodeFilename, cardId }
+    }
+
+    async function sendImagesToBackend(cardId, frontImage, backImage) {
+        const response = await fetch("/api/save-images", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                cardId,
+                frontIdImageBase64: frontImage,
+                backIdImageBase64: backImage
+            })
+        });
+
+        return await response.json(); // Expects { success: true }
+    }
+
+    function downloadCard(id, filename) {
+        html2canvas(document.getElementById(id), {scale: 3}).then(canvas => {
+            const link = document.createElement("a");
+            link.download = filename;
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+
+    async function downloadPDF() {
+        const {jsPDF} = window.jspdf;
+        const pdf = new jsPDF("p", "pt", "a4");
+        const frontCanvas = await html2canvas(document.getElementById("id-card-front"), {scale: 3});
+        const backCanvas = await html2canvas(document.getElementById("id-card-back"), {scale: 3});
+
+        const frontImg = frontCanvas.toDataURL("image/png");
+        const backImg = backCanvas.toDataURL("image/png");
+
+        pdf.addImage(frontImg, "PNG", 40, 40, 520, 180);
+        pdf.addPage();
+        pdf.addImage(backImg, "PNG", 40, 40, 520, 180);
+        pdf.save("fsda_id_card.pdf");
+    }
+
+</script>
+
+<!-- 🌐 Cropping Modal -->
+<div id="cropper-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-4 rounded shadow max-w-[90%] max-h-[90%]">
+        <div class="text-right mb-2">
+            <button onclick="closeCropperModal()" class="text-red-500 text-lg font-bold">✖</button>
+        </div>
+        <div>
+            <img id="cropper-image" class="max-h-[70vh] max-w-full object-contain"/>
+        </div>
+        <div class="mt-4 flex justify-end space-x-2">
+            <button onclick="cropAndSetImage()" class="bg-blue-600 text-white px-4 py-2 rounded">Crop & Set</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

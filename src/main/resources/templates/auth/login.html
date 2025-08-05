@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}">
+    <title>Login - UPFSDA Attendance System</title>
+</head>
+<body class="login-page">
+    <!-- Theme Toggle -->
+    <button class="login-theme-toggle" id="loginThemeToggle" title="Toggle Theme">
+        <i class="fas fa-moon" id="loginThemeIcon"></i>
+    </button>
+    
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-large">
+                    <i class="fas fa-clock"></i>
+                    <h1>UPFSDA</h1>
+                </div>
+                <p class="login-subtitle">Attendance Management System</p>
+            </div>
+            
+            <form id="loginForm" class="login-form" data-loading>
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span th:text="${error}">Invalid credentials</span>
+                </div>
+                
+                <div th:if="${message}" class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span th:text="${message}">Message</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user me-2"></i>Username
+                    </label>
+                    <input type="text" 
+                           id="username" 
+                           name="username" 
+                           class="form-control" 
+                           placeholder="Enter your username"
+                           required
+                           autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Password
+                    </label>
+                    <div class="password-input-group">
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="form-control" 
+                               placeholder="Enter your password"
+                               required
+                               autocomplete="current-password">
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" 
+                               id="remember" 
+                               name="remember-me" 
+                               class="form-check-input">
+                        <label for="remember" class="form-check-label">
+                            Remember me
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg w-100" id="loginBtn">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Sign In
+                </button>
+                
+                <div class="text-center mt-3">
+                    <span class="text-muted">Don't have an account? </span>
+                    <a href="#" id="showSignupForm" class="text-primary">Sign Up</a>
+                </div>
+            </form>
+            
+            <!-- Signup Form (Hidden by default) -->
+            <form id="signupForm" class="signup-form" style="display: none;" data-loading>
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span th:text="${error}">Error message</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupUsername" class="form-label">
+                        <i class="fas fa-user me-2"></i>Username
+                    </label>
+                    <input type="text" 
+                           id="signupUsername" 
+                           name="username" 
+                           class="form-control" 
+                           placeholder="Choose a username"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupEmail" class="form-label">
+                        <i class="fas fa-envelope me-2"></i>Email
+                    </label>
+                    <input type="email" 
+                           id="signupEmail" 
+                           name="email" 
+                           class="form-control" 
+                           placeholder="Enter your email"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupPassword" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Password
+                    </label>
+                    <div class="password-input-group">
+                        <input type="password" 
+                               id="signupPassword" 
+                               name="password" 
+                               class="form-control" 
+                               placeholder="Create a password"
+                               required>
+                        <button type="button" class="password-toggle" onclick="toggleSignupPassword()">
+                            <i class="fas fa-eye" id="signupPasswordToggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg w-100" id="signupBtn">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Sign Up
+                </button>
+                
+                <div class="text-center mt-3">
+                    <span class="text-muted">Already have an account? </span>
+                    <a href="#" id="showLoginForm" class="text-primary">Sign In</a>
+                </div>
+            </form>
+            
+            <div class="login-footer">
+                <div class="login-links">
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+    
+    <script>
+        let isLoginMode = true;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            setupFormHandlers();
+            setupFormToggle();
+            setupLoginTheme();
+        });
+        
+        function setupFormHandlers() {
+            // Login form handler
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // Signup form handler
+            document.getElementById('signupForm').addEventListener('submit', handleSignup);
+        }
+        
+        function setupFormToggle() {
+            document.getElementById('showSignupForm').addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleToSignup();
+            });
+            
+            document.getElementById('showLoginForm').addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleToLogin();
+            });
+        }
+        
+        function toggleToSignup() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+            document.querySelector('.login-subtitle').textContent = 'Create Your Account';
+            isLoginMode = false;
+        }
+        
+        function toggleToLogin() {
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.querySelector('.login-subtitle').textContent = 'Attendance Management System';
+            isLoginMode = true;
+        }
+        
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (!username || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+            
+            try {
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = '<span class="spinner"></span> Signing In...';
+                
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                console.log('Login response:', data); // Debug log
+                
+                if (response.ok && (data.success || data.token)) {
+                    // Store token for API calls
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('username', data.username);
+                    
+                    showSuccess('Login successful! Redirecting...');
+                    
+                    // Role-based redirection with slight delay to ensure token is stored
+                    setTimeout(() => {
+                        if (data.username === 'MasterAdmin') {
+                            // Admin goes to team management
+                            window.location.href = '/attendance/team';
+                        } else {
+                            // Regular users go to dashboard
+                            window.location.href = '/attendance/dashboard';
+                        }
+                    }, 1500);
+                } else {
+                    const errorMessage = data.message || 'Login failed. Please check your credentials.';
+                    showError(errorMessage);
+                    console.error('Login failed:', data);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Sign In';
+            }
+        }
+        
+        async function handleSignup(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const signupBtn = document.getElementById('signupBtn');
+            
+            if (!username || !email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters long');
+                return;
+            }
+            
+            try {
+                signupBtn.disabled = true;
+                signupBtn.innerHTML = '<span class="spinner"></span> Creating Account...';
+                
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                console.log('Signup response:', data); // Debug log
+                
+                if (response.ok && (data.success || data.token)) {
+                    showSuccess('Account created successfully! Switching to sign in...');
+                    
+                    // Clear form and switch to login immediately
+                    document.getElementById('signupForm').reset();
+                    setTimeout(() => {
+                        toggleToLogin();
+                        // Pre-fill username for convenience
+                        document.getElementById('username').value = username;
+                    }, 1000);
+                } else {
+                    const errorMessage = data.message || 'Signup failed. Please try again.';
+                    showError(errorMessage);
+                    console.error('Signup failed:', data);
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                signupBtn.disabled = false;
+                signupBtn.innerHTML = '<i class="fas fa-user-plus me-2"></i>Sign Up';
+            }
+        }
+        
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+        
+        function toggleSignupPassword() {
+            const passwordInput = document.getElementById('signupPassword');
+            const toggleIcon = document.getElementById('signupPasswordToggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+        
+        function showError(message) {
+            removeExistingAlerts();
+            const alert = createAlert('danger', message);
+            insertAlert(alert);
+        }
+        
+        function showSuccess(message) {
+            removeExistingAlerts();
+            const alert = createAlert('success', message);
+            insertAlert(alert);
+        }
+        
+        function createAlert(type, message) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+            return alert;
+        }
+        
+        function insertAlert(alert) {
+            const activeForm = isLoginMode ? document.getElementById('loginForm') : document.getElementById('signupForm');
+            activeForm.insertBefore(alert, activeForm.firstChild);
+        }
+        
+        function removeExistingAlerts() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => alert.remove());
+        }
+        
+        function setupLoginTheme() {
+            const themeToggle = document.getElementById('loginThemeToggle');
+            const themeIcon = document.getElementById('loginThemeIcon');
+            
+            // Load saved theme or default to light
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setLoginTheme(savedTheme);
+            
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                setLoginTheme(newTheme);
+            });
+        }
+        
+        function setLoginTheme(theme) {
+            const themeIcon = document.getElementById('loginThemeIcon');
+            
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+            
+            localStorage.setItem('theme', theme);
+        }
+    </script>
+    
+    <style>
+        .login-page {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .login-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px var(--shadow-color);
+        }
+        
+        /* Theme toggle for login page */
+        .login-theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .login-theme-toggle:hover {
+            background-color: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-large {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-large i {
+            font-size: 3rem;
+            color: var(--primary-orange);
+        }
+        
+        .logo-large h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .login-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin: 0;
+        }
+        
+        .login-form {
+            margin-bottom: 2rem;
+        }
+        
+        .password-input-group {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary-orange);
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-check-input {
+            background-color: var(--tertiary-black);
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-orange);
+            border-color: var(--primary-orange);
+        }
+        
+        .login-footer {
+            text-align: center;
+        }
+        
+        .demo-credentials {
+            background-color: var(--tertiary-black);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-credentials h6 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .credential-item {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .credential-item:hover {
+            background-color: var(--border-color);
+            color: var(--primary-orange);
+        }
+        
+        .credential-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .forgot-password {
+            color: var(--primary-orange);
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .logo-large i {
+                font-size: 2.5rem;
+            }
+            
+            .logo-large h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</body>
+</html>
