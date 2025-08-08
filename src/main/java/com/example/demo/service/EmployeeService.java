@@ -4,6 +4,8 @@ import com.example.demo.dto.EmployeeRequest;
 import com.example.demo.dto.EmployeeResponse;
 import com.example.demo.entity.Employee;
 
+import java.util.List;
+
 public interface EmployeeService {
     
     EmployeeResponse createEmployee(EmployeeRequest request);
@@ -13,4 +15,7 @@ public interface EmployeeService {
     Employee findByIdentityCardNo(String identityCardNo);
     
     Employee findById(Long id);
+
+    List<String> getDistinctWorkTypes();
+
 }

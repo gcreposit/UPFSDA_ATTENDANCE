@@ -2,7 +2,6 @@ package com.example.demo.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +20,11 @@ public class EmployeeRequest {
     @NotBlank(message = "Address is required")
     private String address;
     
-    @NotBlank(message = "Assigned location/role is required")
-    private String assignedLocation;
-    
+    @NotBlank(message = "Work Type is required")
+    private String workType;
+
+    private String homeLocation;
+
     @NotBlank(message = "District is required")
     private String district;
     
@@ -42,4 +43,5 @@ public class EmployeeRequest {
     
     @NotNull(message = "Signature is required")
     private MultipartFile uploadSignature;
+
 }

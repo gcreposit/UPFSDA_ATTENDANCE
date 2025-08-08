@@ -200,7 +200,8 @@ class EmployeeServiceTest {
         request.setDateOfBirth("15/06/1990");
         request.setIdentityCardNo("ABC123456");
         request.setAddress("123 Main Street, City");
-        request.setAssignedLocation("Sampler");
+        request.setWorkType("Sampler");
+        request.setHomeLocation("");
         request.setDistrict("Agra");
         request.setTehsil("Agra");
         request.setMobileNumber("9876543210");
@@ -217,7 +218,7 @@ class EmployeeServiceTest {
         employee.setName("John Doe");
         employee.setIdentityCardNo("ABC123456");
         employee.setDateOfBirth("15/06/1990");
-        employee.setAssignedLocation("Sampler");
+        employee.setWorkType("Sampler");
         employee.setDistrict("Agra");
         employee.setTehsil("Agra");
         employee.setUploadFacePhotoImgPath("john_doe_08-04-2025/Face/face.jpg");

@@ -24,43 +24,46 @@ public class Employee {
 
     @NotBlank
     private String name;
-    
+
     @NotBlank
     @Column(unique = true, nullable = false)
     private String identityCardNo;
-    
+
     private String designation;
-    
+
     @NotBlank
     @Pattern(regexp = "\\d{2}/\\d{2}/\\d{4}", message = "Date format should be dd/MM/yyyy")
     private String dateOfBirth;
-    
+
     private String labName;
     private String officeName;
-    
+
     private String mobileNumber;
     private String bloodGroup;
 
     @Column(columnDefinition = "TEXT")
     private String officeAddress;
-    
+
+    @Column(name = "home_location")
+    private String homeLocation;
+
     @NotBlank
     private String district;
-    
+
     @NotBlank
     private String tehsil;
-    
+
     @NotBlank
-    private String assignedLocation;
-    
+    @Column(name = "work_type")
+    private String workType;
+
     private String emailAddress;
 
     @Column(columnDefinition = "TEXT")
     private String permanantAddress;
     private String emergencyContactNo;
 
-
-    //    FACE PHOTO AND UPLAPD SIGNATURE
+    //    FACE PHOTO AND UPLOAD SIGNATURE
     @Transient
     private MultipartFile uploadSignature;
 

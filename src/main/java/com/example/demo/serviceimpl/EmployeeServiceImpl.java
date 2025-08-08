@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -98,7 +100,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepository.findById(id)
             .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with ID: " + id));
     }
-    
+
+    @Override
+    public List<String> getDistinctWorkTypes() {
+
+        return employeeRepository.findDistinctWorkType();
+
+    }
+
     private void validateLocationData(String district, String tehsil) {
         if (!locationService.isValidDistrict(district)) {
             throw new InvalidLocationException("Invalid district: " + district);
@@ -115,9 +124,10 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .name(request.getName())
                 .identityCardNo(request.getIdentityCardNo())
                 .dateOfBirth(convertDateFormat(request.getDateOfBirth()))
-                .assignedLocation(request.getAssignedLocation())
+                .workType(request.getWorkType())
                 .district(request.getDistrict())
                 .tehsil(request.getTehsil())
+                .homeLocation(request.getHomeLocation())
                 
                 // Optional fields
                 .mobileNumber(request.getMobileNumber())
