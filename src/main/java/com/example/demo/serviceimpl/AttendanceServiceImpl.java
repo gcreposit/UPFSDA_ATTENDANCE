@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -44,8 +45,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                                      MultipartFile image,
                                      String timeStr,
                                      String attendanceTypeFromRequest,
-                                     String reason,
-                                     MultipartFile[] fieldImagePaths) throws IOException {
+                                     String reason) throws IOException {
 
         LocalDate today = LocalDate.now();
         Optional<Attendance> existingAttendanceOpt = attendanceRepository.findTopByUserNameAndDate(userName, today);
@@ -56,8 +56,6 @@ public class AttendanceServiceImpl implements AttendanceService {
             attendance.setAttendanceType(attendanceTypeFromRequest);
         }
 
-        String effectiveAttendanceType = attendance.getAttendanceType(); // Always use DB value
-
         // Prevent double attendance marking
         if (attendance.getMorningImagePath() != null && attendance.getEveningImagePath() != null &&
                 attendance.getMorningTime() != null && attendance.getEveningTime() != null) {
@@ -67,7 +65,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendance.setUserName(userName);
         attendance.setReason(reason);
 
-        // Parse incoming time (if any)
+        // Parse incoming time
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime parsedTime = (timeStr != null && !timeStr.isEmpty())
                 ? LocalDateTime.parse(timeStr, formatter)
@@ -108,37 +106,6 @@ public class AttendanceServiceImpl implements AttendanceService {
             }
         }
 
-        // 🟢 Field Images Handling for WFF
-        if ("WFF".equalsIgnoreCase(effectiveAttendanceType)) {
-
-            // ❌ Validation: Require morning attendance first
-            if ((attendance.getMorningImagePath() == null || attendance.getMorningTime() == null)
-                    && fieldImagePaths != null && fieldImagePaths.length > 0) {
-                throw new IllegalStateException("You must mark morning attendance before uploading field images.");
-            }
-
-            // ✅ Upload field images only if present
-            if (fieldImagePaths != null && fieldImagePaths.length > 0) {
-                List<String> savedPaths = new ArrayList<>();
-
-                for (MultipartFile fieldImg : fieldImagePaths) {
-                    if (fieldImg != null && !fieldImg.isEmpty()) {
-                        String path = saveImageToDisk(fieldImg);
-                        savedPaths.add(path);
-                    }
-                }
-
-                if (!savedPaths.isEmpty()) {
-                    attendance.setFieldImagePath(String.join(",", savedPaths));
-                    attendance.setFieldImageUploaded("Images Added");
-                } else {
-                    attendance.setFieldImageUploaded("Not Added");
-                }
-            } else {
-                attendance.setFieldImageUploaded("Not Added");
-            }
-        }
-
         // Set date only on creation
         if (attendance.getDate() == null) {
             attendance.setDate(today);
@@ -147,12 +114,113 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceRepository.save(attendance);
     }
 
-//    private String saveImageToDisk(MultipartFile file) throws IOException {
-//        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-//        File dest = new File(uploadPath + filename);
-//        dest.getParentFile().mkdirs();
-//        file.transferTo(dest);
-//        return dest.getAbsolutePath();
+//    @Override
+//    @Transactional
+//    public Attendance saveAttendance(String userName,
+//                                     MultipartFile image,
+//                                     String timeStr,
+//                                     String attendanceTypeFromRequest,
+//                                     String reason,
+//                                     MultipartFile[] fieldImagePaths) throws IOException {
+//
+//        LocalDate today = LocalDate.now();
+//        Optional<Attendance> existingAttendanceOpt = attendanceRepository.findTopByUserNameAndDate(userName, today);
+//        Attendance attendance = existingAttendanceOpt.orElse(new Attendance());
+//
+//        // Set attendance type only once (when creating new record)
+//        if (attendance.getId() == null) {
+//            attendance.setAttendanceType(attendanceTypeFromRequest);
+//        }
+//
+//        String effectiveAttendanceType = attendance.getAttendanceType(); // Always use DB value
+//
+//        // Prevent double attendance marking
+//        if (attendance.getMorningImagePath() != null && attendance.getEveningImagePath() != null &&
+//                attendance.getMorningTime() != null && attendance.getEveningTime() != null) {
+//            throw new IllegalStateException("User has already marked attendance for today.");
+//        }
+//
+//        attendance.setUserName(userName);
+//        attendance.setReason(reason);
+//
+//        // Parse incoming time (if any)
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        LocalDateTime parsedTime = (timeStr != null && !timeStr.isEmpty())
+//                ? LocalDateTime.parse(timeStr, formatter)
+//                : null;
+//
+//        // Office timing constants
+//        LocalTime officeStart = LocalTime.of(10, 0); // 10:00 AM
+//        LocalTime officeEnd = LocalTime.of(18, 0);   // 6:00 PM
+//
+//        // 🟢 Mark Morning Attendance
+//        if (attendance.getMorningImagePath() == null || attendance.getMorningTime() == null) {
+//            if (image != null && !image.isEmpty()) {
+//                String morningPath = saveImageToDisk(image);
+//                LocalDateTime morningTime = (parsedTime != null) ? parsedTime : LocalDateTime.now();
+//
+//                attendance.setMorningImagePath(morningPath);
+//                attendance.setMorningTime(morningTime);
+//                attendance.setStatus(
+//                        morningTime.toLocalTime().isAfter(officeStart) ? "Late Entry" : "On Time"
+//                );
+//            }
+//        }
+//
+//        // 🟢 Mark Evening Attendance
+//        else if (image != null && !image.isEmpty()) {
+//            String eveningPath = saveImageToDisk(image);
+//            LocalDateTime eveningTime = (parsedTime != null) ? parsedTime : LocalDateTime.now();
+//
+//            attendance.setEveningImagePath(eveningPath);
+//            attendance.setEveningTime(eveningTime);
+//
+//            if (eveningTime.toLocalTime().isBefore(officeEnd)) {
+//                if ("Late Entry".equals(attendance.getStatus())) {
+//                    attendance.setStatus("Late & Half");
+//                } else if ("On Time".equals(attendance.getStatus())) {
+//                    attendance.setStatus("Half Day");
+//                }
+//            }
+//        }
+//
+//        // 🟢 Field Images Handling for WFF
+//        if ("WFF".equalsIgnoreCase(effectiveAttendanceType)) {
+//
+//            // ❌ Validation: Require morning attendance first
+//            if ((attendance.getMorningImagePath() == null || attendance.getMorningTime() == null)
+//                    && fieldImagePaths != null && fieldImagePaths.length > 0) {
+//                throw new IllegalStateException("You must mark morning attendance before uploading field images.");
+//            }
+//
+//            // ✅ Upload field images only if present
+//            if (fieldImagePaths != null && fieldImagePaths.length > 0) {
+//                List<String> savedPaths = new ArrayList<>();
+//
+//                for (MultipartFile fieldImg : fieldImagePaths) {
+//                    if (fieldImg != null && !fieldImg.isEmpty()) {
+//                        String path = saveImageToDisk(fieldImg);
+//                        savedPaths.add(path);
+//                    }
+//                }
+//
+//                if (!savedPaths.isEmpty()) {
+//                    attendance.setFieldImagePath(String.join(",", savedPaths));
+//                    attendance.setFieldImageUploaded("Images Added");
+//                } else {
+//                    attendance.setFieldImageUploaded("Not Added");
+//                }
+//            } else {
+//                attendance.setFieldImageUploaded("Not Added");
+//            }
+//        }
+//
+//        // Set date only on creation
+//        if (attendance.getDate() == null) {
+//            attendance.setDate(today);
+//        }
+//
+//        return attendanceRepository.save(attendance);
 //    }
 
     private String saveImageToDisk(MultipartFile file) throws IOException {

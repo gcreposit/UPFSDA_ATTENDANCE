@@ -191,6 +191,66 @@ public class DataApiController {
         }
     }
 
+    //Api For Mark Attendance (In This Also Field Image accept for WFF)
+//    @PostMapping("/mark-attendance")
+//    public ResponseEntity<ApiResponse<Object>> markAttendance(
+//            @RequestParam String userName,
+//            @RequestParam MultipartFile image,
+//            @RequestParam String time,
+//            @RequestParam String attendanceType,
+//            @RequestParam(required = false) String reason,
+//            @RequestParam(required = false) MultipartFile[] fieldImage
+//    ) {
+//        try {
+//            // Validate reason if attendanceType is WFH or WFF
+//            if ((attendanceType != null && (attendanceType.equalsIgnoreCase("WFH") || attendanceType.equalsIgnoreCase("WFF")))
+//                    && (reason == null || reason.trim().isEmpty())) {
+//                Map<String, Object> errorData = new HashMap<>();
+//                errorData.put("error", "Reason is required when attendanceType is WFH or WFF");
+//
+//                return ResponseEntity.badRequest().body(
+//                        ApiResponse.builder()
+//                                .username(userName)
+//                                .message("Validation error")
+//                                .statusCode(HttpStatus.BAD_REQUEST.value())
+//                                .data(errorData)
+//                                .build()
+//                );
+//            }
+//
+//            Attendance attendance = attendanceService.saveAttendance(
+//                    userName, image, time, attendanceType, reason, fieldImage
+//            );
+//
+//            Map<String, Object> responseData = new HashMap<>();
+//            responseData.put("attendanceId", attendance.getId());
+//            responseData.put("username", attendance.getUserName());
+//            responseData.put("morningTime", attendance.getMorningTime());
+//            responseData.put("eveningTime", attendance.getEveningTime());
+//
+//            return ResponseEntity.ok(
+//                    ApiResponse.builder()
+//                            .username(userName)
+//                            .message("Attendance marked successfully")
+//                            .statusCode(HttpStatus.OK.value())
+//                            .data(responseData)
+//                            .build()
+//            );
+//
+//        } catch (Exception e) {
+//            Map<String, Object> errorData = new HashMap<>();
+//            errorData.put("error", e.getMessage());
+//
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+//                    ApiResponse.builder()
+//                            .username(userName)
+//                            .message("Error processing attendance request")
+//                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                            .data(errorData)
+//                            .build()
+//            );
+//        }
+//    }
 
     //Api For Mark Attendance (In This Also Field Image accept for WFF)
     @PostMapping("/mark-attendance")
@@ -199,8 +259,7 @@ public class DataApiController {
             @RequestParam MultipartFile image,
             @RequestParam String time,
             @RequestParam String attendanceType,
-            @RequestParam(required = false) String reason,
-            @RequestParam(required = false) MultipartFile[] fieldImage
+            @RequestParam(required = false) String reason
     ) {
         try {
             // Validate reason if attendanceType is WFH or WFF
@@ -220,7 +279,7 @@ public class DataApiController {
             }
 
             Attendance attendance = attendanceService.saveAttendance(
-                    userName, image, time, attendanceType, reason, fieldImage
+                    userName, image, time, attendanceType, reason
             );
 
             Map<String, Object> responseData = new HashMap<>();
@@ -252,6 +311,7 @@ public class DataApiController {
             );
         }
     }
+
 
     //Api For Fetch Work Types
     @GetMapping("/work-types")
