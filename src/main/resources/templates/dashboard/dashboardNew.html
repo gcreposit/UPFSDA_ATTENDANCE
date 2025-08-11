@@ -35,8 +35,15 @@
                             <div class="stat-value" id="totalEmployeesCount">0</div>
                         </div>
                     </div>
-                    <div class="stat-card-small" onclick="goToDetails('on_time')">
+                    <div class="stat-card-small" onclick="goToDetails('today_present')">
                         <div class="stat-icon bg-success" style="background:#28a745"><i class="fas fa-user-check"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-title">Present</div>
+                            <div class="stat-value" id="presentCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-small" onclick="goToDetails('on_time')">
+                        <div class="stat-icon bg-success" style="background:#28a745"><i class="fas fa-user-clock"></i></div>
                         <div class="stat-content">
                             <div class="stat-title">On Time</div>
                             <div class="stat-value" id="onTimeCount">0</div>
@@ -65,7 +72,7 @@
                             <div class="stat-value" id="halfDayCount">0</div>
                         </div>
                     </div>
-                    <div class="stat-card-small" onclick="goToDetails('last_and_half')">
+                    <div class="stat-card-small" onclick="goToDetails('late_and_half')">
                         <div class="stat-icon" style="background-color: #e91e63;">
                             <i class="fas fa-exclamation-circle"></i>
                         </div>
@@ -172,6 +179,7 @@
         document.getElementById('wfoCount').textContent = data.total_work_from_office || 0;
         document.getElementById('wfhCount').textContent = data.total_work_from_home || 0;
         document.getElementById('wffCount').textContent = data.total_work_from_field || 0;
+        document.getElementById('presentCount').textContent = data.present_today || 0;
 
         // Prepare pie chart data
         const chartData = [

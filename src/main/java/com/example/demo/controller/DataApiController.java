@@ -11,16 +11,25 @@ import com.example.demo.service.EmployeeService;
 import com.example.demo.service.FileStorageService;
 import com.example.demo.service.LocationService;
 import com.example.demo.serviceimpl.EmployeeServiceImpl;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,6 +42,9 @@ public class DataApiController {
     private final EmployeeService employeeService;
     private final LocationService locationService;
     private final AttendanceService attendanceService;
+
+    @Value("${file.storage.path}")
+    private String uploadPath;
 
     //    FOR SAVING EMPLOYEE DATA (DTO USE KIYA INSTEAD OF MAIN ENTITY)
     @PostMapping("/employees")
@@ -481,4 +493,46 @@ public class DataApiController {
         }
     }
 
+//    Api To Serve Attendance Image
+    @GetMapping("/attendance/image/{id}")
+    public ResponseEntity<byte[]> getAttendanceImage(
+            @PathVariable Long id,
+            @RequestParam(name = "type", defaultValue = "morning") String type) throws IOException {
+
+        Optional<Attendance> optionalAttendance = attendanceService.findById(id);
+
+        if (optionalAttendance.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Attendance attendance = optionalAttendance.get();
+
+        String imagePath;
+
+        if ("morning".equalsIgnoreCase(type)) {
+            imagePath = attendance.getMorningImagePath();
+        } else if ("evening".equalsIgnoreCase(type)) {
+            imagePath = attendance.getEveningImagePath();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (imagePath == null || imagePath.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Combine base directory from properties and imagePath
+        Path path = Paths.get(uploadPath, imagePath);
+
+        if (!Files.exists(path)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        byte[] imageBytes = Files.readAllBytes(path);
+        String contentType = Files.probeContentType(path);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
+                .body(imageBytes);
+    }
 }

@@ -368,8 +368,11 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .filter(r -> "On Leave".equalsIgnoreCase(r.getStatus()))
                 .count();
 
+        // Calculate present today (excluding those on leave).
+        long presentToday = onTime + lateEntry + halfDay + lateAndHalf;
+
         // Calculate the total number of employees who are accounted for (present or on leave).
-        long accountedForToday = onTime + lateEntry + halfDay + lateAndHalf + onLeaveToday;
+        long accountedForToday = presentToday + onLeaveToday;
 
         // The number of absent employees is the total number of employees minus those accounted for.
         long absentToday = totalEmployees - accountedForToday;
@@ -388,9 +391,9 @@ public class AttendanceServiceImpl implements AttendanceService {
         // Prepare the dashboard data map.
         Map<String, Object> data = new HashMap<>();
         data.put("total_employees", totalEmployees);
-        data.put("present_today", accountedForToday - onLeaveToday); // Present is anyone who logged attendance
+        data.put("present_today", presentToday); // explicitly present today count
         data.put("on_time", onTime);
-        data.put("late_entry", lateEntry + lateAndHalf); // Combine for a total late count
+        data.put("late_entry", lateEntry);
         data.put("half_day", halfDay);
         data.put("late_and_half", lateAndHalf);
         data.put("absent_today", absentToday);
@@ -400,12 +403,10 @@ public class AttendanceServiceImpl implements AttendanceService {
         data.put("total_work_from_field", wff);
         data.put("todays_date", today);
 
-        // Check if there is data to return.
         if (totalEmployees == 0) {
             return Optional.empty();
         }
 
-        // Return the data wrapped in an Optional.
         return Optional.of(data);
     }
 
@@ -453,14 +454,18 @@ public class AttendanceServiceImpl implements AttendanceService {
             case "late_and_half":
                 return attendanceRepository.findLateAndHalfDayEmployees(today);
 
-            case "WFH":
+            case "wfh":
                 return attendanceRepository.findWfhEmployees(today);
 
-            case "WFF":
+            case "wff":
                 return attendanceRepository.findWffEmployees(today);
 
-            case "WFO":
+            case "wfo":
                 return attendanceRepository.findWfoEmployees(today);
+
+            case "today_present":
+
+                return attendanceRepository.findTodayPresentEmployees(today);
 
             default:
                 return new ArrayList<>();
@@ -471,6 +476,13 @@ public class AttendanceServiceImpl implements AttendanceService {
     public List<Employee> fetchAllEmployeeDetails() {
 
         return employeeRepository.findAll();
+
+    }
+
+    @Override
+    public Optional<Attendance> findById(Long id) {
+
+        return attendanceRepository.findById(id);
 
     }
 

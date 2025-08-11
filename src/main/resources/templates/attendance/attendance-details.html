@@ -16,150 +16,202 @@
 
 <main class="main-content">
     <div class="dashboard-grid-admin">
+        <div class="dashboard-center">
+            <div class="welcome-card">
+                <div class="welcome-content">
+                    <h3>Employee Details</h3>
+                    <p>Here's the attendance overview for today.</p>
+                    <small th:text="'Today is ' + ${#dates.format(#dates.createNow(), 'EEEE, MMMM dd, yyyy')}"></small>
+                </div>
+                <div class="welcome-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+            </div>
 
-        <main class="main-content">
-            <div class="dashboard-grid-admin">
+            <!-- Table section -->
+            <div class="dashboard-main">
 
-                <div class="dashboard-center">
-                    <div class="welcome-card">
-                        <div class="welcome-content">
-                            <h3>Admin Dashboard</h3>
-                            <p>Here's the attendance overview for today.</p>
-                            <small th:text="'Today is ' + ${#dates.format(#dates.createNow(), 'EEEE, MMMM dd, yyyy')}"></small>
-                        </div>
-                        <div class="welcome-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                    </div>
-
-                    <!-- Table section -->
-                    <div class="dashboard-main">
-
-                        <div th:if="${records == null or records.isEmpty()}">
-                            <p>No records found.</p>
-                        </div>
-
-                        <!-- Employee Table -->
-                        <table id="employeeTable"
-                               th:if="${records != null and !records.isEmpty() and records[0] instanceof T(com.example.demo.entity.Employee)}"
-                               class="display nowrap" style="width:100%">
-                            <thead>
-                            <tr>
-                                <th>ID Card No</th>
-                                <th>Name</th>
-                                <th>Designation</th>
-                                <th>Date of Birth</th>
-                                <th>Lab Name</th>
-                                <th>Office Name</th>
-                                <th>Mobile Number</th>
-                                <th>Blood Group</th>
-                                <th>Office Address</th>
-                                <th>Home Location</th>
-                                <th>District</th>
-                                <th>Tehsil</th>
-                                <th>Work Type</th>
-                                <th>Email Address</th>
-                                <th>Permanent Address</th>
-                                <th>Emergency Contact No</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="record : ${records}">
-                                <td th:text="${record.identityCardNo}"></td>
-                                <td th:text="${record.name}"></td>
-                                <td th:text="${record.designation}"></td>
-                                <td th:text="${record.dateOfBirth}"></td>
-                                <td th:text="${record.labName}"></td>
-                                <td th:text="${record.officeName}"></td>
-                                <td th:text="${record.mobileNumber}"></td>
-                                <td th:text="${record.bloodGroup}"></td>
-                                <td th:text="${record.officeAddress}"></td>
-                                <td th:text="${record.homeLocation}"></td>
-                                <td th:text="${record.district}"></td>
-                                <td th:text="${record.tehsil}"></td>
-                                <td th:text="${record.workType}"></td>
-                                <td th:text="${record.emailAddress}"></td>
-                                <td th:text="${record.permanantAddress}"></td>
-                                <td th:text="${record.emergencyContactNo}"></td>
-                            </tr>
-                            </tbody>
-                        </table>
-
-                        <!-- Attendance Table -->
-                        <table id="attendanceTable"
-                               th:if="${records != null and !records.isEmpty() and records[0] instanceof T(com.example.demo.entity.Attendance)}"
-                               class="display nowrap" style="width:100%">
-                            <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Attendance Type</th>
-                                <th>Reason</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Morning Time</th>
-                                <th>Evening Time</th>
-                                <th>Field Image Time</th>
-                                <th>Field Image Uploaded</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="record : ${records}">
-                                <td th:text="${record.userName}"></td>
-                                <td th:text="${record.attendanceType}"></td>
-                                <td th:text="${record.reason}"></td>
-                                <td th:text="${record.date}"></td>
-                                <td th:text="${record.status}"></td>
-                                <td th:text="${record.morningTime != null ? #dates.format(record.morningTime, 'HH:mm:ss') : 'N/A'}"></td>
-                                <td th:text="${record.eveningTime != null ? #dates.format(record.eveningTime, 'HH:mm:ss') : 'N/A'}"></td>
-                                <td th:text="${record.fieldImageTime != null ? #dates.format(record.fieldImageTime, 'HH:mm:ss') : 'N/A'}"></td>
-                                <td th:text="${record.fieldImageUploaded}"></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <!-- Employee Table -->
+                <div class="table-responsive">
+                    <table id="employeeTable"
+                           th:if="${records != null and !records.isEmpty()}"
+                           class="table table-bordered mb-0 display nowrap" style="width:100%">
+                        <thead>
+                        <tr>
+                            <th>ID Card No</th>
+                            <th>Name</th>
+                            <th>Designation</th>
+                            <th>Date of Birth</th>
+                            <th>Lab Name</th>
+                            <th>Office Name</th>
+                            <th>Mobile Number</th>
+                            <th>Blood Group</th>
+                            <th>Office Address</th>
+                            <th>Home Location</th>
+                            <th>District</th>
+                            <th>Tehsil</th>
+                            <th>Work Type</th>
+                            <th>Email Address</th>
+                            <th>Permanent Address</th>
+                            <th>Emergency Contact No</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="record : ${records}">
+                            <td th:text="${record.identityCardNo}"></td>
+                            <td th:text="${record.name}"></td>
+                            <td th:text="${record.designation}"></td>
+                            <td th:text="${record.dateOfBirth}"></td>
+                            <td th:text="${record.labName}"></td>
+                            <td th:text="${record.officeName}"></td>
+                            <td th:text="${record.mobileNumber}"></td>
+                            <td th:text="${record.bloodGroup}"></td>
+                            <td th:text="${record.officeAddress}"></td>
+                            <td th:text="${record.homeLocation}"></td>
+                            <td th:text="${record.district}"></td>
+                            <td th:text="${record.tehsil}"></td>
+                            <td th:text="${record.workType}"></td>
+                            <td th:text="${record.emailAddress}"></td>
+                            <td th:text="${record.permanantAddress}"></td>
+                            <td th:text="${record.emergencyContactNo}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div class="dashboard-right">
-                    <div class="simple-calendar-card">
-                        <div class="simple-calendar-header">
-                            <button class="simple-nav" id="simplePrevMonth"><i class="fas fa-chevron-left"></i></button>
-                            <span class="simple-month-year" id="simpleCurrentMonth">August 2025</span>
-                            <button class="simple-nav" id="simpleNextMonth"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                        <div class="simple-calendar-grid" id="simpleCalendarGrid"></div>
-                    </div>
+                <!-- Attendance Table -->
+                <table id="attendanceTable"
+                       th:if="${attendances != null and !attendances.isEmpty()}"
+                       class="table table-bordered mb-0 display nowrap" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Attendance Type</th>
+                        <th>Reason</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Morning Time</th>
+                        <th>Evening Time</th>
+                        <th>Morning Image</th>
+                        <th>Evening Image</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="record : ${attendances}">
+                        <td th:text="${record.userName}"></td>
+                        <td th:text="${record.attendanceType}"></td>
+                        <td th:text="${record.reason}"></td>
+                        <td th:text="${record.date}"></td>
+                        <td th:text="${record.status}"></td>
+                        <td th:text="${record.morningTime}"></td>
+                        <td th:text="${record.eveningTime}"></td>
+
+                        <!-- Morning Image -->
+                        <td>
+    <span th:if="${record.morningImagePath == null or record.morningImagePath.isEmpty()}">
+        No Image Available
+    </span>
+                            <button type="button" class="btn btn-primary btn-sm open-image-modal"
+                                    th:if="${record.morningImagePath != null and !record.morningImagePath.isEmpty()}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#imageModal"
+                                    th:attr="data-id=${record.id}, data-type='morning', data-img-title='Morning Image - ' + ${record.userName}">
+                                View Image
+                            </button>
+                        </td>
+
+                        <!-- Evening Image -->
+                        <td>
+    <span th:if="${record.eveningImagePath == null or record.eveningImagePath.isEmpty()}">
+        No Image Available
+    </span>
+                            <button type="button" class="btn btn-primary btn-sm open-image-modal"
+                                    th:if="${record.eveningImagePath != null and !record.eveningImagePath.isEmpty()}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#imageModal"
+                                    th:attr="data-id=${record.id}, data-type='evening', data-img-title='Evening Image - ' + ${record.userName}">
+                                View Image
+                            </button>
+                        </td>
+
+
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Show message if both lists are empty or null -->
+                <div th:if="(${records == null or records.isEmpty()}) and (${attendances == null or attendances.isEmpty()})">
+                    <p>No records found.</p>
                 </div>
 
             </div>
-        </main>
+        </div>
 
+        <div class="dashboard-right">
+            <div class="simple-calendar-card">
+                <div class="simple-calendar-header">
+                    <button class="simple-nav" id="simplePrevMonth"><i class="fas fa-chevron-left"></i></button>
+                    <span class="simple-month-year" id="simpleCurrentMonth">August 2025</span>
+                    <button class="simple-nav" id="simpleNextMonth"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="simple-calendar-grid" id="simpleCalendarGrid"></div>
+            </div>
+        </div>
     </div>
 </main>
 
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Attendance Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="attendanceImage" src="" alt="Attendance Image"
+                     style="max-width:100%; max-height:500px; display:block; margin:0 auto; object-fit: contain;" />
+            </div>
+        </div>
+    </div>
+</div>
+
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 
-<!-- jQuery (required for DataTables) -->
-<script th:src="@{/webjars/jquery/3.7.0/jquery.min.js}"></script>
-
-<!-- DataTables JS -->
-<script th:src="@{/webjars/datatables/1.13.6/js/jquery.dataTables.min.js}"></script>
-<!-- DataTables Responsive -->
-<script th:src="@{/webjars/datatables-responsive/2.5.0/js/dataTables.responsive.min.js}"></script>
-
 <script>
-    $(document).ready(function () {
-        $('#employeeTable').DataTable({
-            responsive: true,
-            paging: true,
-            searching: true,
-            ordering: true
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('.open-image-modal');
+        const modalLabel = document.getElementById('imageModalLabel');
+        const attendanceImage = document.getElementById('attendanceImage');
+        const imageModal = document.getElementById('imageModal');
+
+        // Add inline styles dynamically via JS
+        attendanceImage.style.maxWidth = "100%";
+        attendanceImage.style.maxHeight = "500px";
+        attendanceImage.style.display = "block";
+        attendanceImage.style.margin = "0 auto";
+        attendanceImage.style.objectFit = "contain";
+
+        buttons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const attendanceId = button.getAttribute('data-id');
+                const imageType = button.getAttribute('data-type');
+                const imageTitle = button.getAttribute('data-img-title');
+
+                // Set modal title
+                modalLabel.textContent = imageTitle;
+
+                // Construct image URL
+                const imageUrl = `/api/data/attendance/image/${attendanceId}?type=${imageType}`;
+
+                // Set image src
+                attendanceImage.setAttribute('src', imageUrl);
+            });
         });
 
-        $('#attendanceTable').DataTable({
-            responsive: true,
-            paging: true,
-            searching: true,
-            ordering: true
+        // Clear image on modal hide event (Bootstrap 5)
+        imageModal.addEventListener('hidden.bs.modal', function () {
+            attendanceImage.setAttribute('src', '');
         });
     });
 </script>

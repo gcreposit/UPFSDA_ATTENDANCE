@@ -32,4 +32,7 @@ public interface AttendanceService {
     List<Employee> fetchAllEmployeeDetails();
 
 
+    Optional<Attendance> findById(Long id);
+
+
 }

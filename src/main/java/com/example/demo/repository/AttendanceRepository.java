@@ -57,5 +57,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance,Long> {
     @Query(value = "SELECT user_name FROM attendance WHERE attendance_date = ?1 ", nativeQuery = true)
     List<String> findUserNamesByDate(LocalDate date);
 
+    @Query(value = "SELECT * FROM attendance WHERE attendance_date = ?1", nativeQuery = true)
+    List<Attendance> findTodayPresentEmployees(LocalDate date);
+
 
 }
