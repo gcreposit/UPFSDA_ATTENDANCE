@@ -18,4 +18,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query(value = "SELECT DISTINCT work_type FROM employee;",nativeQuery = true)
     List<String> findDistinctWorkType();
 
+    @Query(value = "SELECT COUNT(*) FROM employee;",nativeQuery = true)
+    List<Employee> countAllEmployees();
+
+
 }

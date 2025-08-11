@@ -56,6 +56,9 @@ public class Attendance {
     @Transient
     private String fieldImage;
 
+    @Column(name = "field_image_time")
+    private LocalDateTime fieldImageTime;
+
     @Column(name = "field_image_path")
     private String fieldImagePath;
 

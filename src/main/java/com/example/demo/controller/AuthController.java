@@ -163,9 +163,9 @@ public class AuthController {
         }
         
         // Password validation
-        if (request.getPassword().length() < 6) {
-            return "Password must be at least 6 characters long";
-        }
+//        if (request.getPassword().length() < 6) {
+//            return "Password must be at least 6 characters long";
+//        }
         
         // Check for potential SQL injection patterns
         if (containsSqlInjectionPatterns(username) || containsSqlInjectionPatterns(request.getPassword())) {

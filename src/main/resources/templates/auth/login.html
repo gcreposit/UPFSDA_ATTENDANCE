@@ -271,11 +271,12 @@
                 showError('Please fill in all fields');
                 return;
             }
+
             
-            if (password.length < 6) {
-                showError('Password must be at least 6 characters long');
-                return;
-            }
+            // if (password.length < 6) {
+            //     showError('Password must be at least 6 characters long');
+            //     return;
+            // }
             
             try {
                 signupBtn.disabled = true;

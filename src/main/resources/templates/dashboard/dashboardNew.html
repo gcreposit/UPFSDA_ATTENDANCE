@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head}">
+    <title>Admin Dashboard - UPFSDA Attendance System</title>
+
+</head>
+
+<body>
+<nav th:replace="~{fragments/layout :: sidebar}"></nav>
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main class="main-content">
+    <div class="dashboard-grid-admin">
+
+        <div class="dashboard-center">
+            <div class="welcome-card">
+                <div class="welcome-content">
+                    <h3>Admin Dashboard</h3>
+                    <p>Here's the attendance overview for today.</p>
+                    <small th:text="'Today is ' + ${#dates.format(#dates.createNow(), 'EEEE, MMMM dd, yyyy')}"></small>
+                </div>
+                <div class="welcome-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+            </div>
+
+            <div class="dashboard-main">
+                <!-- Cards Section -->
+                <div class="stats-section">
+                    <div class="stat-card-small" onclick="goToDetails('total_employees')">
+                        <div class="stat-icon bg-primary" style="background:#007bff"><i class="fas fa-users"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-title">Total Employees</div>
+                            <div class="stat-value" id="totalEmployeesCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-small" onclick="goToDetails('on_time')">
+                        <div class="stat-icon bg-success" style="background:#28a745"><i class="fas fa-user-check"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-title">On Time</div>
+                            <div class="stat-value" id="onTimeCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-small" onclick="goToDetails('late_entry')">
+                        <div class="stat-icon bg-warning" style="background:#ffc107"><i class="fas fa-user-clock"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-title">Late Entry</div>
+                            <div class="stat-value" id="lateEntryCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-small" onclick="goToDetails('absent')">
+                        <div class="stat-icon bg-danger" style="background:#dc3545"><i class="fas fa-user-times"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-title">Absent</div>
+                            <div class="stat-value" id="absentCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-small" onclick="goToDetails('half_day')">
+                        <div class="stat-icon" style="background-color: #ff9800;">
+                            <i class="fas fa-user-slash"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Half Day</div>
+                            <div class="stat-value" id="halfDayCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-small" onclick="goToDetails('last_and_half')">
+                        <div class="stat-icon" style="background-color: #e91e63;">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Late & Half Day</div>
+                            <div class="stat-value" id="lateAndHalfCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-small" onclick="goToDetails('wfo')">
+                        <div class="stat-icon" style="background-color: #673ab7;">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Work From Office</div>
+                            <div class="stat-value" id="wfoCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-small" onclick="goToDetails('wfh')">
+                        <div class="stat-icon" style="background-color: #00bcd4;">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Work From Home</div>
+                            <div class="stat-value" id="wfhCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card-small" onclick="goToDetails('wff')">
+                        <div class="stat-icon" style="background-color: #4caf50;">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-title">Work From Field</div>
+                            <div class="stat-value" id="wffCount">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Section -->
+                <div class="chart-section">
+                    <h4>Attendance Status Distribution</h4>
+                    <canvas id="attendancePieChart" width="300" height="300"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="dashboard-right">
+            <div class="simple-calendar-card">
+                <div class="simple-calendar-header">
+                    <button class="simple-nav" id="simplePrevMonth"><i class="fas fa-chevron-left"></i></button>
+                    <span class="simple-month-year" id="simpleCurrentMonth">August 2025</span>
+                    <button class="simple-nav" id="simpleNextMonth"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="simple-calendar-grid" id="simpleCalendarGrid"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAdminDashboardData();
+        initializeCalendar();
+    });
+
+    function goToDetails(type) {
+
+        window.location.href = `/attendance/attendance-details?type=${type}`;
+
+    }
+
+    let attendancePieChart = null; // store chart instance
+
+    async function loadAdminDashboardData() {
+        try {
+            const response = await fetch('/api/data/dashboard-stats-admin');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const apiResponse = await response.json();
+
+            if (apiResponse.statusCode === 200 && apiResponse.data) {
+                updateDashboardStats(apiResponse.data);
+            } else {
+                console.warn('API returned no data:', apiResponse.message);
+            }
+        } catch (error) {
+            console.error('Error loading admin dashboard data:', error);
+            alert('Failed to load dashboard data. Please try again later.');
+        }
+    }
+
+    function updateDashboardStats(data) {
+        document.getElementById('totalEmployeesCount').textContent = data.total_employees || 0;
+        document.getElementById('onTimeCount').textContent = data.on_time || 0;
+        document.getElementById('lateEntryCount').textContent = data.late_entry || 0;
+        document.getElementById('absentCount').textContent = data.absent_today || 0;
+        document.getElementById('halfDayCount').textContent = data.half_day || 0;
+        document.getElementById('lateAndHalfCount').textContent = data.late_and_half || 0;
+        document.getElementById('wfoCount').textContent = data.total_work_from_office || 0;
+        document.getElementById('wfhCount').textContent = data.total_work_from_home || 0;
+        document.getElementById('wffCount').textContent = data.total_work_from_field || 0;
+
+        // Prepare pie chart data
+        const chartData = [
+            data.on_time || 0,
+            data.late_entry || 0,
+            data.absent_today || 0,
+            data.half_day || 0,
+            data.late_and_half || 0
+        ];
+
+        const chartLabels = ['On Time', 'Late Entry', 'Absent', 'Half Day', 'Late & Half Day'];
+        const chartColors = ['#4caf50', '#ff9800', '#f44336', '#2196f3', '#9c27b0'];
+
+        // Destroy previous chart instance if exists
+        if (attendancePieChart) attendancePieChart.destroy();
+
+        // Create chart
+        const ctx = document.getElementById('attendancePieChart').getContext('2d');
+        attendancePieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Attendance Overview',
+                    data: chartData,
+                    backgroundColor: chartColors,
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { enabled: true }
+                }
+            }
+        });
+    }
+
+    function initializeCalendar() {
+        const currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+
+        document.getElementById('simplePrevMonth').addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderSimpleCalendar();
+        });
+
+        document.getElementById('simpleNextMonth').addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderSimpleCalendar();
+        });
+
+        function renderSimpleCalendar() {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+            document.getElementById('simpleCurrentMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            const calendarGrid = document.getElementById('simpleCalendarGrid');
+            calendarGrid.innerHTML = '';
+
+            weekdays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'simple-weekday';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            });
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'simple-day other-month';
+                calendarGrid.appendChild(dayElement);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'simple-day';
+                dayElement.textContent = day;
+                if (currentYear === currentDate.getFullYear() &&
+                    currentMonth === currentDate.getMonth() &&
+                    day === currentDate.getDate()) {
+                    dayElement.classList.add('today');
+                }
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        renderSimpleCalendar();
+    }
+</script>
+</body>
+</html>

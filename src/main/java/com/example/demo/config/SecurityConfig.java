@@ -116,4 +116,5 @@ public class SecurityConfig {
         log.info("Web Security configuration completed");
         return http.build();
     }
+
 }

@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import java.util.Collections;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User implements UserDetails {
     
     private static final Logger log = LoggerFactory.getLogger(User.class);
@@ -40,6 +42,9 @@ public class User implements UserDetails {
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(unique = true, nullable = false)
+    private String role;
     
     private boolean enabled = true;
     private boolean accountNonExpired = true;

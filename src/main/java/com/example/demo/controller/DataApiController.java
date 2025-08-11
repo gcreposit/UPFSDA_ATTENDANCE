@@ -20,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -191,95 +192,18 @@ public class DataApiController {
         }
     }
 
-    //Api For Mark Attendance (In This Also Field Image accept for WFF)
-//    @PostMapping("/mark-attendance")
-//    public ResponseEntity<ApiResponse<Object>> markAttendance(
-//            @RequestParam String userName,
-//            @RequestParam MultipartFile image,
-//            @RequestParam String time,
-//            @RequestParam String attendanceType,
-//            @RequestParam(required = false) String reason,
-//            @RequestParam(required = false) MultipartFile[] fieldImage
-//    ) {
-//        try {
-//            // Validate reason if attendanceType is WFH or WFF
-//            if ((attendanceType != null && (attendanceType.equalsIgnoreCase("WFH") || attendanceType.equalsIgnoreCase("WFF")))
-//                    && (reason == null || reason.trim().isEmpty())) {
-//                Map<String, Object> errorData = new HashMap<>();
-//                errorData.put("error", "Reason is required when attendanceType is WFH or WFF");
-//
-//                return ResponseEntity.badRequest().body(
-//                        ApiResponse.builder()
-//                                .username(userName)
-//                                .message("Validation error")
-//                                .statusCode(HttpStatus.BAD_REQUEST.value())
-//                                .data(errorData)
-//                                .build()
-//                );
-//            }
-//
-//            Attendance attendance = attendanceService.saveAttendance(
-//                    userName, image, time, attendanceType, reason, fieldImage
-//            );
-//
-//            Map<String, Object> responseData = new HashMap<>();
-//            responseData.put("attendanceId", attendance.getId());
-//            responseData.put("username", attendance.getUserName());
-//            responseData.put("morningTime", attendance.getMorningTime());
-//            responseData.put("eveningTime", attendance.getEveningTime());
-//
-//            return ResponseEntity.ok(
-//                    ApiResponse.builder()
-//                            .username(userName)
-//                            .message("Attendance marked successfully")
-//                            .statusCode(HttpStatus.OK.value())
-//                            .data(responseData)
-//                            .build()
-//            );
-//
-//        } catch (Exception e) {
-//            Map<String, Object> errorData = new HashMap<>();
-//            errorData.put("error", e.getMessage());
-//
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-//                    ApiResponse.builder()
-//                            .username(userName)
-//                            .message("Error processing attendance request")
-//                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-//                            .data(errorData)
-//                            .build()
-//            );
-//        }
-//    }
-
-    //Api For Mark Attendance (In This Also Field Image accept for WFF)
+    //Api For Mark Attendance
     @PostMapping("/mark-attendance")
     public ResponseEntity<ApiResponse<Object>> markAttendance(
             @RequestParam String userName,
             @RequestParam MultipartFile image,
-            @RequestParam String time,
             @RequestParam String attendanceType,
             @RequestParam(required = false) String reason
     ) {
         try {
-            // Validate reason if attendanceType is WFH or WFF
-            if ((attendanceType != null && (attendanceType.equalsIgnoreCase("WFH") || attendanceType.equalsIgnoreCase("WFF")))
-                    && (reason == null || reason.trim().isEmpty())) {
-                Map<String, Object> errorData = new HashMap<>();
-                errorData.put("error", "Reason is required when attendanceType is WFH or WFF");
-
-                return ResponseEntity.badRequest().body(
-                        ApiResponse.builder()
-                                .username(userName)
-                                .message("Validation error")
-                                .statusCode(HttpStatus.BAD_REQUEST.value())
-                                .data(errorData)
-                                .build()
-                );
-            }
 
             Attendance attendance = attendanceService.saveAttendance(
-                    userName, image, time, attendanceType, reason
+                    userName, image, attendanceType, reason
             );
 
             Map<String, Object> responseData = new HashMap<>();
@@ -312,6 +236,50 @@ public class DataApiController {
         }
     }
 
+
+    //    Api For Submit Field Image When AttendanceType is WFF
+    @PostMapping("/attendance/field-images")
+    public ResponseEntity<ApiResponse> uploadFieldImages(
+            @RequestParam String username,
+            @RequestParam String date,
+            @RequestParam String fieldImageTime,
+            @RequestParam("fieldImages") MultipartFile[] fieldImages) {
+
+        try {
+
+            String message = attendanceService.uploadFieldImages(username, date, fieldImageTime, fieldImages);
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .username(username)
+                            .message(message)
+                            .statusCode(HttpStatus.OK.value())
+                            .data(null)
+                            .build()
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .username(username)
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .username(username)
+                            .message("Error processing attendance request")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
 
     //Api For Fetch Work Types
     @GetMapping("/work-types")
@@ -437,6 +405,77 @@ public class DataApiController {
                             .message("Internal server error while saving location")
                             .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                             .data(error)
+                            .build()
+            );
+        }
+    }
+
+
+    //    Api For Dashboard Monthly Counts
+    @PostMapping("/dashboard/monthly")
+    public ResponseEntity<Map<String, Object>> getMonthlyRecordCount(
+            @RequestParam("username") String username,
+            @RequestParam("year") int year,
+            @RequestParam("month") int month) {
+
+        Map<String, Object> response = attendanceService.getMonthlyAttendanceCount(username, year, month);
+        return ResponseEntity.ok(response);
+
+    }
+
+    //    Api For Show Dashboard Data For Admin
+    @GetMapping("/dashboard-stats-admin")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getDashboardStatistics() {
+        try {
+            // Fetch data from the service layer, which returns an Optional.
+            Optional<Map<String, Object>> dashboardDataOptional =
+                    attendanceService.getDashboardDataForAdmin();
+
+            if (dashboardDataOptional.isEmpty()) {
+                // ✅ Case: No data found. Return a 200 OK with a specific message.
+                // Note the correct generic type <Map<String, Object>>
+                return ResponseEntity.ok(
+                        ApiResponse.<Map<String, Object>>builder()
+                                .message("No Data Available for the admin dashboard.")
+                                .statusCode(HttpStatus.OK.value())
+                                .data(null)
+                                .build()
+                );
+            }
+
+            // Case: Data fetched successfully.
+            return ResponseEntity.ok(
+                    ApiResponse.<Map<String, Object>>builder()
+                            .message("Admin dashboard data fetched successfully.")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(dashboardDataOptional.get())
+                            .build()
+            );
+        } catch (IllegalArgumentException e) {
+            // Handle invalid arguments.
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponse.<Map<String, Object>>builder()
+                            .message("Bad Request: " + e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+        } catch (NoSuchElementException e) {
+            // Handle cases where a required resource is not found.
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ApiResponse.<Map<String, Object>>builder()
+                            .message("Resource Not Found: " + e.getMessage())
+                            .statusCode(HttpStatus.NOT_FOUND.value())
+                            .data(null)
+                            .build()
+            );
+        } catch (Exception e) {
+            // Catch-all for any other unexpected server errors.
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.<Map<String, Object>>builder()
+                            .message("Internal server error: " + e.getMessage())
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(null)
                             .build()
             );
         }
