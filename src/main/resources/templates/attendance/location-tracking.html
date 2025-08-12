@@ -54,8 +54,10 @@
                                 <div class="row align-items-center">
                                     <div class="col-md-6">
                                         <div class="input-group">
-                                            <select class="form-select" id="userSelect">
+                                            <select class="form-select" id="userSelect1">
                                                 <option value="">Select a user to view history</option>
+                                                <option th:each="username : ${wffEmployees}" th:value="${username}" th:text="${username}">
+                                                </option>
                                             </select>
                                             <button class="btn btn-primary" id="viewUserHistoryBtn">
                                                 <i class="fas fa-history me-2"></i>View History

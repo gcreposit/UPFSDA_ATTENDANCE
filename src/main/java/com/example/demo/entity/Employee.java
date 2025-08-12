@@ -21,13 +21,14 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @NotBlank
     private String name;
 
     @NotBlank
     @Column(unique = true, nullable = false)
     private String identityCardNo;
+
+    private String username;
 
     private String designation;
 
@@ -73,5 +74,6 @@ public class Employee {
     private String uploadSignatureImgPath;
     private String uploadFacePhotoImgPath;
 
+    private boolean isActive = false;
 
 }

@@ -3,7 +3,9 @@ package com.example.demo.service;
 import com.example.demo.dto.ApiResponse;
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Employee;
+import com.example.demo.entity.WffLocationTracking;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,11 +30,23 @@ public interface AttendanceService {
 
     List<Attendance> getAttendanceByType(String type);
 
-
     List<Employee> fetchAllEmployeeDetails();
-
 
     Optional<Attendance> findById(Long id);
 
+    Employee getDetailsByUsername(String username);
+
+    List<String> getDistricts();
+
+    List<String> getTehsilByDistrict(String district);
+
+    List<String> fetchWffEmployees();
+
+    List<WffLocationTracking> fetchWffEmployeesLocationHistory(String userName);
+
+
+    SseEmitter createEmitter(String userName);
+
+    WffLocationTracking getLatest(String userName);
 
 }

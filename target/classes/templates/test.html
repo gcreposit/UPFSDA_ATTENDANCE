@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SSE Location Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #output { white-space: pre-wrap; background: #f9f9f9; padding: 10px; border: 1px solid #ccc; height: 400px; overflow-y: auto; }
+        .status { margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+<h2>Live Location SSE Test</h2>
+
+<label>
+    Username:
+    <input type="text" id="username" value="nadeemkhan">
+</label>
+<button id="connectBtn">Connect</button>
+<div class="status" id="status">Disconnected</div>
+
+<h3>Received Events:</h3>
+<div id="output"></div>
+
+<script>
+    let es = null;
+
+    document.getElementById('connectBtn').addEventListener('click', () => {
+        const userName = document.getElementById('username').value.trim();
+        if (!userName) {
+            alert("Please enter a username");
+            return;
+        }
+
+        if (es) {
+            es.close();
+            es = null;
+        }
+
+        const url = `http://localhost:9090/api/data/stream/${userName}`;
+        es = new EventSource(url);
+
+        document.getElementById('output').textContent += `\nConnecting to ${url}...\n`;
+        document.getElementById('status').textContent = "Connecting...";
+
+        es.addEventListener('open', () => {
+            document.getElementById('status').textContent = "Connected";
+        });
+
+        es.addEventListener('location', event => {
+            const data = JSON.parse(event.data);
+            const time = new Date().toLocaleTimeString();
+            document.getElementById('output').textContent += `\n[${time}] ${JSON.stringify(data)}`;
+            document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+        });
+
+        es.onerror = err => {
+            console.error("SSE error", err);
+            document.getElementById('output').textContent += "\nConnection error!";
+            document.getElementById('status').textContent = "Error / Disconnected";
+        };
+    });
+</script>
+</body>
+</html>

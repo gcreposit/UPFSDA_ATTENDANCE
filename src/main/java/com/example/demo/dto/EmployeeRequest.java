@@ -11,13 +11,13 @@ public class EmployeeRequest {
     @NotBlank(message = "Employee name is required")
     private String name;
     
-    @NotBlank(message = "Date of birth is required")
+//    @NotBlank(message = "Date of birth is required")
     private String dateOfBirth;
     
     @NotBlank(message = "Identity card number is required")
     private String identityCardNo;
     
-    @NotBlank(message = "Address is required")
+//    @NotBlank(message = "Address is required")
     private String address;
     
     @NotBlank(message = "Work Type is required")
@@ -30,7 +30,9 @@ public class EmployeeRequest {
     
     @NotBlank(message = "Tehsil is required")
     private String tehsil;
-    
+
+    private String designation;
+
     private String mobileNumber;
     private String bloodGroup;
     private String emailAddress;

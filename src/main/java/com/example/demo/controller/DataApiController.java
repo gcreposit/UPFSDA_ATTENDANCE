@@ -6,6 +6,7 @@ import com.example.demo.dto.EmployeeResponse;
 import com.example.demo.dto.ErrorResponse;
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Employee;
+import com.example.demo.entity.WffLocationTracking;
 import com.example.demo.service.AttendanceService;
 import com.example.demo.service.EmployeeService;
 import com.example.demo.service.FileStorageService;
@@ -24,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -31,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,6 +45,7 @@ public class DataApiController {
     private final EmployeeService employeeService;
     private final LocationService locationService;
     private final AttendanceService attendanceService;
+
 
     @Value("${file.storage.path}")
     private String uploadPath;
@@ -422,7 +426,6 @@ public class DataApiController {
         }
     }
 
-
     //    Api For Dashboard Monthly Counts
     @PostMapping("/dashboard/monthly")
     public ResponseEntity<Map<String, Object>> getMonthlyRecordCount(
@@ -493,7 +496,7 @@ public class DataApiController {
         }
     }
 
-//    Api To Serve Attendance Image
+    //    Api To Serve Attendance Image
     @GetMapping("/attendance/image/{id}")
     public ResponseEntity<byte[]> getAttendanceImage(
             @PathVariable Long id,
@@ -535,4 +538,163 @@ public class DataApiController {
                 .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
                 .body(imageBytes);
     }
+
+    //    Api for fetch Details By Username
+    @PostMapping("/detailsByUsername")
+    public ResponseEntity<ApiResponse> getDetailsByUsername(@RequestParam String username) {
+
+        try {
+            // Call the service to fetch details
+            Employee employee = attendanceService.getDetailsByUsername(username);
+
+            if (employee == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        ApiResponse.builder()
+                                .username(username)
+                                .message("No username found with given username: " + username)
+                                .statusCode(HttpStatus.NOT_FOUND.value())
+                                .data(null)
+                                .build()
+                );
+            }
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .username(username)
+                            .message("User details fetched successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(employee)
+                            .build()
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .username(username)
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .username(username)
+                            .message("Error fetching user details")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
+
+    //    Api for fetch District For Dropdown
+    @PostMapping("/fetchDistricts")
+    public ResponseEntity<ApiResponse> fetchDistricts() {
+
+        try {
+            // Call the service to fetch details
+            List<String> districts = attendanceService.getDistricts();
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("District details fetched successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(districts)
+                            .build()
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error fetching user details")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
+    //    Api for fetch Tehsil For Dropdown By Giving District Name
+    @PostMapping("/fetchTehsilByDistrict")
+    public ResponseEntity<ApiResponse> fetchTehsilByDistrict(@RequestParam(value = "district") String district) {
+
+        try {
+            // Call the service to fetch details
+            List<String> tehsils = attendanceService.getTehsilByDistrict(district);
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("Tehsil details fetched successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(tehsils)
+                            .build()
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error fetching user details")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
+    //    For Location Tracking Work
+    @GetMapping("/history/{userName}")
+    public List<WffLocationTracking> getHistory(@PathVariable String userName) {
+
+        return attendanceService.fetchWffEmployeesLocationHistory(userName);
+
+    }
+
+    // SSE stream for live updates
+    @GetMapping("/stream/{userName}")
+    public SseEmitter streamLocation(@PathVariable String userName) {
+
+        SseEmitter emitter = attendanceService.createEmitter(userName);
+
+        // Send last known location immediately
+        WffLocationTracking latest = attendanceService.getLatest(userName);
+        if (latest != null) {
+            try {
+                emitter.send(SseEmitter.event().name("location").data(latest));
+            } catch (Exception ignored) {
+            }
+        }
+
+        return emitter;
+    }
+
 }

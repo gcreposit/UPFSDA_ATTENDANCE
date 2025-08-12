@@ -21,5 +21,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query(value = "SELECT COUNT(*) FROM employee;",nativeQuery = true)
     List<Employee> countAllEmployees();
 
+    Employee findByUsername(String username);
+
+    @Query(value = "SELECT DISTINCT dst FROM dst_teh_vil ORDER BY dst;",nativeQuery = true)
+    List<String> fetchAllDistricts();
+
+    @Query(value = "SELECT DISTINCT teh FROM dst_teh_vil WHERE dst = ?1 ORDER BY teh;",nativeQuery = true)
+    List<String> fetchAllTehsilByDistrict(String district);
 
 }

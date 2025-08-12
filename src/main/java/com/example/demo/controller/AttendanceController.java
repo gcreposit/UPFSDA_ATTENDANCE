@@ -160,6 +160,10 @@ public class AttendanceController {
 
     @GetMapping("/location-tracking")
     public String locationTracking(Model model) {
+
+        List<String> wffEmployees = attendanceService.fetchWffEmployees();
+        model.addAttribute("wffEmployees",wffEmployees);
+
         Map<String, Object> user = getMockUserData("user");
         String userRole = "employee";
 

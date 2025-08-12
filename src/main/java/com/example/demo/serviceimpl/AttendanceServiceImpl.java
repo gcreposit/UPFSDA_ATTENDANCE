@@ -7,6 +7,7 @@ import com.example.demo.entity.WffLocationTracking;
 import com.example.demo.repository.AttendanceRepository;
 import com.example.demo.repository.EmployeeRepository;
 import com.example.demo.repository.WffLocationTrackingRepository;
+import com.example.demo.repository.WorkTypesRepository;
 import com.example.demo.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,12 +29,17 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AttendanceServiceImpl implements AttendanceService {
+
+    // username -> list of active SSE connections
+    private final Map<String, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
     @Value("${file.storage.path}")
     private String uploadPath;
@@ -45,6 +52,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private WorkTypesRepository workTypesRepository;
 
     @Override
     @Transactional
@@ -155,7 +165,8 @@ public class AttendanceServiceImpl implements AttendanceService {
                     .timestamp(parsedTimestamp)
                     .build();
 
-            locationTrackingRepository.save(tracking);
+            WffLocationTracking saved = locationTrackingRepository.save(tracking);
+            notifyClients(userName, saved);
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("flag", "success");
@@ -248,6 +259,15 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public Map<String, Object> getMonthlyAttendanceCount(String employeeId, int year, int month) {
+
+        Attendance attendance = attendanceRepository.findByUsername(employeeId);
+        if (attendance == null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("flag", "error");
+            response.put("message", "Username not found");
+            return response;
+        }
+
         // Fetch all attendance records for the given employee, year, and month.
         List<Attendance> records = attendanceRepository.findByUserNameAndMonthAndYear(employeeId, year, month);
 
@@ -422,28 +442,35 @@ public class AttendanceServiceImpl implements AttendanceService {
             case "late_entry":
                 return attendanceRepository.findLateEmployees(today);
 
-            case "absent_today":
-                // 1. Combine idCardNo and name to form usernames
+            case "absent":
+
+                // 1. Get all employee usernames in the *same format* as stored in Attendance
                 List<String> allEmployees = employeeRepository.findAll()
                         .stream()
-                        .map(emp -> emp.getIdentityCardNo() + "_" + emp.getName())
+                        .map(Employee::getIdentityCardNo) // Match DB format exactly
                         .collect(Collectors.toList());
 
-                // 2. Get usernames who marked attendance today
+                // 2. Get today's present employees (make sure date matching ignores time)
                 List<String> presentEmployees = attendanceRepository.findUserNamesByDate(today);
+                if (presentEmployees == null) {
+                    presentEmployees = new ArrayList<>();
+                }
 
-                // 3. Filter absentees
+                // 3. Use a Set for faster lookup
+                Set<String> presentSet = new HashSet<>(presentEmployees);
+
+                // 4. Filter out absentees
                 List<String> absentEmployees = allEmployees.stream()
-                        .filter(emp -> !presentEmployees.contains(emp))
+                        .filter(emp -> !presentSet.contains(emp))
                         .collect(Collectors.toList());
 
-                // 4. Convert to Attendance objects
+                // 5. Convert to Attendance objects
                 return absentEmployees.stream()
                         .map(emp -> {
                             Attendance att = new Attendance();
                             att.setUserName(emp);
                             att.setDate(today);
-                            att.setStatus("Absent");
+                            att.setStatus("Absent"); // not from DB, computed in code
                             return att;
                         })
                         .collect(Collectors.toList());
@@ -485,5 +512,97 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceRepository.findById(id);
 
     }
+
+    @Override
+    public Employee getDetailsByUsername(String username) {
+
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Username cannot be blank");
+        }
+
+        Employee employee = employeeRepository.findByUsername(username);
+
+        return employee;
+
+    }
+
+    @Override
+    public List<String> getDistricts() {
+
+        return employeeRepository.fetchAllDistricts();
+
+    }
+
+    @Override
+    public List<String> getTehsilByDistrict(String district) {
+
+        return employeeRepository.fetchAllTehsilByDistrict(district);
+
+    }
+
+    @Override
+    public List<String> fetchWffEmployees() {
+
+        LocalDate today = LocalDate.now();
+
+        List<Attendance> employeesList = attendanceRepository.findWffEmployees(today);
+
+        return employeesList.stream()
+                .map(Attendance::getUserName)
+                .distinct()
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<WffLocationTracking> fetchWffEmployeesLocationHistory(String userName) {
+
+        return locationTrackingRepository.findByUserNameOrderByTimestampAsc(userName);
+
+    }
+
+    @Override
+    public SseEmitter createEmitter(String userName) {
+
+        SseEmitter emitter = new SseEmitter(0L); // 0L = no timeout
+        emitters.computeIfAbsent(userName, k -> new CopyOnWriteArrayList<>()).add(emitter);
+
+        emitter.onCompletion(() -> removeEmitter(userName, emitter));
+        emitter.onTimeout(() -> removeEmitter(userName, emitter));
+        emitter.onError((e) -> removeEmitter(userName, emitter));
+
+        return emitter;
+    }
+
+    @Override
+    public WffLocationTracking getLatest(String userName) {
+
+        return locationTrackingRepository.findTopByUserNameOrderByTimestampDesc(userName);
+
+    }
+
+    private void removeEmitter(String userName, SseEmitter emitter) {
+        List<SseEmitter> userEmitters = emitters.get(userName);
+        if (userEmitters != null) {
+            userEmitters.remove(emitter);
+            if (userEmitters.isEmpty()) {
+                emitters.remove(userName);
+            }
+        }
+    }
+
+    public void notifyClients(String userName, WffLocationTracking location) {
+        List<SseEmitter> userEmitters = emitters.get(userName);
+        if (userEmitters != null) {
+            for (SseEmitter emitter : userEmitters) {
+                try {
+                    emitter.send(SseEmitter.event().name("location").data(location));
+                } catch (IOException e) {
+                    removeEmitter(userName, emitter);
+                }
+            }
+        }
+    }
+
 
 }
