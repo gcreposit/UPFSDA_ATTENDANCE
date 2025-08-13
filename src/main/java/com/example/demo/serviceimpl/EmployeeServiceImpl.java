@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,20 +35,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             log.info("Creating employee with identity card: {}", request.getIdentityCardNo());
 
-            // Validate identity card uniqueness
-            if (!isIdentityCardUnique(request.getIdentityCardNo())) {
-                log.warn("Identity card number already exists: {}", request.getIdentityCardNo());
-                throw new IdentityCardDuplicateException("Identity card number already exists: " + request.getIdentityCardNo());
-            }
-
             // Validate location data
             validateLocationData(request.getDistrict(), request.getTehsil());
 
             // Store files
             FileStorageService.FileStorageResult fileResult = fileStorageService.storeEmployeeFiles(
                     request.getName(),
-                    request.getUploadFacePhoto(),
-                    request.getUploadSignature()
+                    request.getUploadFacePhoto()
             );
 
             if (!fileResult.isSuccess()) {
@@ -56,7 +50,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
             // Create and save employee
             Employee employee = mapRequestToEmployee(request, fileResult);
-            String idCardNo = request.getIdentityCardNo();
+            String idCardNo = employee.getIdentityCardNo();
             String name = request.getName();
 
             String username = idCardNo + '_' + name;
@@ -127,16 +121,22 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
+    private String generateUniqueIdentityCardNo() {
+
+        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+
     private Employee mapRequestToEmployee(EmployeeRequest request, FileStorageService.FileStorageResult fileResult) {
         return Employee.builder()
                 // Basic information
                 .name(request.getName())
-                .identityCardNo(request.getIdentityCardNo())
+                .identityCardNo(generateUniqueIdentityCardNo()) // auto-generated UUID
                 .dateOfBirth(convertDateFormat(request.getDateOfBirth()))
-                .workType(request.getWorkType())
+                .post(request.getPost())
                 .district(request.getDistrict())
                 .tehsil(request.getTehsil())
                 .homeLocation(request.getHomeLocation())
+                .designation(generateUniqueDesignation(request.getDistrict(), request.getPost()))
 
                 // Optional fields
                 .mobileNumber(request.getMobileNumber())
@@ -152,9 +152,22 @@ public class EmployeeServiceImpl implements EmployeeService {
 
                 // File paths
                 .uploadFacePhotoImgPath(fileResult.getFacePhotoPath())
-                .uploadSignatureImgPath(fileResult.getSignaturePath())
 
                 .build();
+    }
+
+
+    private String generateUniqueDesignation(String district, String post) {
+
+        int counter = 1;
+        String designation;
+
+        do {
+            designation = district + "-" + post + "-" + counter;
+            counter++;
+        } while (employeeRepository.existsByDesignation(designation));
+
+        return designation;
     }
 
     private String convertDateFormat(String dateOfBirth) {

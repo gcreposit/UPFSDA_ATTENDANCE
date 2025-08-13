@@ -52,7 +52,6 @@ public class DataApiController {
     //    FOR SAVING EMPLOYEE DATA (DTO USE KIYA INSTEAD OF MAIN ENTITY)
     @PostMapping("/employees")
     public ResponseEntity<?> createEmployee(@Valid @ModelAttribute EmployeeRequest request, BindingResult bindingResult) {
-        log.info("Received request to create employee with identity card: {}", request.getIdentityCardNo());
 
         try {
             // Check for validation errors
@@ -67,14 +66,8 @@ public class DataApiController {
 
             //--------------After A To Create employee--------
             EmployeeResponse response = employeeService.createEmployee(request);
-            log.info("Successfully created employee with ID: {}", response.getId());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
-        } catch (EmployeeServiceImpl.IdentityCardDuplicateException e) {
-            log.warn("Identity card duplicate error: {}", e.getMessage());
-            ErrorResponse errorResponse = ErrorResponse.of(e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
 
         } catch (EmployeeServiceImpl.InvalidLocationException e) {
             log.warn("Invalid location error: {}", e.getMessage());

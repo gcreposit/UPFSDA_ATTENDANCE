@@ -37,12 +37,11 @@ class FileStorageServiceTest {
         MultipartFile signature = createValidImageFile("signature.png", "image/png");
         
         // Act
-        FileStorageService.FileStorageResult result = fileStorageService.storeEmployeeFiles(userName, facePhoto, signature);
+        FileStorageService.FileStorageResult result = fileStorageService.storeEmployeeFiles(userName, facePhoto);
         
         // Assert
         assertThat(result.isSuccess()).isTrue();
         assertThat(result.getFacePhotoPath()).isNotNull();
-        assertThat(result.getSignaturePath()).isNotNull();
         
         // Verify directory structure
         String expectedDirName = userName + "_" + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
@@ -53,14 +52,13 @@ class FileStorageServiceTest {
         
         // Verify files exist
         assertThat(fileStorageService.fileExists(result.getFacePhotoPath())).isTrue();
-        assertThat(fileStorageService.fileExists(result.getSignaturePath())).isTrue();
     }
     
     @Test
     void storeEmployeeFiles_ShouldThrowExceptionForNullFacePhoto() {
         MultipartFile signature = createValidImageFile("signature.png", "image/png");
         
-        assertThatThrownBy(() -> fileStorageService.storeEmployeeFiles("john_doe", null, signature))
+        assertThatThrownBy(() -> fileStorageService.storeEmployeeFiles("john_doe", null))
             .isInstanceOf(FileStorageService.FileStorageException.class)
             .hasMessageContaining("Face Photo is required");
     }
@@ -70,7 +68,7 @@ class FileStorageServiceTest {
         MultipartFile facePhoto = new MockMultipartFile("face", "face.jpg", "image/jpeg", new byte[0]);
         MultipartFile signature = createValidImageFile("signature.png", "image/png");
         
-        assertThatThrownBy(() -> fileStorageService.storeEmployeeFiles("john_doe", facePhoto, signature))
+        assertThatThrownBy(() -> fileStorageService.storeEmployeeFiles("john_doe", facePhoto))
             .isInstanceOf(FileStorageService.FileStorageException.class)
             .hasMessageContaining("Face Photo is required");
     }
@@ -80,7 +78,7 @@ class FileStorageServiceTest {
         MultipartFile facePhoto = new MockMultipartFile("face", "face.txt", "text/plain", "content".getBytes());
         MultipartFile signature = createValidImageFile("signature.png", "image/png");
         
-        assertThatThrownBy(() -> fileStorageService.storeEmployeeFiles("john_doe", facePhoto, signature))
+        assertThatThrownBy(() -> fileStorageService.storeEmployeeFiles("john_doe", facePhoto))
             .isInstanceOf(FileStorageService.FileStorageException.class)
             .hasMessageContaining("Face Photo must be a JPEG or PNG image");
     }
@@ -91,7 +89,7 @@ class FileStorageServiceTest {
         MultipartFile facePhoto = new MockMultipartFile("face", "face.jpg", "image/jpeg", largeContent);
         MultipartFile signature = createValidImageFile("signature.png", "image/png");
         
-        assertThatThrownBy(() -> fileStorageService.storeEmployeeFiles("john_doe", facePhoto, signature))
+        assertThatThrownBy(() -> fileStorageService.storeEmployeeFiles("john_doe", facePhoto))
             .isInstanceOf(FileStorageService.FileStorageException.class)
             .hasMessageContaining("Face Photo size cannot exceed 5MB");
     }

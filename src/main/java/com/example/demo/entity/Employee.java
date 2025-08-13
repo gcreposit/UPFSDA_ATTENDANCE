@@ -24,15 +24,14 @@ public class Employee {
     @NotBlank
     private String name;
 
-    @NotBlank
-    @Column(unique = true, nullable = false)
+//    @Column(unique = true, nullable = false)
     private String identityCardNo;
 
     private String username;
 
     private String designation;
 
-    @NotBlank
+//    @NotBlank
     @Pattern(regexp = "\\d{2}/\\d{2}/\\d{4}", message = "Date format should be dd/MM/yyyy")
     private String dateOfBirth;
 
@@ -55,8 +54,8 @@ public class Employee {
     private String tehsil;
 
     @NotBlank
-    @Column(name = "work_type")
-    private String workType;
+    @Column(name = "post")
+    private String post;
 
     private String emailAddress;
 

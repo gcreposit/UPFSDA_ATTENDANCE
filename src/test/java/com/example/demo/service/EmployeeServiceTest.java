@@ -53,8 +53,8 @@ class EmployeeServiceTest {
         when(employeeRepository.existsByIdentityCardNo(anyString())).thenReturn(false);
         when(locationService.isValidDistrict(anyString())).thenReturn(true);
         when(locationService.isValidTehsilForDistrict(anyString(), anyString())).thenReturn(true);
-        when(fileStorageService.storeEmployeeFiles(anyString(), any(), any()))
-                .thenReturn(FileStorageService.FileStorageResult.success("face/path.jpg", "signature/path.jpg"));
+        when(fileStorageService.storeEmployeeFiles(anyString(), any()))
+                .thenReturn(FileStorageService.FileStorageResult.success("face/path.jpg"));
         when(employeeRepository.save(any(Employee.class))).thenReturn(savedEmployee);
 
         // Act
@@ -118,7 +118,7 @@ class EmployeeServiceTest {
         when(employeeRepository.existsByIdentityCardNo(anyString())).thenReturn(false);
         when(locationService.isValidDistrict(anyString())).thenReturn(true);
         when(locationService.isValidTehsilForDistrict(anyString(), anyString())).thenReturn(true);
-        when(fileStorageService.storeEmployeeFiles(anyString(), any(), any()))
+        when(fileStorageService.storeEmployeeFiles(anyString(), any()))
                 .thenThrow(new FileStorageService.FileStorageException("File storage failed"));
 
         // Act & Assert
@@ -200,7 +200,7 @@ class EmployeeServiceTest {
         request.setDateOfBirth("15/06/1990");
         request.setIdentityCardNo("ABC123456");
         request.setAddress("123 Main Street, City");
-        request.setWorkType("Sampler");
+        request.setPost("Sampler");
         request.setHomeLocation("");
         request.setDistrict("Agra");
         request.setTehsil("Agra");
@@ -218,7 +218,7 @@ class EmployeeServiceTest {
         employee.setName("John Doe");
         employee.setIdentityCardNo("ABC123456");
         employee.setDateOfBirth("15/06/1990");
-        employee.setWorkType("Sampler");
+        employee.setPost("Sampler");
         employee.setDistrict("Agra");
         employee.setTehsil("Agra");
         employee.setUploadFacePhotoImgPath("john_doe_08-04-2025/Face/face.jpg");
