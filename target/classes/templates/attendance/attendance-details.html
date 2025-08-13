@@ -41,16 +41,16 @@
                             <th>ID Card No</th>
                             <th>Name</th>
                             <th>Designation</th>
-                            <th>Date of Birth</th>
+                            <th hidden>Date of Birth</th>
                             <th>Lab Name</th>
                             <th>Office Name</th>
                             <th>Mobile Number</th>
-                            <th>Blood Group</th>
+                            <th hidden>Blood Group</th>
                             <th>Office Address</th>
                             <th>Home Location</th>
                             <th>District</th>
                             <th>Tehsil</th>
-                            <th>Work Type</th>
+                            <th>Post</th>
                             <th>Email Address</th>
                             <th>Permanent Address</th>
                             <th>Emergency Contact No</th>
@@ -61,16 +61,16 @@
                             <td th:text="${record.identityCardNo}"></td>
                             <td th:text="${record.name}"></td>
                             <td th:text="${record.designation}"></td>
-                            <td th:text="${record.dateOfBirth}"></td>
+                            <td hidden th:text="${record.dateOfBirth}"></td>
                             <td th:text="${record.labName}"></td>
                             <td th:text="${record.officeName}"></td>
                             <td th:text="${record.mobileNumber}"></td>
-                            <td th:text="${record.bloodGroup}"></td>
+                            <td hidden th:text="${record.bloodGroup}"></td>
                             <td th:text="${record.officeAddress}"></td>
                             <td th:text="${record.homeLocation}"></td>
                             <td th:text="${record.district}"></td>
                             <td th:text="${record.tehsil}"></td>
-                            <td th:text="${record.workType}"></td>
+                            <td th:text="${record.post}"></td>
                             <td th:text="${record.emailAddress}"></td>
                             <td th:text="${record.permanantAddress}"></td>
                             <td th:text="${record.emergencyContactNo}"></td>

@@ -168,8 +168,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
             WffLocationTracking tracking = WffLocationTracking.builder()
                     .userName(userName)
-                    .lat(lat)
-                    .lon(lon)
+                    .lat(Double.valueOf(lat))
+                    .lon(Double.valueOf(lon))
                     .timestamp(parsedTimestamp)
                     .build();
 
@@ -553,6 +553,13 @@ public class AttendanceServiceImpl implements AttendanceService {
     public WffLocationTracking getLatest(String userName) {
 
         return locationTrackingRepository.findTopByUserNameOrderByTimestampDesc(userName);
+
+    }
+
+    @Override
+    public List<WffLocationTracking> findAllLocationHistory() {
+
+        return locationTrackingRepository.findAll();
 
     }
 

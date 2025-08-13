@@ -111,6 +111,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    @Override
+    public List<Employee> findAllEmployeeDetails() {
+
+        return employeeRepository.findAll();
+
+    }
+
     private void validateLocationData(String district, String tehsil) {
         if (!locationService.isValidDistrict(district)) {
             throw new InvalidLocationException("Invalid district: " + district);
@@ -121,16 +128,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-    private String generateUniqueIdentityCardNo() {
-
-        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-    }
+//    private String generateUniqueIdentityCardNo() {
+//
+//        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+//    }
 
     private Employee mapRequestToEmployee(EmployeeRequest request, FileStorageService.FileStorageResult fileResult) {
         return Employee.builder()
                 // Basic information
                 .name(request.getName())
-                .identityCardNo(generateUniqueIdentityCardNo()) // auto-generated UUID
+                .identityCardNo(request.getIdentityCardNo()) // auto-generated UUID
                 .dateOfBirth(convertDateFormat(request.getDateOfBirth()))
                 .post(request.getPost())
                 .district(request.getDistrict())
@@ -155,7 +162,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
                 .build();
     }
-
 
     private String generateUniqueDesignation(String district, String post) {
 

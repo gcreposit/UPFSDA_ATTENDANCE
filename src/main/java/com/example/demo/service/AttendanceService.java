@@ -49,4 +49,7 @@ public interface AttendanceService {
 
     WffLocationTracking getLatest(String userName);
 
+    List<WffLocationTracking> findAllLocationHistory();
+
+
 }

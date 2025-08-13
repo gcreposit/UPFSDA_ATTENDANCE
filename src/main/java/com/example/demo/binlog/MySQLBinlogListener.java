@@ -77,9 +77,9 @@ public class MySQLBinlogListener {
         try {
             return WffLocationTracking.builder()
                     .id(((Number) row[0]).longValue())
-                    .userName(row[1].toString())
-                    .lat(row[2].toString())
-                    .lon(row[3].toString())
+                    .userName((String) row[1])
+                    .lat((Double) row[2])
+                    .lon((Double) row[3])
                     .timestamp(LocalDateTime.parse(row[4].toString()))
                     .build();
         } catch (Exception e) {

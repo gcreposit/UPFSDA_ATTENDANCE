@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Entity
 @Table(name = "wff_location_tracking")
@@ -22,10 +25,20 @@ public class WffLocationTracking {
 
     private String userName;
 
-    private String lat;
+    private Double lat;
 
-    private String lon;
+    private Double lon;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // Ensures ISO string
     private LocalDateTime timestamp;
+
+    // Optional: if you want live status in history
+    private Boolean isActive;
+
+    // Virtual property: sends { lat: ..., lng: ... } in JSON
+    @JsonProperty("location")
+    public Map<String, Double> getLocation() {
+        return Map.of("lat", lat, "lng", lon);
+    }
 
 }
