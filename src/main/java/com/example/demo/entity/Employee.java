@@ -24,7 +24,7 @@ public class Employee {
     @NotBlank
     private String name;
 
-//    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String identityCardNo;
 
     private String username;

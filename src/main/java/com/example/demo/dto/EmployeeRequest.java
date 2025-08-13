@@ -14,7 +14,7 @@ public class EmployeeRequest {
 //    @NotBlank(message = "Date of birth is required")
     private String dateOfBirth;
     
-//    @NotBlank(message = "Identity card number is required")
+    @NotBlank(message = "Identity card number is required")
     private String identityCardNo;
     
 //    @NotBlank(message = "Address is required")

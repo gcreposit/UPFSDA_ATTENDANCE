@@ -111,6 +111,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    @Override
+    public List<Employee> findAllEmployeeDetails() {
+
+        return employeeRepository.findAll();
+
+    }
+
     private void validateLocationData(String district, String tehsil) {
         if (!locationService.isValidDistrict(district)) {
             throw new InvalidLocationException("Invalid district: " + district);
@@ -121,16 +128,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-    private String generateUniqueIdentityCardNo() {
-
-        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-    }
+//    private String generateUniqueIdentityCardNo() {
+//
+//        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+//    }
 
     private Employee mapRequestToEmployee(EmployeeRequest request, FileStorageService.FileStorageResult fileResult) {
         return Employee.builder()
                 // Basic information
                 .name(request.getName())
-                .identityCardNo(generateUniqueIdentityCardNo()) // auto-generated UUID
+                .identityCardNo(request.getIdentityCardNo()) // auto-generated UUID
                 .dateOfBirth(convertDateFormat(request.getDateOfBirth()))
                 .post(request.getPost())
                 .district(request.getDistrict())
@@ -156,7 +163,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
-
     private String generateUniqueDesignation(String district, String post) {
 
         int counter = 1;
@@ -172,22 +178,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private String convertDateFormat(String dateOfBirth) {
         if (dateOfBirth == null || dateOfBirth.trim().isEmpty()) {
-            return dateOfBirth;
+            return null; // No date provided
         }
 
         try {
-            // Check if it's already in dd/MM/yyyy format
-            if (dateOfBirth.matches("\\d{2}/\\d{2}/\\d{4}")) {
-                return dateOfBirth;
-            }
-
-            // Check if it's in YYYY-MM-DD format (from HTML5 date input)
-            if (dateOfBirth.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            // Convert only if in YYYY-MM-DD format
+            if (dateOfBirth.contains("-")) {
                 String[] parts = dateOfBirth.split("-");
-                return parts[2] + "/" + parts[1] + "/" + parts[0]; // Convert to dd/MM/yyyy
+                if (parts.length == 3) {
+                    return parts[2] + "/" + parts[1] + "/" + parts[0];
+                }
             }
-
-            // If neither format matches, return as is
+            // Otherwise return original
             return dateOfBirth;
 
         } catch (Exception e) {

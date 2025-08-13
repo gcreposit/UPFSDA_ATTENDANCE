@@ -18,4 +18,7 @@ public interface EmployeeService {
 
     List<String> getDistinctWorkTypes();
 
+    List<Employee> findAllEmployeeDetails();
+
+
 }

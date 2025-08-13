@@ -12,13 +12,10 @@ import com.example.demo.service.EmployeeService;
 import com.example.demo.service.FileStorageService;
 import com.example.demo.service.LocationService;
 import com.example.demo.serviceimpl.EmployeeServiceImpl;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @RestController
@@ -687,6 +682,20 @@ public class DataApiController {
         }
 
         return emitter;
+    }
+
+    //    For get All Employees Details
+    @GetMapping("/employeesDetails")
+    public List<Employee> employeesDetails() {
+
+        return employeeService.findAllEmployeeDetails();
+    }
+
+    //    For Get Location History Data
+    @GetMapping("/location-history")
+    public List<WffLocationTracking> getLocationHistory() {
+
+        return attendanceService.findAllLocationHistory();
     }
 
 }

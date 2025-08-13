@@ -462,17 +462,17 @@ async function validateAuthToken(token) {
         // Token is valid, check role-based access
         const username = localStorage.getItem('username');
         const currentPath = window.location.pathname;
-        
+
         console.log('Current user:', username, 'Current path:', currentPath);
-        
-        // If non-admin user tries to access team management, redirect to dashboard
-        if (currentPath === '/attendance/team' && username !== 'MasterAdmin') {
-            console.log('Non-admin user accessing team page, redirecting to dashboard');
+
+// Always redirect to dashboard unless already there
+        if (currentPath !== '/attendance/dashboard') {
+            console.log('Redirecting to dashboard page only');
             window.location.replace('/attendance/dashboard');
         } else {
-            console.log('Access granted to current page');
+            console.log('Already on dashboard — access granted');
         }
-        
+
     } catch (error) {
         console.error('Token validation error:', error);
         // On error, clear auth data and redirect to login for safety

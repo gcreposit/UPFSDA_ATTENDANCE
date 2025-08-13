@@ -46,21 +46,23 @@ public class AttendanceController {
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
 
-        // Mock user data for display purposes
-        Map<String, Object> user = getMockUserData("user"); // Default to employee view
-        String userRole = "employee"; // Default role
+        // Decide role dynamically (example: fetch from logged-in user's session or authentication)
+        String username = "MasterAdmin"; // Change to dynamic retrieval later
+        String userRole = username.equals("admin") ? "Administrator" : "employee";
+
+        Map<String, Object> user = getMockUserData(username);
 
         model.addAttribute("pageTitle", "Dashboard");
         model.addAttribute("currentPage", "dashboard");
         model.addAttribute("user", user);
         model.addAttribute("userRole", userRole);
 
-//        Map<String, Object> attendances = attendanceService.getDashboardDataForAdmin();
-//        model.addAttribute("attendances",attendances);
+        // Map<String, Object> attendances = attendanceService.getDashboardDataForAdmin();
+        // model.addAttribute("attendances", attendances);
 
         return "dashboard/dashboardNew";
-
     }
+
 
     @GetMapping("/attendance-details")
     public String attendanceDetails(@RequestParam("type") String type, Model model) {
@@ -173,8 +175,10 @@ public class AttendanceController {
         List<String> wffEmployees = attendanceService.fetchWffEmployees();
         model.addAttribute("wffEmployees",wffEmployees);
 
-        Map<String, Object> user = getMockUserData("user");
-        String userRole = "employee";
+        String username = "MasterAdmin"; // Change to dynamic retrieval later
+        String userRole = username.equals("admin") ? "Administrator" : "employee";
+
+        Map<String, Object> user = getMockUserData(username);
 
         model.addAttribute("pageTitle", "Location Tracking");
         model.addAttribute("currentPage", "location");
