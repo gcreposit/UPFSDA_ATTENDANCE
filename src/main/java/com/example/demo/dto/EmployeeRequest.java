@@ -42,8 +42,7 @@ public class EmployeeRequest {
     
     @NotNull(message = "Face photo is required")
     private MultipartFile uploadFacePhoto;
-    
-    @NotNull(message = "Signature is required")
+
     private MultipartFile uploadSignature;
 
 }

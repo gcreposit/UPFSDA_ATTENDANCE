@@ -72,6 +72,7 @@ public class Employee {
     private MultipartFile uploadFacePhoto;
 
     private String uploadSignatureImgPath;
+
     private String uploadFacePhotoImgPath;
 
     private boolean isActive = false;

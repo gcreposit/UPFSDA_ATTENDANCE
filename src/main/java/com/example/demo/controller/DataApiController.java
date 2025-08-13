@@ -46,7 +46,6 @@ public class DataApiController {
     private final LocationService locationService;
     private final AttendanceService attendanceService;
 
-
     @Value("${file.storage.path}")
     private String uploadPath;
 

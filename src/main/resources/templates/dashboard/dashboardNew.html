@@ -26,43 +26,65 @@
             </div>
 
             <div class="dashboard-main">
-                <!-- Cards Section -->
+                <!-- Summary Cards Section -->
                 <div class="stats-section">
+
+                    <!-- Total Employees -->
                     <div class="stat-card-small" onclick="goToDetails('total_employees')">
-                        <div class="stat-icon bg-primary" style="background:#007bff"><i class="fas fa-users"></i></div>
+                        <div class="stat-icon" style="background:#007bff"><i class="fas fa-users"></i></div>
                         <div class="stat-content">
                             <div class="stat-title">Total Employees</div>
                             <div class="stat-value" id="totalEmployeesCount">0</div>
                         </div>
                     </div>
-                    <div class="stat-card-small" onclick="goToDetails('today_present')">
-                        <div class="stat-icon bg-success" style="background:#28a745"><i class="fas fa-user-check"></i></div>
-                        <div class="stat-content">
+
+                    <!-- Present Card with Breakdown Inside -->
+                    <div class="stat-card-small" style="flex: 1;" onclick="goToDetails('today_present')">
+                        <div class="stat-icon" style="background:#28a745"><i class="fas fa-user-check"></i></div>
+                        <div class="stat-content" style="width: 100%;">
                             <div class="stat-title">Present</div>
                             <div class="stat-value" id="presentCount">0</div>
+
+                            <!-- Attendance Type Breakdown -->
+                            <div style="margin-top: 8px; font-size: 0.85rem; color: #555;">
+                                <strong>Attendance Type</strong>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>On Time:</span> <span id="onTimeCount">0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Late Entry:</span> <span id="lateEntryCount">0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Late & Half Day:</span> <span id="lateAndHalfCount">0</span>
+                                </div>
+                            </div>
+
+                            <!-- Work Mode Breakdown -->
+                            <div style="margin-top: 8px; font-size: 0.85rem; color: #555;">
+                                <strong>Work Mode</strong>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Work From Office:</span> <span id="wfoCount">0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Work From Home:</span> <span id="wfhCount">0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Work From Field:</span> <span id="wffCount">0</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="stat-card-small" onclick="goToDetails('on_time')">
-                        <div class="stat-icon bg-success" style="background:#28a745"><i class="fas fa-user-clock"></i></div>
-                        <div class="stat-content">
-                            <div class="stat-title">On Time</div>
-                            <div class="stat-value" id="onTimeCount">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card-small" onclick="goToDetails('late_entry')">
-                        <div class="stat-icon bg-warning" style="background:#ffc107"><i class="fas fa-user-clock"></i></div>
-                        <div class="stat-content">
-                            <div class="stat-title">Late Entry</div>
-                            <div class="stat-value" id="lateEntryCount">0</div>
-                        </div>
-                    </div>
+
+                    <!-- Absent -->
                     <div class="stat-card-small" onclick="goToDetails('absent')">
-                        <div class="stat-icon bg-danger" style="background:#dc3545"><i class="fas fa-user-times"></i></div>
+                        <div class="stat-icon" style="background:#dc3545"><i class="fas fa-user-times"></i></div>
                         <div class="stat-content">
                             <div class="stat-title">Absent</div>
                             <div class="stat-value" id="absentCount">0</div>
                         </div>
                     </div>
+
+                    <!-- Half Day -->
                     <div class="stat-card-small" onclick="goToDetails('half_day')">
                         <div class="stat-icon" style="background-color: #ff9800;">
                             <i class="fas fa-user-slash"></i>
@@ -70,42 +92,6 @@
                         <div class="stat-content">
                             <div class="stat-title">Half Day</div>
                             <div class="stat-value" id="halfDayCount">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card-small" onclick="goToDetails('late_and_half')">
-                        <div class="stat-icon" style="background-color: #e91e63;">
-                            <i class="fas fa-exclamation-circle"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-title">Late & Half Day</div>
-                            <div class="stat-value" id="lateAndHalfCount">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card-small" onclick="goToDetails('wfo')">
-                        <div class="stat-icon" style="background-color: #673ab7;">
-                            <i class="fas fa-building"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-title">Work From Office</div>
-                            <div class="stat-value" id="wfoCount">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card-small" onclick="goToDetails('wfh')">
-                        <div class="stat-icon" style="background-color: #00bcd4;">
-                            <i class="fas fa-home"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-title">Work From Home</div>
-                            <div class="stat-value" id="wfhCount">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card-small" onclick="goToDetails('wff')">
-                        <div class="stat-icon" style="background-color: #4caf50;">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-title">Work From Field</div>
-                            <div class="stat-value" id="wffCount">0</div>
                         </div>
                     </div>
                 </div>
