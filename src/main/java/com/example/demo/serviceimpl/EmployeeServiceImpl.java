@@ -178,22 +178,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private String convertDateFormat(String dateOfBirth) {
         if (dateOfBirth == null || dateOfBirth.trim().isEmpty()) {
-            return dateOfBirth;
+            return null; // No date provided
         }
 
         try {
-            // Check if it's already in dd/MM/yyyy format
-            if (dateOfBirth.matches("\\d{2}/\\d{2}/\\d{4}")) {
-                return dateOfBirth;
-            }
-
-            // Check if it's in YYYY-MM-DD format (from HTML5 date input)
-            if (dateOfBirth.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            // Convert only if in YYYY-MM-DD format
+            if (dateOfBirth.contains("-")) {
                 String[] parts = dateOfBirth.split("-");
-                return parts[2] + "/" + parts[1] + "/" + parts[0]; // Convert to dd/MM/yyyy
+                if (parts.length == 3) {
+                    return parts[2] + "/" + parts[1] + "/" + parts[0];
+                }
             }
-
-            // If neither format matches, return as is
+            // Otherwise return original
             return dateOfBirth;
 
         } catch (Exception e) {
