@@ -239,11 +239,12 @@
                     setTimeout(() => {
                         if (data.username === 'MasterAdmin') {
                             // Admin goes to team management
-                            window.location.href = '/attendance/team';
-                        } else {
-                            // Regular users go to dashboard
                             window.location.href = '/attendance/dashboard';
                         }
+                        // else {
+                        //     // Regular users go to dashboard
+                        //     window.location.href = '/attendance/dashboard';
+                        // }
                     }, 1500);
                 } else {
                     const errorMessage = data.message || 'Login failed. Please check your credentials.';

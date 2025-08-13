@@ -97,7 +97,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Web Security Configuration (Allow attendance pages, protect with client-side JWT)
     @Bean
     @Order(2)
     public SecurityFilterChain webFilterChain(
@@ -109,12 +108,41 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()  // Allow all web requests, handle auth client-side
+                        // Allow public pages
+                        .requestMatchers("/login", "/css/**", "/js/**", "/images/**","/api/web/**","/attendance/**").permitAll()
+                        // Require authentication for everything else
+                        .anyRequest().authenticated()
                 )
-                .authenticationProvider(authenticationProvider);
+                .authenticationProvider(authenticationProvider)
+                .formLogin(form -> form
+                        .loginPage("/login")           // your custom login page
+                        .permitAll()
+                )
+                .logout(logout -> logout.permitAll());
 
         log.info("Web Security configuration completed");
         return http.build();
     }
+
+
+//    // Web Security Configuration (Allow attendance pages, protect with client-side JWT)
+//    @Bean
+//    @Order(2)
+//    public SecurityFilterChain webFilterChain(
+//            HttpSecurity http,
+//            DaoAuthenticationProvider authenticationProvider) throws Exception {
+//        log.info("Configuring Web Security filter chain");
+//
+//        http.securityMatcher("/**")
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(auth -> auth
+//                        .anyRequest().permitAll()  // Allow all web requests, handle auth client-side
+//                )
+//                .authenticationProvider(authenticationProvider);
+//
+//        log.info("Web Security configuration completed");
+//        return http.build();
+//    }
 
 }

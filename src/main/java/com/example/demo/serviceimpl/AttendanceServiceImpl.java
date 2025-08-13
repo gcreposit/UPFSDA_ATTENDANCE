@@ -22,10 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -55,6 +52,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Autowired
     private WorkTypesRepository workTypesRepository;
+    @Autowired
+    private AttendanceService attendanceService;
 
     @Override
     @Transactional
@@ -265,6 +264,72 @@ public class AttendanceServiceImpl implements AttendanceService {
         return "Field images uploaded successfully";
     }
 
+//    @Override
+//    public Map<String, Object> getMonthlyAttendanceCount(String employeeId, int year, int month) {
+//
+//        Attendance attendance = attendanceRepository.findByUsername(employeeId);
+//        if (attendance == null) {
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("flag", "error");
+//            response.put("message", "Username not found");
+//            return response;
+//        }
+//
+//        // Fetch all attendance records for the given employee, year, and month.
+//        List<Attendance> records = attendanceRepository.findByUserNameAndMonthAndYear(employeeId, year, month);
+//
+//        // Calculate the total number of days in the specified month and year.
+//        int totalDaysInMonth = YearMonth.of(year, month).lengthOfMonth();
+//
+//        // Count attendance by status using streams.
+//        long onTime = records.stream()
+//                .filter(r -> "On Time".equalsIgnoreCase(r.getStatus()))
+//                .count();
+//        long lateEntry = records.stream()
+//                .filter(r -> "Late Entry".equalsIgnoreCase(r.getStatus()))
+//                .count();
+//        long halfDay = records.stream()
+//                .filter(r -> "Half Day".equalsIgnoreCase(r.getStatus()))
+//                .count();
+//        long lateAndHalf = records.stream()
+//                .filter(r -> "Late & Half".equalsIgnoreCase(r.getStatus()))
+//                .count();
+//
+//        // Calculate the number of absent days.
+//        // This is the total days in the month minus the number of records (which includes present and on leave).
+//        long absent = totalDaysInMonth - records.size();
+//
+//        // Count attendance by work type.
+//        long wfh = records.stream()
+//                .filter(r -> "WFH".equalsIgnoreCase(r.getAttendanceType()))
+//                .count();
+//        long wfo = records.stream()
+//                .filter(r -> "WFO".equalsIgnoreCase(r.getAttendanceType()))
+//                .count();
+//        long wff = records.stream()
+//                .filter(r -> "WFF".equalsIgnoreCase(r.getAttendanceType()))
+//                .count();
+//
+//        // Prepare the detailed data map.
+//        Map<String, Object> data = new HashMap<>();
+//        data.put("on_time", onTime);
+//        data.put("late_entry", lateEntry + lateAndHalf); // Combine late entries for a clearer summary
+//        data.put("half_day", halfDay);
+//        data.put("absent", absent); // Correctly calculated absent days
+//        data.put("total_work_from_home", wfh);
+//        data.put("total_work_from_office", wfo);
+//        data.put("total_work_from_field", wff);
+//        data.put("total_days_in_month", totalDaysInMonth);
+//
+//        // Prepare the final response map.
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("flag", "success");
+//        response.put("message", "Monthly attendance summary retrieved successfully");
+//        response.put("data", data);
+//
+//        return response;
+//    }
+
     @Override
     public Map<String, Object> getMonthlyAttendanceCount(String employeeId, int year, int month) {
 
@@ -276,13 +341,35 @@ public class AttendanceServiceImpl implements AttendanceService {
             return response;
         }
 
-        // Fetch all attendance records for the given employee, year, and month.
+        // Fetch records for the given month/year
         List<Attendance> records = attendanceRepository.findByUserNameAndMonthAndYear(employeeId, year, month);
 
-        // Calculate the total number of days in the specified month and year.
-        int totalDaysInMonth = YearMonth.of(year, month).lengthOfMonth();
+        // Step 1: Generate working days list (exclude Sundays)
+        YearMonth ym = YearMonth.of(year, month);
+        LocalDate today = LocalDate.now();
+        LocalDate endDate = (year == today.getYear() && month == today.getMonthValue())
+                ? today  // if current month, only consider days up to today
+                : ym.atEndOfMonth(); // for past months, consider full month
 
-        // Count attendance by status using streams.
+        List<LocalDate> workingDays = new ArrayList<>();
+        for (int day = 1; day <= endDate.getDayOfMonth(); day++) {
+            LocalDate date = LocalDate.of(year, month, day);
+            if (date.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                workingDays.add(date);
+            }
+        }
+
+        // Step 2: Get attended days from records
+        Set<LocalDate> attendedDays = records.stream()
+                .map(Attendance::getDate)
+                .collect(Collectors.toSet());
+
+        // Step 3: Calculate absent days (working days without attendance)
+        long absent = workingDays.stream()
+                .filter(day -> !attendedDays.contains(day))
+                .count();
+
+        // Step 4: Count attendance by status
         long onTime = records.stream()
                 .filter(r -> "On Time".equalsIgnoreCase(r.getStatus()))
                 .count();
@@ -296,11 +383,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .filter(r -> "Late & Half".equalsIgnoreCase(r.getStatus()))
                 .count();
 
-        // Calculate the number of absent days.
-        // This is the total days in the month minus the number of records (which includes present and on leave).
-        long absent = totalDaysInMonth - records.size();
-
-        // Count attendance by work type.
+        // Step 5: Count by attendance type
         long wfh = records.stream()
                 .filter(r -> "WFH".equalsIgnoreCase(r.getAttendanceType()))
                 .count();
@@ -311,18 +394,18 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .filter(r -> "WFF".equalsIgnoreCase(r.getAttendanceType()))
                 .count();
 
-        // Prepare the detailed data map.
+        // Step 6: Prepare the detailed data
         Map<String, Object> data = new HashMap<>();
         data.put("on_time", onTime);
-        data.put("late_entry", lateEntry + lateAndHalf); // Combine late entries for a clearer summary
+        data.put("late_entry", lateEntry + lateAndHalf);
         data.put("half_day", halfDay);
-        data.put("absent", absent); // Correctly calculated absent days
+        data.put("absent", absent);
         data.put("total_work_from_home", wfh);
         data.put("total_work_from_office", wfo);
         data.put("total_work_from_field", wff);
-        data.put("total_days_in_month", totalDaysInMonth);
+        data.put("total_days_in_month", ym.lengthOfMonth());
 
-        // Prepare the final response map.
+        // Step 7: Prepare final response
         Map<String, Object> response = new HashMap<>();
         response.put("flag", "success");
         response.put("message", "Monthly attendance summary retrieved successfully");

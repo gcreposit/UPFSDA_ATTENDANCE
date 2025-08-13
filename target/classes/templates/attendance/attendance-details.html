@@ -38,6 +38,7 @@
                            class="table table-bordered mb-0 display nowrap" style="width:100%">
                         <thead>
                         <tr>
+                            <th>Action</th>
                             <th>ID Card No</th>
                             <th>Name</th>
                             <th>Designation</th>
@@ -58,6 +59,14 @@
                         </thead>
                         <tbody>
                         <tr th:each="record : ${records}">
+                            <td>
+                                <button class="btn btn-primary btn-sm"
+                                        th:data-username="${record.username}"
+                                        onclick="showMonthlyReportFromButton(this)">
+                                    See Monthly Report
+                                </button>
+                            </td>
+
                             <td th:text="${record.identityCardNo}"></td>
                             <td th:text="${record.name}"></td>
                             <td th:text="${record.designation}"></td>
@@ -76,6 +85,7 @@
                             <td th:text="${record.emergencyContactNo}"></td>
                         </tr>
                         </tbody>
+
                     </table>
                 </div>
 
@@ -159,7 +169,6 @@
         </div>
     </div>
 </main>
-
 <!-- Image Modal -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -176,8 +185,95 @@
     </div>
 </div>
 
+<!--Modal to Show The Monthly Report Data-->
+<div class="modal fade" id="monthlyReportModal" tabindex="-1" role="dialog" aria-labelledby="monthlyReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="monthlyReportModalLabel">Monthly Report</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="monthlyReportContainer">
+                <!-- Report content will be injected here by JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 
+<!--js For See Monthly Report On Click of the Button-->
+<script>
+    function showMonthlyReportFromButton(button) {
+        const username = button.getAttribute('data-username');
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+
+        console.log("Check Username", username);
+
+        // Prepare form data
+        const formData = new URLSearchParams();
+        formData.append('username', username);
+        formData.append('year', year);
+        formData.append('month', month);
+
+        fetch('/api/data/dashboard/monthly', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                console.log("Data ",data);
+
+                if (data.flag === "success") {
+                    const d = data.data;
+
+                    const content = `
+                <h5>Monthly Attendance Report for ${username}</h5>
+                <ul>
+                    <li>On Time: ${d.on_time}</li>
+                    <li>Late Entry: ${d.late_entry}</li>
+                    <li>Half Day: ${d.half_day}</li>
+                    <li>Absent: ${d.absent}</li>
+                    <li>Work From Home: ${d.total_work_from_home}</li>
+                    <li>Work From Office: ${d.total_work_from_office}</li>
+                    <li>Work From Field: ${d.total_work_from_field}</li>
+                    <li>Total Days in Month: ${d.total_days_in_month}</li>
+                </ul>
+            `;
+
+                    // Update modal content
+                    const container = document.getElementById('monthlyReportContainer');
+                    container.innerHTML = content;
+
+                    // Show modal (vanilla JS)
+                    const modal = document.getElementById('monthlyReportModal');
+                    modal.style.display = "block";
+
+                    // Optional: Close modal when clicking the close button
+                    const closeBtn = modal.querySelector('.close');
+                    if (closeBtn) {
+                        closeBtn.onclick = () => { modal.style.display = "none"; };
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(err => console.error('Error fetching monthly report:', err));
+    }
+</script>
+
+
+
+<!--Js For Show Image-->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const buttons = document.querySelectorAll('.open-image-modal');

@@ -67,6 +67,16 @@ public class AttendanceController {
     @GetMapping("/attendance-details")
     public String attendanceDetails(@RequestParam("type") String type, Model model) {
 
+        String username = "MasterAdmin"; // Change to dynamic retrieval later
+        String userRole = username.equals("admin") ? "Administrator" : "employee";
+
+        Map<String, Object> user = getMockUserData(username);
+
+        model.addAttribute("pageTitle", "Dashboard");
+        model.addAttribute("currentPage", "dashboard");
+        model.addAttribute("user", user);
+        model.addAttribute("userRole", userRole);
+
         List<Employee> records = new ArrayList<>(); // Use wildcard if mixing Employee and Attendance types
 
         List<Attendance> attendances = new ArrayList<>();; // Use wildcard if mixing Employee and Attendance types

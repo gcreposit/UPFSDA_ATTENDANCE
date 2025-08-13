@@ -119,13 +119,13 @@
                             <!-- Attendance Type Breakdown -->
                             <div class="stat-breakdown">
                                 <strong>Attendance Type</strong>
-                                <div class="breakdown-item" onclick="goToDetails('on_time')">
+                                <div class="breakdown-item" onclick="event.stopPropagation(); goToDetails('on_time')">
                                     <span>On Time:</span> <span id="onTimeCount">0</span>
                                 </div>
-                                <div class="breakdown-item" onclick="goToDetails('late_entry')">
+                                <div class="breakdown-item" onclick="event.stopPropagation(); goToDetails('late_entry')">
                                     <span>Late Entry:</span> <span id="lateEntryCount">0</span>
                                 </div>
-                                <div class="breakdown-item" onclick="goToDetails('late_and_half')">
+                                <div class="breakdown-item" onclick="event.stopPropagation(); goToDetails('late_and_half')">
                                     <span>Late & Half Day:</span> <span id="lateAndHalfCount">0</span>
                                 </div>
                             </div>
@@ -133,7 +133,7 @@
                     </div>
 
                     <!-- Work Mode Card -->
-                    <div class="stat-card-large" style="background: linear-gradient(145deg, #3f51b5, #303f9f);" onclick="goToDetails('work_mode')">
+                    <div class="stat-card-large" style="background: linear-gradient(145deg, #3f51b5, #303f9f);">
                         <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
                         <div class="stat-content">
                             <div class="stat-title">Work Mode</div>
@@ -229,7 +229,7 @@
             }
         } catch (error) {
             console.error('Error loading admin dashboard data:', error);
-            alert('Failed to load dashboard data. Please try again later.');
+            // alert('Failed to load dashboard data. Please try again later.');
         }
     }
 
