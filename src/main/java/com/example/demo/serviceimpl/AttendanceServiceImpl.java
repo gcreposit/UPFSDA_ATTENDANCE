@@ -63,6 +63,12 @@ public class AttendanceServiceImpl implements AttendanceService {
                                      String attendanceTypeFromRequest,
                                      String reason) throws IOException {
 
+        // Step 1: Check if username exists in Employee table
+        boolean userExists = employeeRepository.existsByUsername(userName);
+        if (!userExists) {
+            throw new IllegalArgumentException("Username not registered");
+        }
+
         LocalDate today = LocalDate.now();
         Optional<Attendance> existingAttendanceOpt = attendanceRepository.findTopByUserNameAndDate(userName, today);
         Attendance attendance = existingAttendanceOpt.orElse(new Attendance());
@@ -134,6 +140,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendanceRepository.save(attendance);
     }
 
+
     private String saveImageToDisk(MultipartFile file) throws IOException {
         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
         File dest = new File(uploadPath + filename);
@@ -153,6 +160,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
+    @Transactional
     public ApiResponse<Object> saveLocationForTracking(String userName, String lat, String lon, String timestamp) {
 
         try {
@@ -323,40 +331,6 @@ public class AttendanceServiceImpl implements AttendanceService {
         return response;
     }
 
-//    @Override
-//    public Map<String, Object> getMonthlyAttendanceCount(String employeeId, int year, int month) {
-//
-//        List<Attendance> records = attendanceRepository.findByUserNameAndMonthAndYear(employeeId, year, month);
-//
-//        // Count by status
-//        long onTime = records.stream().filter(r -> "On Time".equalsIgnoreCase(r.getStatus())).count();
-//        long lateEntry = records.stream().filter(r -> "Late Entry".equalsIgnoreCase(r.getStatus())).count();
-//        long halfDay = records.stream().filter(r -> "Half Day".equalsIgnoreCase(r.getStatus())).count();
-//        long lateAndHalf = records.stream().filter(r -> "Late & Half".equalsIgnoreCase(r.getStatus())).count();
-//        long absent = records.stream().filter(r -> "Absent".equalsIgnoreCase(r.getStatus())).count();
-//
-//        // Count by attendance type
-//        long wfh = records.stream().filter(r -> "WFH".equalsIgnoreCase(r.getAttendanceType())).count();
-//        long wfo = records.stream().filter(r -> "WFO".equalsIgnoreCase(r.getAttendanceType())).count();
-//        long wff = records.stream().filter(r -> "WFF".equalsIgnoreCase(r.getAttendanceType())).count();
-//
-//        Map<String, Object> data = new HashMap<>();
-//        data.put("on_time", onTime);
-//        data.put("late_entry", lateEntry);
-//        data.put("half_day", halfDay);
-//        data.put("late_and_half", lateAndHalf);
-//        data.put("absent", absent);
-//        data.put("total_work_from_home", wfh);
-//        data.put("total_work_from_office", wfo);
-//        data.put("total_work_from_field", wff);
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("flag", "success");
-//        response.put("message", "Monthly attendance summary retrieved successfully");
-//        response.put("data", data);
-//
-//        return response;
-//    }
 
     @Override
     public Optional<Map<String, Object>> getDashboardDataForAdmin() {
@@ -603,6 +577,5 @@ public class AttendanceServiceImpl implements AttendanceService {
             }
         }
     }
-
 
 }

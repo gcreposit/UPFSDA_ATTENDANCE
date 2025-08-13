@@ -29,4 +29,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query(value = "SELECT DISTINCT teh FROM dst_teh_vil WHERE dst = ?1 ORDER BY teh;",nativeQuery = true)
     List<String> fetchAllTehsilByDistrict(String district);
 
+    boolean existsByUsername(String userName);
+
+
 }
