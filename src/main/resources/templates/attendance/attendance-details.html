@@ -186,22 +186,53 @@
 </div>
 
 <!--Modal to Show The Monthly Report Data-->
-<div class="modal fade" id="monthlyReportModal" tabindex="-1" role="dialog" aria-labelledby="monthlyReportModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="monthlyReportModalLabel">Monthly Report</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="monthlyReportContainer">
-                <!-- Report content will be injected here by JS -->
-            </div>
+<!-- Modal to Show The Monthly Report Data -->
+<div id="monthlyReportModal" class="custom-modal">
+    <div class="custom-modal-content">
+        <div class="custom-modal-header">
+            <h5>Monthly Report</h5>
+            <span class="custom-modal-close">&times;</span>
+        </div>
+        <div class="custom-modal-body" id="monthlyReportContainer">
+            <!-- Report content will be injected here by JS -->
         </div>
     </div>
 </div>
 
+<!-- Modal CSS -->
+<style>
+    .custom-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .custom-modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+        border-radius: 8px;
+    }
+
+    .custom-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .custom-modal-close {
+        cursor: pointer;
+        font-size: 1.5rem;
+    }
+</style>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 
@@ -223,16 +254,11 @@
 
         fetch('/api/data/dashboard/monthly', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: formData.toString()
         })
             .then(response => response.json())
             .then(data => {
-
-                console.log("Data ",data);
-
                 if (data.flag === "success") {
                     const d = data.data;
 
@@ -250,19 +276,24 @@
                 </ul>
             `;
 
-                    // Update modal content
-                    const container = document.getElementById('monthlyReportContainer');
-                    container.innerHTML = content;
+                    document.getElementById('monthlyReportContainer').innerHTML = content;
 
-                    // Show modal (vanilla JS)
+                    // Show modal
                     const modal = document.getElementById('monthlyReportModal');
                     modal.style.display = "block";
 
-                    // Optional: Close modal when clicking the close button
-                    const closeBtn = modal.querySelector('.close');
-                    if (closeBtn) {
-                        closeBtn.onclick = () => { modal.style.display = "none"; };
+                    // Close modal when clicking 'X'
+                    modal.querySelector('.custom-modal-close').onclick = () => {
+                        modal.style.display = "none";
                     }
+
+                    // Close modal when clicking outside modal content
+                    window.onclick = (event) => {
+                        if (event.target === modal) {
+                            modal.style.display = "none";
+                        }
+                    }
+
                 } else {
                     alert(data.message);
                 }
@@ -270,7 +301,6 @@
             .catch(err => console.error('Error fetching monthly report:', err));
     }
 </script>
-
 
 
 <!--Js For Show Image-->
