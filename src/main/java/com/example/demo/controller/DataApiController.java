@@ -684,14 +684,14 @@ public class DataApiController {
         return emitter;
     }
 
-//    For get All Employees Details
+    //    For get All Employees Details
     @GetMapping("/employeesDetails")
     public List<Employee> employeesDetails() {
 
         return employeeService.findAllEmployeeDetails();
     }
 
-//    For Get Location History Data
+    //    For Get Location History Data
     @GetMapping("/location-history")
     public List<WffLocationTracking> getLocationHistory() {
 

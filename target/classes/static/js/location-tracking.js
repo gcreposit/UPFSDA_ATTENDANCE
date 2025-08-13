@@ -228,8 +228,6 @@ function populateUserSelect() {
 
     mockUsers.forEach(user => {
 
-        console.log("Check Users For Dropdown ", user);
-
         if (user.id !== 'MasterAdmin') {
             const option = document.createElement('option');
             option.value = user.id;
