@@ -46,6 +46,15 @@ public class AttendanceController {
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
 
+        // Mock user data for display purposes
+        Map<String, Object> user = getMockUserData("user"); // Default to employee view
+        String userRole = "employee"; // Default role
+
+        model.addAttribute("pageTitle", "Dashboard");
+        model.addAttribute("currentPage", "dashboard");
+        model.addAttribute("user", user);
+        model.addAttribute("userRole", userRole);
+
 //        Map<String, Object> attendances = attendanceService.getDashboardDataForAdmin();
 //        model.addAttribute("attendances",attendances);
 

@@ -421,14 +421,16 @@ public class AttendanceServiceImpl implements AttendanceService {
                 // 1. Get all employee usernames in the *same format* as stored in Attendance
                 List<String> allEmployees = employeeRepository.findAll()
                         .stream()
-                        .map(Employee::getIdentityCardNo) // Match DB format exactly
+                        .map(e -> e.getUsername().trim().toLowerCase()) // normalize for comparison
                         .collect(Collectors.toList());
 
-                // 2. Get today's present employees (make sure date matching ignores time)
-                List<String> presentEmployees = attendanceRepository.findUserNamesByDate(today);
-                if (presentEmployees == null) {
-                    presentEmployees = new ArrayList<>();
-                }
+                // 2. Get today's present employees (null-safe and normalized)
+                List<String> presentEmployees = Optional.ofNullable(
+                                attendanceRepository.findUserNamesByDate(today)
+                        ).orElse(Collections.emptyList())
+                        .stream()
+                        .map(name -> name.trim().toLowerCase()) // normalize for comparison
+                        .collect(Collectors.toList());
 
                 // 3. Use a Set for faster lookup
                 Set<String> presentSet = new HashSet<>(presentEmployees);
@@ -444,11 +446,10 @@ public class AttendanceServiceImpl implements AttendanceService {
                             Attendance att = new Attendance();
                             att.setUserName(emp);
                             att.setDate(today);
-                            att.setStatus("Absent"); // not from DB, computed in code
+                            att.setStatus("Absent"); // computed in code, not DB
                             return att;
                         })
                         .collect(Collectors.toList());
-
             case "half_day":
                 return attendanceRepository.findHalfDayEmployees(today);
 

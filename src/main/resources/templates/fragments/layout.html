@@ -42,42 +42,42 @@
                         <span class="nav-text">Dashboard</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a th:href="@{/attendance/projects}" class="nav-link" th:classappend="${currentPage == 'projects'} ? 'active' : ''">
-                        <i class="fas fa-project-diagram"></i>
-                        <span class="nav-text">Projects</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a th:href="@{/attendance/leave}" class="nav-link" th:classappend="${currentPage == 'leave'} ? 'active' : ''">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span class="nav-text">Leave Management</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a th:href="@{/attendance/todo}" class="nav-link" th:classappend="${currentPage == 'todo'} ? 'active' : ''">
-                        <i class="fas fa-tasks"></i>
-                        <span class="nav-text">To-Do List</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a th:href="@{/attendance/calendar}" class="nav-link" th:classappend="${currentPage == 'calendar'} ? 'active' : ''">
-                        <i class="fas fa-calendar"></i>
-                        <span class="nav-text">Calendar</span>
-                    </a>
-                </li>
+<!--                <li class="nav-item">-->
+<!--                    <a th:href="@{/attendance/projects}" class="nav-link" th:classappend="${currentPage == 'projects'} ? 'active' : ''">-->
+<!--                        <i class="fas fa-project-diagram"></i>-->
+<!--                        <span class="nav-text">Projects</span>-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--                <li class="nav-item">-->
+<!--                    <a th:href="@{/attendance/leave}" class="nav-link" th:classappend="${currentPage == 'leave'} ? 'active' : ''">-->
+<!--                        <i class="fas fa-calendar-alt"></i>-->
+<!--                        <span class="nav-text">Leave Management</span>-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--                <li class="nav-item">-->
+<!--                    <a th:href="@{/attendance/todo}" class="nav-link" th:classappend="${currentPage == 'todo'} ? 'active' : ''">-->
+<!--                        <i class="fas fa-tasks"></i>-->
+<!--                        <span class="nav-text">To-Do List</span>-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--                <li class="nav-item">-->
+<!--                    <a th:href="@{/attendance/calendar}" class="nav-link" th:classappend="${currentPage == 'calendar'} ? 'active' : ''">-->
+<!--                        <i class="fas fa-calendar"></i>-->
+<!--                        <span class="nav-text">Calendar</span>-->
+<!--                    </a>-->
+<!--                </li>-->
                 <li class="nav-item">
                     <a th:href="@{/attendance/location-tracking}" class="nav-link" th:classappend="${currentPage == 'location'} ? 'active' : ''">
                         <i class="fas fa-map-marker-alt"></i>
                         <span class="nav-text">Location Tracking</span>
                     </a>
                 </li>
-                <li class="nav-item" th:if="${userRole == 'admin'}">
-                    <a th:href="@{/attendance/team}" class="nav-link" th:classappend="${currentPage == 'team'} ? 'active' : ''">
-                        <i class="fas fa-users"></i>
-                        <span class="nav-text">Team Management</span>
-                    </a>
-                </li>
+<!--                <li class="nav-item" th:if="${userRole == 'admin'}">-->
+<!--                    <a th:href="@{/attendance/team}" class="nav-link" th:classappend="${currentPage == 'team'} ? 'active' : ''">-->
+<!--                        <i class="fas fa-users"></i>-->
+<!--                        <span class="nav-text">Team Management</span>-->
+<!--                    </a>-->
+<!--                </li>-->
             </ul>
         </div>
         

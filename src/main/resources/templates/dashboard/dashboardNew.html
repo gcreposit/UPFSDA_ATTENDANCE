@@ -39,22 +39,22 @@
                     </div>
 
                     <!-- Present Card with Breakdown Inside -->
-                    <div class="stat-card-small" style="flex: 1;" onclick="goToDetails('today_present')">
+                    <div class="stat-card-small" style="flex: 1;">
                         <div class="stat-icon" style="background:#28a745"><i class="fas fa-user-check"></i></div>
                         <div class="stat-content" style="width: 100%;">
-                            <div class="stat-title">Present</div>
-                            <div class="stat-value" id="presentCount">0</div>
+                            <div class="stat-title" onclick="goToDetails('today_present')" style="cursor: pointer;">Present</div>
+                            <div class="stat-value" id="presentCount" onclick="goToDetails('today_present')" style="cursor: pointer;">0</div>
 
                             <!-- Attendance Type Breakdown -->
                             <div style="margin-top: 8px; font-size: 0.85rem; color: #555;">
                                 <strong>Attendance Type</strong>
-                                <div style="display: flex; justify-content: space-between;">
+                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('on_time')">
                                     <span>On Time:</span> <span id="onTimeCount">0</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between;">
+                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('late_entry')">
                                     <span>Late Entry:</span> <span id="lateEntryCount">0</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between;">
+                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('late_and_half')">
                                     <span>Late & Half Day:</span> <span id="lateAndHalfCount">0</span>
                                 </div>
                             </div>
@@ -62,13 +62,13 @@
                             <!-- Work Mode Breakdown -->
                             <div style="margin-top: 8px; font-size: 0.85rem; color: #555;">
                                 <strong>Work Mode</strong>
-                                <div style="display: flex; justify-content: space-between;">
+                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('wfo')">
                                     <span>Work From Office:</span> <span id="wfoCount">0</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between;">
+                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('wfh')">
                                     <span>Work From Home:</span> <span id="wfhCount">0</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between;">
+                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('wff')">
                                     <span>Work From Field:</span> <span id="wffCount">0</span>
                                 </div>
                             </div>
@@ -125,7 +125,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         loadAdminDashboardData();
         initializeCalendar();
     });
@@ -199,8 +199,8 @@
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { position: 'bottom' },
-                    tooltip: { enabled: true }
+                    legend: {position: 'bottom'},
+                    tooltip: {enabled: true}
                 }
             }
         });
@@ -213,13 +213,19 @@
 
         document.getElementById('simplePrevMonth').addEventListener('click', () => {
             currentMonth--;
-            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
             renderSimpleCalendar();
         });
 
         document.getElementById('simpleNextMonth').addEventListener('click', () => {
             currentMonth++;
-            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
             renderSimpleCalendar();
         });
 
