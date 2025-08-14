@@ -339,8 +339,8 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public Map<String, Object> getMonthlyAttendanceCount(String employeeId, int year, int month) {
 
-        Attendance attendance = attendanceRepository.findByUsername(employeeId);
-        if (attendance == null) {
+        Employee employee = employeeRepository.findByUsername(employeeId);
+        if (employee == null) {
             Map<String, Object> response = new HashMap<>();
             response.put("flag", "error");
             response.put("message", "Username not found");
