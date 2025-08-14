@@ -63,7 +63,6 @@ public class AttendanceController {
         return "dashboard/dashboardNew";
     }
 
-
     @GetMapping("/attendance-details")
     public String attendanceDetails(@RequestParam("type") String type, Model model) {
 
@@ -79,7 +78,8 @@ public class AttendanceController {
 
         List<Employee> records = new ArrayList<>(); // Use wildcard if mixing Employee and Attendance types
 
-        List<Attendance> attendances = new ArrayList<>();; // Use wildcard if mixing Employee and Attendance types
+        List<Attendance> attendances = new ArrayList<>();
+        ; // Use wildcard if mixing Employee and Attendance types
 
         if (type.equalsIgnoreCase("total_employees")) {
             records = attendanceService.fetchAllEmployeeDetails();
@@ -88,10 +88,20 @@ public class AttendanceController {
         }
 
         model.addAttribute("records", records);
-        model.addAttribute("attendances",attendances);
+        model.addAttribute("attendances", attendances);
 
         return "attendance/attendance-details"; // Thymeleaf view
     }
+
+//    @GetMapping("/monthly-report")
+//    public String showMonthlyReportPage(@RequestParam("username") String username, Model model) {
+//        // Pass the username to the view
+//        model.addAttribute("username", username);
+//
+////        model.addAttribute("year", year);
+////        model.addAttribute("month", month);
+//        return "attendance/monthly-report"; // This is the Thymeleaf template name
+//    }
 
     @GetMapping("/projects")
     public String projects(Model model) {
@@ -183,7 +193,7 @@ public class AttendanceController {
     public String locationTracking(Model model) {
 
         List<String> wffEmployees = attendanceService.fetchWffEmployees();
-        model.addAttribute("wffEmployees",wffEmployees);
+        model.addAttribute("wffEmployees", wffEmployees);
 
         String username = "MasterAdmin"; // Change to dynamic retrieval later
         String userRole = username.equals("admin") ? "Administrator" : "employee";

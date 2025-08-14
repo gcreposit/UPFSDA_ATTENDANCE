@@ -67,6 +67,15 @@
                                 </button>
                             </td>
 
+<!--                            <td>-->
+<!--                                <button class="btn btn-primary btn-sm"-->
+<!--                                        th:onclick="'window.location.href=\'/attendance/dashboard/monthly-report?username='-->
+<!--                        + ${#urls.urlEncode(record.username)} + '\''">-->
+<!--                                    Show Monthly Report-->
+<!--                                </button>-->
+<!--                            </td>-->
+
+
                             <td th:text="${record.identityCardNo}"></td>
                             <td th:text="${record.name}"></td>
                             <td th:text="${record.designation}"></td>
@@ -235,6 +244,7 @@
 </style>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
 
 <!--js For See Monthly Report On Click of the Button-->
 <script>
@@ -300,7 +310,6 @@
     }
 </script>
 
-
 <!--Js For Show Image-->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -339,8 +348,6 @@
         });
     });
 </script>
-
-<div th:replace="~{fragments/layout :: scripts}"></div>
 
 </body>
 </html>
