@@ -524,6 +524,43 @@ public class DataApiController {
                 .body(imageBytes);
     }
 
+    // API to serve field images
+    @GetMapping("/attendance/field-images/{id}")
+    public ResponseEntity<Map<String, String>> getFieldImages(@PathVariable Long id) throws IOException {
+        Optional<Attendance> optionalAttendance = attendanceService.findById(id);
+        if (optionalAttendance.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Attendance attendance = optionalAttendance.get();
+        String fieldImagePaths = attendance.getFieldImagePath();
+
+        if (fieldImagePaths == null || fieldImagePaths.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, String> imagesBase64 = new LinkedHashMap<>();
+        String[] paths = fieldImagePaths.split(",");
+
+        for (int i = 0; i < paths.length; i++) {
+            Path path = Paths.get(uploadPath, paths[i].trim());
+            if (Files.exists(path)) {
+                byte[] imageBytes = Files.readAllBytes(path);
+                String contentType = Files.probeContentType(path);
+                String base64 = "data:" + (contentType != null ? contentType : "image/jpeg") + ";base64,"
+                        + Base64.getEncoder().encodeToString(imageBytes);
+                imagesBase64.put("image" + (i + 1), base64); // fixed key: image1, image2, ...
+            }
+        }
+
+        if (imagesBase64.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(imagesBase64);
+    }
+
+
     //    Api for fetch Details By Username
     @PostMapping("/detailsByUsername")
     public ResponseEntity<ApiResponse> getDetailsByUsername(@RequestParam String username) {

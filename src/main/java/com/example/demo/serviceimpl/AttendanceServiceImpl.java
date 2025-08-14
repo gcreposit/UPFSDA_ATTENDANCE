@@ -340,6 +340,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     public Map<String, Object> getMonthlyAttendanceCount(String employeeId, int year, int month) {
 
         Employee employee = employeeRepository.findByUsername(employeeId);
+
         if (employee == null) {
             Map<String, Object> response = new HashMap<>();
             response.put("flag", "error");
