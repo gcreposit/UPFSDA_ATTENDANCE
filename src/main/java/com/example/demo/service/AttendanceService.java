@@ -22,7 +22,7 @@ public interface AttendanceService {
 
     ApiResponse<Object> saveLocationForTracking(String userName, String lat, String lon, String timestamp);
 
-    String uploadFieldImages(String username, String date, String fieldImageTime, MultipartFile[] fieldImages) throws IOException;
+    String uploadFieldImages(String username, MultipartFile[] fieldImages) throws IOException;
 
     Map<String, Object> getMonthlyAttendanceCount(String username, int year, int month);
 

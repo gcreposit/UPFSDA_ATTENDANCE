@@ -244,13 +244,11 @@ public class DataApiController {
     @PostMapping("/attendance/field-images")
     public ResponseEntity<ApiResponse> uploadFieldImages(
             @RequestParam String username,
-            @RequestParam String date,
-            @RequestParam String fieldImageTime,
             @RequestParam("fieldImages") MultipartFile[] fieldImages) {
 
         try {
 
-            String message = attendanceService.uploadFieldImages(username, date, fieldImageTime, fieldImages);
+            String message = attendanceService.uploadFieldImages(username, fieldImages);
 
             return ResponseEntity.ok(
                     ApiResponse.builder()

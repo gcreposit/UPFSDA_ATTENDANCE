@@ -208,19 +208,25 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     @Transactional
-    public String uploadFieldImages(String username, String date, String fieldImageTime, MultipartFile[] fieldImages) throws IOException {
+    public String uploadFieldImages(String username, MultipartFile[] fieldImages) throws IOException {
 
-        // Parse date from String to LocalDate
-        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        // Use backend current date
+        LocalDate localDate = LocalDate.now();
+
+        // Validate if employee exists
+        Employee employee = employeeRepository.findByUsername(username);
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee not found for username: " + username);
+        }
 
         Attendance attendance = attendanceRepository.findByUserNameAndDate(username, localDate);
         if (attendance == null) {
-            throw new IllegalArgumentException("Attendance record not found for given date");
+            throw new IllegalArgumentException("Attendance record not found for today");
         }
 
         // Validation: If already uploaded, stop
         if ("Images Added".equalsIgnoreCase(attendance.getFieldImageUploaded())) {
-            throw new IllegalArgumentException("Field images already uploaded for this date");
+            throw new IllegalArgumentException("Field images already uploaded for today");
         }
 
         // Validate: only WFF type allowed
@@ -233,11 +239,11 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new IllegalArgumentException("At least one field image is required");
         }
 
-        // Save images to disk (same method as before)
+        // Save images to disk
         List<String> newImagePaths = new ArrayList<>();
         for (MultipartFile image : fieldImages) {
             if (image != null && !image.isEmpty()) {
-                String filePath = saveImageToDisk(image); // same helper method as before
+                String filePath = saveImageToDisk(image); // helper method
                 newImagePaths.add(filePath);
             }
         }
@@ -256,7 +262,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         // Update fields
         attendance.setFieldImagePath(existingImages);
-        attendance.setFieldImageTime(LocalDateTime.parse(fieldImageTime));
+        attendance.setFieldImageTime(LocalDateTime.now()); // use backend current date & time
         attendance.setFieldImageUploaded("Images Added");
 
         attendanceRepository.save(attendance);
