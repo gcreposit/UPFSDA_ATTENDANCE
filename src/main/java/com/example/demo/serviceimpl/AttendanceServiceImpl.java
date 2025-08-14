@@ -151,6 +151,12 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public Attendance getDashboardData(String userName, String date) {
 
+        // Validate if employee exists
+        Employee employee = employeeRepository.findByUsername(userName);
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee not found for username: " + userName);
+        }
+
         // Parse date string to LocalDate
         LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
@@ -649,7 +655,9 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public List<WffLocationTracking> findAllLocationHistory() {
 
-        return locationTrackingRepository.findAll();
+        LocalDate today = LocalDate.now();
+
+        return locationTrackingRepository.findTrackingDataByDate(today);
 
     }
 

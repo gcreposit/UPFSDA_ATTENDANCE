@@ -63,7 +63,7 @@
                                 <button class="btn btn-primary btn-sm"
                                         th:data-username="${record.username}"
                                         onclick="showMonthlyReportFromButton(this)">
-                                    See Monthly Report
+                                    Show Monthly Report
                                 </button>
                             </td>
 
@@ -243,8 +243,6 @@
         const now = new Date();
         const month = now.getMonth() + 1;
         const year = now.getFullYear();
-
-        console.log("Check Username", username);
 
         // Prepare form data
         const formData = new URLSearchParams();

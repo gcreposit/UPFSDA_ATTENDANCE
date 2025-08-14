@@ -8,7 +8,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Map;
 
 @Entity
@@ -28,6 +30,9 @@ public class WffLocationTracking {
     private Double lat;
 
     private Double lon;
+
+    @Column(name = "date")
+    private LocalDate date;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // Ensures ISO string
     private LocalDateTime timestamp;

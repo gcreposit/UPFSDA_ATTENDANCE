@@ -693,7 +693,7 @@ public class DataApiController {
         }
     }
 
-    //    For Location Tracking Work
+    //    For Location Tracking Work - Not Currently In Use
     @GetMapping("/history/{userName}")
     public List<WffLocationTracking> getHistory(@PathVariable String userName) {
 
@@ -701,7 +701,7 @@ public class DataApiController {
 
     }
 
-    // SSE stream for live updates
+    // SSE stream for live updates - Not Currently In Use
     @GetMapping("/stream/{userName}")
     public SseEmitter streamLocation(@PathVariable String userName) {
 

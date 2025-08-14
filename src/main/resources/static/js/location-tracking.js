@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function initializeLocationTracking() {
-    console.log('Initializing Location Tracking...');
 
     // Get current user info
     currentUser = localStorage.getItem('username') || 'user';
@@ -43,7 +42,6 @@ function initializeLocationTracking() {
     // Start mock location updates
     startMockLocationUpdates();
 
-    console.log('Location Tracking initialized successfully');
 }
 
 function initializeMap() {
@@ -143,7 +141,6 @@ async function loadMockData() {
         console.error('Error loading data:', error);
     }
 }
-
 
 function renderLocationHistory(history) {
     console.log("Loaded Location History:", history);
