@@ -35,7 +35,7 @@
                 <div class="table-responsive">
                     <table id="employeeTable"
                            th:if="${records != null and !records.isEmpty()}"
-                           class="table table-bordered mb-0 display nowrap" style="width:100%">
+                           class="datatable table table-bordered mb-0 display nowrap" style="width:100%">
                         <thead>
                         <tr>
                             <th>Action</th>
@@ -101,7 +101,7 @@
                 <!-- Attendance Table -->
                 <table id="attendanceTable"
                        th:if="${attendances != null and !attendances.isEmpty()}"
-                       class="table table-bordered mb-0 display nowrap" style="width:100%">
+                       class="datatable table table-bordered mb-0 display nowrap" style="width:100%">
                     <thead>
                     <tr>
                         <th>Username</th>
@@ -178,6 +178,7 @@
         </div>
     </div>
 </main>
+
 <!-- Image Modal -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -245,6 +246,7 @@
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <div th:replace="~{fragments/layout :: scripts}"></div>
+
 
 <!--js For See Monthly Report On Click of the Button-->
 <script>

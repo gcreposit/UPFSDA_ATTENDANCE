@@ -44,12 +44,13 @@ public interface AttendanceService {
 
     List<WffLocationTracking> fetchWffEmployeesLocationHistory(String userName);
 
-
     SseEmitter createEmitter(String userName);
 
     WffLocationTracking getLatest(String userName);
 
     List<WffLocationTracking> findAllLocationHistory();
+
+    Map<String, Object> getMonthlyCategoryDetails(String username, int year, int month, String category);
 
 
 }

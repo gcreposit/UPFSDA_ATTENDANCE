@@ -120,6 +120,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout.permitAll());
 
+
         log.info("Web Security configuration completed");
         return http.build();
     }

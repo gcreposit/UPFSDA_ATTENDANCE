@@ -785,6 +785,50 @@ public class DataApiController {
         }
     }
 
+// API for On-Click Detailed Attendance by Category
+    @PostMapping("/dashboard/monthly/details")
+    public ResponseEntity<ApiResponse> getMonthlyCategoryDetails(
+            @RequestParam("username") String username,
+            @RequestParam("year") int year,
+            @RequestParam("month") int month,
+            @RequestParam("category") String category) {
+
+        try {
+            Map<String, Object> details = attendanceService.getMonthlyCategoryDetails(username, year, month, category);
+
+            // Check if service returned an error
+            if ("error".equals(details.get("flag"))) {
+                return ResponseEntity.badRequest().body(
+                        ApiResponse.builder()
+                                .message((String) details.get("message"))
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .data(null)
+                                .build()
+                );
+            }
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message((String) details.get("message"))
+                            .statusCode(HttpStatus.OK.value())
+                            .data(details.get("data"))
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error fetching attendance details")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
 
     //    For Location Tracking Work - Not Currently In Use
     @GetMapping("/history/{userName}")
