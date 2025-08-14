@@ -15,11 +15,12 @@
 
 /*!* Right side - chart *!*/
 .chart-section {
-    flex: 1;
+    /*flex: 1;*/
+    width: 40% !important;
     background: #fff;
     padding: 20px;
     border-radius: 8px;
-   width: 49% !important;
+
 }
 
 /*!* Card styles *!*/
@@ -205,4 +206,134 @@
     background-color: rgba(0, 0, 0, 0.1);
     padding: 2px 8px;
     border-radius: 6px;
+}
+
+
+/* Custom styles for the chart containers */
+.chart-container {
+    background: linear-gradient(135deg, #f0f4f8, #e7e9f3);
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+}
+
+.chart-wrapper {
+    height: 400px;
+}
+
+@media (min-width: 768px) {
+    .chart-wrapper {
+        height: 500px;
+    }
+}
+
+
+
+
+
+
+
+/* General Popup Styling */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    animation: popupFadeIn 0.3s ease-in-out;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Animation for Popup */
+@keyframes popupFadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Popup Header */
+.popup-header {
+    background: linear-gradient(135deg, #007BFF, #00D4FF);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.popup-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.popup-header i {
+    margin-right: 10px;
+}
+
+/* Popup Content */
+.popup-content {
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.popup-content p {
+    margin: 10px 0;
+}
+
+.popup-content strong {
+    color: #333;
+}
+
+.popup-content i {
+    color: #007BFF;
+    margin-right: 10px;
+}
+
+/* Footer Section */
+.popup-footer {
+    padding: 15px;
+    text-align: center;
+    background-color: #f1f1f1;
+}
+
+.close-popup {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.close-popup:hover {
+    background-color: #218838;
+}
+
+.close-popup i {
+    margin-right: 8px;
+}
+
+/* Overlay Styling */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Fade-In Effect for Overlay */
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
 }
