@@ -20,5 +20,7 @@ public interface EmployeeService {
 
     List<Employee> findAllEmployeeDetails();
 
+    Employee updateEmployeeProfile(Long id, String dateOfBirth, String labName, String officeName, String mobileNumber, String bloodGroup, String officeAddress, String homeLocation, String emailAddress, String permanantAddress, String emergencyContactNo);
+
 
 }

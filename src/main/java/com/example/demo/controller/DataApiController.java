@@ -524,6 +524,38 @@ public class DataApiController {
                 .body(imageBytes);
     }
 
+    // API to Serve Employee Profile Image
+    @GetMapping("/employee/profile/image/{id}")
+    public ResponseEntity<byte[]> getProfileImage(@PathVariable Long id) throws IOException {
+
+        Employee employee = employeeService.findById(id); // assuming this returns null if not found
+
+        if (employee == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Get profile image path from entity
+        String imagePath = employee.getUploadFacePhotoImgPath();
+
+        if (imagePath == null || imagePath.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Combine base directory from properties and imagePath
+        Path path = Paths.get(uploadPath, imagePath);
+
+        if (!Files.exists(path)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        byte[] imageBytes = Files.readAllBytes(path);
+        String contentType = Files.probeContentType(path);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
+                .body(imageBytes);
+    }
+
     // API to serve field images
     @GetMapping("/attendance/field-images/{id}")
     public ResponseEntity<Map<String, String>> getFieldImages(@PathVariable Long id) throws IOException {
@@ -700,6 +732,59 @@ public class DataApiController {
             );
         }
     }
+
+//    Api for Update Employee Profile
+    @PostMapping("/employee/updateProfile")
+    public ResponseEntity<ApiResponse> updateProfile(
+            @RequestParam("id") Long id,
+            @RequestParam(value = "dateOfBirth", required = false) String dateOfBirth,
+            @RequestParam(value = "labName", required = false) String labName,
+            @RequestParam(value = "officeName", required = false) String officeName,
+            @RequestParam(value = "mobileNumber", required = false) String mobileNumber,
+            @RequestParam(value = "bloodGroup", required = false) String bloodGroup,
+            @RequestParam(value = "officeAddress", required = false) String officeAddress,
+            @RequestParam(value = "homeLocation", required = false) String homeLocation,
+            @RequestParam(value = "emailAddress", required = false) String emailAddress,
+            @RequestParam(value = "permanantAddress", required = false) String permanantAddress,
+            @RequestParam(value = "emergencyContactNo", required = false) String emergencyContactNo
+    ) {
+        try {
+
+            Employee updatedEmployee = employeeService.updateEmployeeProfile(
+                    id, dateOfBirth, labName, officeName,
+                    mobileNumber, bloodGroup, officeAddress, homeLocation, emailAddress,
+                    permanantAddress, emergencyContactNo);
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("Employee profile updated successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(updatedEmployee)
+                            .build()
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error updating employee profile")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
 
     //    For Location Tracking Work - Not Currently In Use
     @GetMapping("/history/{userName}")

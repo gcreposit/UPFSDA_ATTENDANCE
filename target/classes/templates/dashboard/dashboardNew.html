@@ -187,7 +187,7 @@
 
                 <div class="w-full  text-gray-800 mt-4">
                     <div class="text-center mb-10">
-                        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-indigo-700">Weekly Attendance Trend</h1>
+                        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-indigo-700">Today Attendance Trend</h1>
                         <p class="text-lg text-gray-600">Dynamic visualization for your attendance data.</p>
                     </div>
 
@@ -290,7 +290,6 @@
 
 
 
-
     // Function to fetch the API data and update the chart
     async function fetchDataAndUpdateChart() {
         try {
@@ -298,22 +297,23 @@
             const data = await response.json();
 
             if (data.statusCode === 200) {
-                // Use the 'present_today' value from the API to update the chart
+                // Use the 'present_today' and 'absent_today' values from the API to update the chart
                 const presentToday = data.data.present_today;
+                const absentToday = data.data.absent_today;
 
-                // Update the chart data
-                const updatedWeeklyData = {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                // Create data for today's attendance trend
+                const updatedTodayData = {
+                    labels: ['Today'],  // Only show 'Today'
                     datasets: [{
-                        label: 'Present Students',
-                        data: [45, 48, 42, 49, 46], // Old data
+                        label: 'Present Employee',
+                        data: [presentToday],  // Only today’s data
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.2)',
                         tension: 0.4,
                         fill: true
                     }, {
-                        label: 'Absent Students',
-                        data: [5, 2, 8, 1, 4], // Old data
+                        label: 'Absent Employee',
+                        data: [absentToday],  // Only today’s data
                         borderColor: '#f87171',
                         backgroundColor: 'rgba(248, 113, 129, 0.2)',
                         tension: 0.4,
@@ -321,11 +321,8 @@
                     }]
                 };
 
-                // Update 'Present Students' data with the API value
-                updatedWeeklyData.datasets[0].data = updatedWeeklyData.datasets[0].data.map(() => presentToday);
-
-                // Now create or update the chart with the updated data
-                createChart('weeklyChart', 'line', updatedWeeklyData);
+                // Now create or update the chart with today's data
+                createChart('weeklyChart', 'line', updatedTodayData);
             } else {
                 console.error('Error fetching data:', data.message);
             }
@@ -350,7 +347,9 @@
                         labels: { color: '#343a40' }
                     },
                     title: {
-                        display: false,
+                        display: true,
+                        text: 'Today Attendance Trend',  // Set the title
+                        font: { size: 18 }
                     }
                 },
                 scales: {

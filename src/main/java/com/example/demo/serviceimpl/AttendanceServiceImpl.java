@@ -209,7 +209,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                     .data(error)
                     .build();
         }
-
     }
 
     @Override

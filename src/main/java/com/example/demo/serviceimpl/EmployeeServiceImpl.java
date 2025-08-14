@@ -121,6 +121,47 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    @Override
+    @Transactional
+    public Employee updateEmployeeProfile(
+            Long id,
+            String dateOfBirth,
+            String labName,
+            String officeName,
+            String mobileNumber,
+            String bloodGroup,
+            String officeAddress,
+            String homeLocation,
+            String emailAddress,
+            String permanantAddress,
+            String emergencyContactNo
+    ) {
+        Employee existing = employeeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Employee not found with ID: " + id));
+
+        // Update only allowed fields
+        if (dateOfBirth != null && !dateOfBirth.isBlank()) existing.setDateOfBirth(dateOfBirth);
+        if (labName != null && !labName.isBlank()) existing.setLabName(labName);
+        if (officeName != null && !officeName.isBlank()) existing.setOfficeName(officeName);
+        if (mobileNumber != null && !mobileNumber.isBlank()) existing.setMobileNumber(mobileNumber);
+        if (bloodGroup != null && !bloodGroup.isBlank()) existing.setBloodGroup(bloodGroup);
+        if (officeAddress != null && !officeAddress.isBlank()) existing.setOfficeAddress(officeAddress);
+        if (homeLocation != null && !homeLocation.isBlank()) existing.setHomeLocation(homeLocation);
+        if (emailAddress != null && !emailAddress.isBlank()) existing.setEmailAddress(emailAddress);
+        if (permanantAddress != null && !permanantAddress.isBlank()) existing.setPermanantAddress(permanantAddress);
+        if (emergencyContactNo != null && !emergencyContactNo.isBlank()) existing.setEmergencyContactNo(emergencyContactNo);
+
+        // DO NOT touch name, district, tehsil, post, identityCardNo, username
+        return employeeRepository.saveAndFlush(existing);
+    }
+
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+
+
     private void validateLocationData(String district, String tehsil) {
         if (!locationService.isValidDistrict(district)) {
             throw new InvalidLocationException("Invalid district: " + district);
