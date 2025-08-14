@@ -214,9 +214,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     @Transactional
-    public String uploadFieldImages(String username, MultipartFile[] fieldImages) throws IOException {
+    public String uploadFieldImages(String username, MultipartFile fieldImage, MultipartFile fieldImage1) throws IOException {
 
-        // Use backend current date
         LocalDate localDate = LocalDate.now();
 
         // Validate if employee exists
@@ -240,41 +239,31 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new IllegalArgumentException("Field images are allowed only for WFF attendance type");
         }
 
-        // Validate: images must be provided
-        if (fieldImages == null || fieldImages.length == 0) {
+        // Validate: both images must be provided
+        if ((fieldImage == null || fieldImage.isEmpty()) && (fieldImage1 == null || fieldImage1.isEmpty())) {
             throw new IllegalArgumentException("At least one field image is required");
         }
 
-        // Save images to disk
-        List<String> newImagePaths = new ArrayList<>();
-        for (MultipartFile image : fieldImages) {
-            if (image != null && !image.isEmpty()) {
-                String filePath = saveImageToDisk(image); // helper method
-                newImagePaths.add(filePath);
-            }
+        // Save first image
+        if (fieldImage != null && !fieldImage.isEmpty()) {
+            String filePath = saveImageToDisk(fieldImage); // your helper method
+            attendance.setFieldImagePath(filePath);
         }
 
-        if (newImagePaths.isEmpty()) {
-            throw new IllegalArgumentException("No valid field images provided");
+        // Save second image
+        if (fieldImage1 != null && !fieldImage1.isEmpty()) {
+            String filePath1 = saveImageToDisk(fieldImage1); // your helper method
+            attendance.setFieldImagePath1(filePath1);
         }
 
-        // Merge with existing images if any (comma-separated)
-        String existingImages = attendance.getFieldImagePath();
-        if (existingImages != null && !existingImages.isBlank()) {
-            existingImages = existingImages + "," + String.join(",", newImagePaths);
-        } else {
-            existingImages = String.join(",", newImagePaths);
-        }
-
-        // Update fields
-        attendance.setFieldImagePath(existingImages);
-        attendance.setFieldImageTime(LocalDateTime.now()); // use backend current date & time
+        attendance.setFieldImageTime(LocalDateTime.now());
         attendance.setFieldImageUploaded("Images Added");
 
         attendanceRepository.save(attendance);
 
         return "Field images uploaded successfully";
     }
+
 
 //    @Override
 //    public Map<String, Object> getMonthlyAttendanceCount(String employeeId, int year, int month) {

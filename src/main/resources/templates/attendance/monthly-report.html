@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}">
+    <title>Monthly Attendance Report</title>
+    <link th:href="@{/webjars/datatables/1.13.6/css/jquery.dataTables.min.css}" rel="stylesheet"/>
+</head>
+<body>
+<nav th:replace="~{fragments/layout :: sidebar}"></nav>
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main class="main-content">
+    <div class="dashboard-center">
+        <h3 th:text="'Monthly Attendance Report for ' + ${username}"></h3>
+        <small th:text="'Month: ' + ${month} + ', Year: ' + ${year}"></small>
+
+        <div class="table-responsive">
+            <table id="reportTable" class="table table-bordered display nowrap" style="width:100%">
+                <thead>
+                <tr>
+                    <th>On Time</th>
+                    <th>Late Entry</th>
+                    <th>Half Day</th>
+                    <th>Absent</th>
+                    <th>Work From Home</th>
+                    <th>Work From Office</th>
+                    <th>Work From Field</th>
+                    <th>Total Days</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+<script th:src="@{/webjars/datatables/1.13.6/js/jquery.dataTables.min.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const username = /*[[${username}]]*/ '';
+        const year = /*[[${year}]]*/ 0;
+        const month = /*[[${month}]]*/ 0;
+
+        const formData = new URLSearchParams();
+        formData.append('username', username);
+        formData.append('year', year);
+        formData.append('month', month);
+
+        fetch('/api/data/dashboard/monthly', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.flag === 'success') {
+                    const d = data.data;
+                    $('#reportTable').DataTable({
+                        data: [[
+                            d.on_time,
+                            d.late_entry,
+                            d.half_day,
+                            d.absent,
+                            d.total_work_from_home,
+                            d.total_work_from_office,
+                            d.total_work_from_field,
+                            d.total_days_in_month
+                        ]]
+                    });
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(err => console.error('Error:', err));
+    });
+</script>
+</body>
+</html>

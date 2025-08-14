@@ -244,11 +244,11 @@ public class DataApiController {
     @PostMapping("/attendance/field-images")
     public ResponseEntity<ApiResponse> uploadFieldImages(
             @RequestParam String username,
-            @RequestParam("fieldImages") MultipartFile[] fieldImages) {
+            @RequestParam("fieldImage") MultipartFile fieldImage,@RequestParam("fieldImage1") MultipartFile fieldImage1) {
 
         try {
 
-            String message = attendanceService.uploadFieldImages(username, fieldImages);
+            String message = attendanceService.uploadFieldImages(username, fieldImage,fieldImage1);
 
             return ResponseEntity.ok(
                     ApiResponse.builder()
@@ -527,29 +527,37 @@ public class DataApiController {
     // API to serve field images
     @GetMapping("/attendance/field-images/{id}")
     public ResponseEntity<Map<String, String>> getFieldImages(@PathVariable Long id) throws IOException {
+
         Optional<Attendance> optionalAttendance = attendanceService.findById(id);
         if (optionalAttendance.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         Attendance attendance = optionalAttendance.get();
-        String fieldImagePaths = attendance.getFieldImagePath();
 
-        if (fieldImagePaths == null || fieldImagePaths.isEmpty()) {
+        // Get paths from both columns
+        List<String> imagePaths = new ArrayList<>();
+        if (attendance.getFieldImagePath() != null && !attendance.getFieldImagePath().isBlank()) {
+            imagePaths.add(attendance.getFieldImagePath().trim());
+        }
+        if (attendance.getFieldImagePath1() != null && !attendance.getFieldImagePath1().isBlank()) {
+            imagePaths.add(attendance.getFieldImagePath1().trim());
+        }
+
+        // If no images found
+        if (imagePaths.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         Map<String, String> imagesBase64 = new LinkedHashMap<>();
-        String[] paths = fieldImagePaths.split(",");
-
-        for (int i = 0; i < paths.length; i++) {
-            Path path = Paths.get(uploadPath, paths[i].trim());
+        for (int i = 0; i < imagePaths.size(); i++) {
+            Path path = Paths.get(uploadPath, imagePaths.get(i));
             if (Files.exists(path)) {
                 byte[] imageBytes = Files.readAllBytes(path);
                 String contentType = Files.probeContentType(path);
                 String base64 = "data:" + (contentType != null ? contentType : "image/jpeg") + ";base64,"
                         + Base64.getEncoder().encodeToString(imageBytes);
-                imagesBase64.put("image" + (i + 1), base64); // fixed key: image1, image2, ...
+                imagesBase64.put("image" + (i + 1), base64);
             }
         }
 

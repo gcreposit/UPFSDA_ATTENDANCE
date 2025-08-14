@@ -62,6 +62,9 @@ public class Attendance {
     @Column(name = "field_image_path")
     private String fieldImagePath;
 
+    @Column(name = "field_image_path1")
+    private String fieldImagePath1;
+
     @Column(name = "field_image_uploaded")
     private String fieldImageUploaded;
 
