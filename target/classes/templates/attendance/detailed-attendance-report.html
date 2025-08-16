@@ -104,19 +104,28 @@
         })
             .then(res => res.json())
             .then(data => {
-
                 if (data.statusCode === 200 && data.data) {
-                    // Map the API response data to a format DataTables can use
                     const mappedData = data.data.map(item => [
-                        item.date,
-                        item.in_time ? new Date(item.in_time).toLocaleTimeString() : 'N/A',
-                        item.out_time ? new Date(item.out_time).toLocaleTimeString() : 'N/A',
+                        item.date
+                            ? (() => {
+                                const d = new Date(item.date);
+                                const day = String(d.getDate()).padStart(2, '0');
+                                const month = String(d.getMonth() + 1).padStart(2, '0');
+                                const year = d.getFullYear();
+                                return `${day}-${month}-${year}`;
+                            })()
+                            : 'N/A',
+                        item.in_time
+                            ? new Date(item.in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                            : 'N/A',
+                        item.out_time
+                            ? new Date(item.out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                            : 'N/A',
                         item.status,
                         item.attendance_type,
                         item.remarks
                     ]);
 
-                    // Initialize the DataTable with the new data
                     $('#detailTable').DataTable({
                         data: mappedData,
                         responsive: true
@@ -124,11 +133,11 @@
                 } else {
                     document.getElementById('reportTitle').textContent = "Data Not Found";
                     document.getElementById('reportSubTitle').textContent = data.message || "Could not retrieve details.";
-                    // Optionally, hide the table
                     $('#detailTable').hide();
                 }
             })
-            .catch(err => {
+
+                .catch(err => {
                 console.error('Error:', err);
                 document.getElementById('reportTitle').textContent = "Error Loading Report";
                 document.getElementById('reportSubTitle').textContent = "An error occurred while fetching the data.";

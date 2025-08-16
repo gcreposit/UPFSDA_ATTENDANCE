@@ -109,10 +109,10 @@
                             <td th:text="${record.userName}"></td>
                             <td th:text="${record.attendanceType}"></td>
                             <td th:text="${record.reason}"></td>
-                            <td th:text="${record.date}"></td>
+                            <td th:text="${record.date != null ? #temporals.format(record.date, 'dd-MM-yyyy') : ''}"></td>
                             <td th:text="${record.status}"></td>
-                            <td th:text="${record.morningTime}"></td>
-                            <td th:text="${record.eveningTime}"></td>
+                            <td th:text="${#temporals.format(record.morningTime, 'HH:mm')}"></td>
+                            <td th:text="${#temporals.format(record.eveningTime, 'HH:mm')}"></td>
 
                             <!-- Morning Image -->
                             <td>

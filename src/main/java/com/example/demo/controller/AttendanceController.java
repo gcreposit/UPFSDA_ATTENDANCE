@@ -41,7 +41,7 @@ public class AttendanceController {
         return "dashboard/dashboardNew";
     }
 
-    //    Attendance Details Page For On Onclick Dashbaord Counts
+    //    Attendance Details Page For On Onclick Dashboard Counts
     @GetMapping("/attendance-details")
     public String attendanceDetails(@RequestParam("type") String type, Model model) {
 
@@ -72,7 +72,7 @@ public class AttendanceController {
         return "attendance/attendance-details"; // Thymeleaf view
     }
 
-//    Attendace Monthly Report Page for On Click
+    //    Attendance Monthly Report Page for On Click
     @GetMapping("/monthly-report")
     public String showMonthlyReportPage(@RequestParam String username, Model model) {
 
@@ -90,7 +90,7 @@ public class AttendanceController {
         return "attendance/monthly-report"; // Thymeleaf template name
     }
 
-
+    //Full Detailed Page For Full Monthly Report
     @GetMapping("/monthly/details")
     public String showMonthlyCategoryDetailsPage(
             @RequestParam String username,
@@ -117,6 +117,7 @@ public class AttendanceController {
         return "attendance/detailed-attendance-report"; // Thymeleaf/HTML template
     }
 
+    //These pages are Not Currently in Use
 
     @GetMapping("/projects")
     public String projects(Model model) {
