@@ -61,9 +61,10 @@
                             <tbody>
                             <tr th:each="record : ${records}">
                                 <td>
-                                    <a th:href="@{/attendance/monthly-report/{username}(username=${record.username})}"
+                                    <a th:href="@{/attendance/monthly-report(username=${record.username})}"
                                        th:text="${record.username}"></a>
                                 </td>
+
                                 <td th:text="${record.username}"></td>
                                 <td hidden th:text="${record.identityCardNo}"></td>
                                 <td th:text="${record.name}"></td>

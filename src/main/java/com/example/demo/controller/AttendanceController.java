@@ -94,8 +94,8 @@ public class AttendanceController {
         return "attendance/attendance-details"; // Thymeleaf view
     }
 
-    @GetMapping("/monthly-report/{username}")
-    public String showMonthlyReportPage(@PathVariable String username, Model model) {
+    @GetMapping("/monthly-report")
+    public String showMonthlyReportPage(@RequestParam String username, Model model) {
 
         String usernames = "MasterAdmin"; // Change to dynamic retrieval later
         String userRole = usernames.equals("admin") ? "Administrator" : "employee";

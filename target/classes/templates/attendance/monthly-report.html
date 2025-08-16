@@ -73,9 +73,8 @@
 
 <script th:inline="none">
     document.addEventListener('DOMContentLoaded', function () {
-        const path = window.location.pathname;
-        const pathParts = path.split('/');
-        const username = pathParts[pathParts.length - 1];
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
 
         const today = new Date();
         const year = today.getFullYear();
@@ -96,7 +95,6 @@
                 if (data.flag === 'success') {
                     const d = data.data;
 
-                    // Function to create hyperlink for each category
                     function linkify(value, category) {
                         return `<a href="/attendance/monthly/details?username=${encodeURIComponent(username)}&year=${year}&month=${month}&category=${encodeURIComponent(category)}">${value}</a>`;
                     }
@@ -111,7 +109,7 @@
                             linkify(d.total_work_from_home, 'wfh'),
                             linkify(d.total_work_from_office, 'wfo'),
                             linkify(d.total_work_from_field, 'wff'),
-                            d.total_days_in_month // total days probably doesn't need a link
+                            d.total_days_in_month
                         ]],
                         columnDefs: [
                             {targets: '_all', className: 'text-center'}
@@ -124,6 +122,7 @@
             .catch(err => console.error('Error:', err));
     });
 </script>
+
 
 </body>
 </html>
