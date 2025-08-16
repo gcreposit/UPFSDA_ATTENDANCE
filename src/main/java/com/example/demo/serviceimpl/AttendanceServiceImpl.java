@@ -166,26 +166,48 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     @Transactional
-    public ApiResponse<Object> saveLocationForTracking(String userName, String lat, String lon, String timestamp) {
-
+    public ApiResponse<Object> saveLocationForTracking(
+            String userName,
+            String lat,
+            String lon,
+            String timestamp,
+            boolean isActive
+    ) {
         try {
-            LocalDateTime parsedTimestamp = LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME);
+            // 1️⃣ Parse timestamp (or default to now if null/blank)
+            LocalDateTime parsedTimestamp;
+            if (timestamp != null && !timestamp.isBlank()) {
+                parsedTimestamp = LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME);
+            } else {
+                parsedTimestamp = LocalDateTime.now();
+            }
 
+            // 2️⃣ Find employee by username
+            Employee employee = employeeRepository.findByUsername(userName);
+
+            // 3️⃣ Update isActive in employee
+            employee.setActive(isActive);
+            employeeRepository.save(employee);
+
+            // 4️⃣ Save location tracking record
             WffLocationTracking tracking = WffLocationTracking.builder()
                     .userName(userName)
-                    .lat(Double.valueOf(lat))
-                    .lon(Double.valueOf(lon))
+                    .lat(lat != null && !lat.isBlank() ? Double.valueOf(lat) : null)
+                    .lon(lon != null && !lon.isBlank() ? Double.valueOf(lon) : null)
+                    .date(LocalDate.now())
                     .timestamp(parsedTimestamp)
                     .build();
 
             WffLocationTracking saved = locationTrackingRepository.save(tracking);
+
+            // 5️⃣ Notify clients
             notifyClients(userName, saved);
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("flag", "success");
 
             return ApiResponse.builder()
-                    .message("Location saved successfully")
+                    .message("Location saved and employee status updated successfully")
                     .statusCode(HttpStatus.OK.value())
                     .data(responseData)
                     .build();
@@ -204,7 +226,7 @@ public class AttendanceServiceImpl implements AttendanceService {
             error.put("error", e.getMessage());
 
             return ApiResponse.builder()
-                    .message("Failed to save location")
+                    .message("Failed to save location and update employee status")
                     .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .data(error)
                     .build();

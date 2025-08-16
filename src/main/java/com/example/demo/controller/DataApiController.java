@@ -384,12 +384,13 @@ public class DataApiController {
     @PostMapping("/location-tracking")
     public ResponseEntity<ApiResponse<Object>> trackLocation(
             @RequestParam String userName,
-            @RequestParam String lat,
-            @RequestParam String lon,
-            @RequestParam String timestamp
+            @RequestParam(required = false) String lat,
+            @RequestParam(required = false) String lon,
+            @RequestParam(required = false) String timestamp,
+            boolean isActive
     ) {
         try {
-            ApiResponse<Object> response = attendanceService.saveLocationForTracking(userName, lat, lon, timestamp);
+            ApiResponse<Object> response = attendanceService.saveLocationForTracking(userName, lat, lon, timestamp,isActive);
 
             if (response.getStatusCode() != HttpStatus.OK.value()) {
                 return ResponseEntity.status(response.getStatusCode()).body(response);

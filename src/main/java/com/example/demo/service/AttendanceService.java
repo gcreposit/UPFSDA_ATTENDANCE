@@ -20,7 +20,7 @@ public interface AttendanceService {
 
     Attendance getDashboardData(String userName, String date);
 
-    ApiResponse<Object> saveLocationForTracking(String userName, String lat, String lon, String timestamp);
+    ApiResponse<Object> saveLocationForTracking(String userName, String lat, String lon, String timestamp,boolean isActive);
 
     String uploadFieldImages(String username, MultipartFile fieldImage,MultipartFile fieldImage1) throws IOException;
 
