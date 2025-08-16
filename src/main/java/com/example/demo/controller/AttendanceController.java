@@ -23,27 +23,7 @@ public class AttendanceController {
         this.attendanceService = attendanceService;
     }
 
-//    @GetMapping("/dashboard")
-//    public String dashboard(Model model) {
-//        // Get username from JWT token stored in localStorage (handled by client-side auth check)
-//        // For now, we'll use mock data for display but real auth for access
-//
-//        // Mock user data for display purposes
-//        Map<String, Object> user = getMockUserData("user"); // Default to employee view
-//        String userRole = "employee"; // Default role
-//
-//        model.addAttribute("pageTitle", "Dashboard");
-//        model.addAttribute("currentPage", "dashboard");
-//        model.addAttribute("user", user);
-//        model.addAttribute("userRole", userRole);
-//        model.addAttribute("breadcrumbs", Arrays.asList(
-//            Map.of("name", "Home", "url", "/attendance/dashboard"),
-//            Map.of("name", "Dashboard", "url", "")
-//        ));
-//
-//        return "dashboard/dashboard";
-//    }
-
+    //    Dashboard Page
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
 
@@ -58,12 +38,10 @@ public class AttendanceController {
         model.addAttribute("user", user);
         model.addAttribute("userRole", userRole);
 
-        // Map<String, Object> attendances = attendanceService.getDashboardDataForAdmin();
-        // model.addAttribute("attendances", attendances);
-
         return "dashboard/dashboardNew";
     }
 
+    //    Attendance Details Page For On Onclick Dashbaord Counts
     @GetMapping("/attendance-details")
     public String attendanceDetails(@RequestParam("type") String type, Model model) {
 
@@ -94,6 +72,7 @@ public class AttendanceController {
         return "attendance/attendance-details"; // Thymeleaf view
     }
 
+//    Attendace Monthly Report Page for On Click
     @GetMapping("/monthly-report")
     public String showMonthlyReportPage(@RequestParam String username, Model model) {
 
@@ -110,6 +89,7 @@ public class AttendanceController {
         model.addAttribute("username", username);
         return "attendance/monthly-report"; // Thymeleaf template name
     }
+
 
     @GetMapping("/monthly/details")
     public String showMonthlyCategoryDetailsPage(
@@ -303,4 +283,5 @@ public class AttendanceController {
     private String getUserRole(String username) {
         return "MasterAdmin".equals(username) ? "admin" : "employee";
     }
+
 }
