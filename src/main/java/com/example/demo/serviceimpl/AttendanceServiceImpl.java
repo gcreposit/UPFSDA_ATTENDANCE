@@ -52,8 +52,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Autowired
     private WorkTypesRepository workTypesRepository;
+
     @Autowired
     private AttendanceService attendanceService;
+
+    private final LocationEventPublisher publisher;
 
     @Override
     @Transactional
@@ -200,8 +203,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
             WffLocationTracking saved = locationTrackingRepository.save(tracking);
 
-            // 5️⃣ Notify clients
-            notifyClients(userName, saved);
+            publisher.publish(saved);
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("flag", "success");
@@ -644,19 +646,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public SseEmitter createEmitter(String userName) {
-
-        SseEmitter emitter = new SseEmitter(0L); // 0L = no timeout
-        emitters.computeIfAbsent(userName, k -> new CopyOnWriteArrayList<>()).add(emitter);
-
-        emitter.onCompletion(() -> removeEmitter(userName, emitter));
-        emitter.onTimeout(() -> removeEmitter(userName, emitter));
-        emitter.onError((e) -> removeEmitter(userName, emitter));
-
-        return emitter;
-    }
-
-    @Override
     public WffLocationTracking getLatest(String userName) {
 
         return locationTrackingRepository.findTopByUserNameOrderByTimestampDesc(userName);
@@ -668,7 +657,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         LocalDate today = LocalDate.now();
 
-        return locationTrackingRepository.findTrackingDataByDate(today);
+        return locationTrackingRepository.findLatestTrackingDataByDate(today);
 
     }
 
@@ -796,27 +785,24 @@ public class AttendanceServiceImpl implements AttendanceService {
         return response;
     }
 
-    private void removeEmitter(String userName, SseEmitter emitter) {
-        List<SseEmitter> userEmitters = emitters.get(userName);
-        if (userEmitters != null) {
-            userEmitters.remove(emitter);
-            if (userEmitters.isEmpty()) {
-                emitters.remove(userName);
-            }
-        }
+    @Override
+    public List<WffLocationTracking> getHistory(LocalDateTime from, LocalDateTime to) {
+        return locationTrackingRepository.findByTimestampBetweenOrderByTimestampDesc(from, to);
     }
 
-    public void notifyClients(String userName, WffLocationTracking location) {
-        List<SseEmitter> userEmitters = emitters.get(userName);
-        if (userEmitters != null) {
-            for (SseEmitter emitter : userEmitters) {
-                try {
-                    emitter.send(SseEmitter.event().name("location").data(location));
-                } catch (IOException e) {
-                    removeEmitter(userName, emitter);
-                }
-            }
-        }
+    @Override
+    public List<WffLocationTracking> getHistoryForUser(String userName, LocalDateTime from, LocalDateTime to) {
+        return locationTrackingRepository.findByUserNameAndTimestampBetweenOrderByTimestampDesc(userName, from, to);
+    }
+
+    @Override
+    public List<WffLocationTracking> getLatestPerUser() {
+        return locationTrackingRepository.findLatestPerUser();
+    }
+
+    @Override
+    public List<WffLocationTracking> getLatestForUser(String userName) {
+        return locationTrackingRepository.findLatestForUser(userName);
     }
 
 }

@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -244,11 +246,11 @@ public class DataApiController {
     @PostMapping("/attendance/field-images")
     public ResponseEntity<ApiResponse> uploadFieldImages(
             @RequestParam String username,
-            @RequestParam("fieldImage") MultipartFile fieldImage,@RequestParam("fieldImage1") MultipartFile fieldImage1) {
+            @RequestParam("fieldImage") MultipartFile fieldImage, @RequestParam("fieldImage1") MultipartFile fieldImage1) {
 
         try {
 
-            String message = attendanceService.uploadFieldImages(username, fieldImage,fieldImage1);
+            String message = attendanceService.uploadFieldImages(username, fieldImage, fieldImage1);
 
             return ResponseEntity.ok(
                     ApiResponse.builder()
@@ -390,7 +392,7 @@ public class DataApiController {
             boolean isActive
     ) {
         try {
-            ApiResponse<Object> response = attendanceService.saveLocationForTracking(userName, lat, lon, timestamp,isActive);
+            ApiResponse<Object> response = attendanceService.saveLocationForTracking(userName, lat, lon, timestamp, isActive);
 
             if (response.getStatusCode() != HttpStatus.OK.value()) {
                 return ResponseEntity.status(response.getStatusCode()).body(response);
@@ -734,7 +736,7 @@ public class DataApiController {
         }
     }
 
-//    Api for Update Employee Profile
+    //    Api for Update Employee Profile
     @PostMapping("/employee/updateProfile")
     public ResponseEntity<ApiResponse> updateProfile(
             @RequestParam("id") Long id,
@@ -786,7 +788,7 @@ public class DataApiController {
         }
     }
 
-// API for On-Click Detailed Attendance by Category
+    // API for On-Click Detailed Attendance by Category
     @PostMapping("/dashboard/monthly/details")
     public ResponseEntity<ApiResponse> getMonthlyCategoryDetails(
             @RequestParam("username") String username,
@@ -831,31 +833,7 @@ public class DataApiController {
     }
 
 
-    //    For Location Tracking Work - Not Currently In Use
-    @GetMapping("/history/{userName}")
-    public List<WffLocationTracking> getHistory(@PathVariable String userName) {
-
-        return attendanceService.fetchWffEmployeesLocationHistory(userName);
-
-    }
-
-    // SSE stream for live updates - Not Currently In Use
-    @GetMapping("/stream/{userName}")
-    public SseEmitter streamLocation(@PathVariable String userName) {
-
-        SseEmitter emitter = attendanceService.createEmitter(userName);
-
-        // Send last known location immediately
-        WffLocationTracking latest = attendanceService.getLatest(userName);
-        if (latest != null) {
-            try {
-                emitter.send(SseEmitter.event().name("location").data(latest));
-            } catch (Exception ignored) {
-            }
-        }
-
-        return emitter;
-    }
+//    Location Works - Currently These are in work
 
     //    For get All Employees Details
     @GetMapping("/employeesDetails")
@@ -864,11 +842,33 @@ public class DataApiController {
         return employeeService.findAllEmployeeDetails();
     }
 
-    //    For Get Location History Data
     @GetMapping("/location-history")
-    public List<WffLocationTracking> getLocationHistory() {
+    public List<WffLocationTracking> getHistory(
+            @RequestParam(required = false) String userName,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
+    ) {
+        final LocalDateTime toTs = (to != null) ? to : LocalDateTime.now();
+        final LocalDateTime fromTs = (from != null) ? from : toTs.minusHours(24);
 
-        return attendanceService.findAllLocationHistory();
+        if (userName != null && !userName.isBlank()) {
+            return attendanceService.getHistoryForUser(userName, fromTs, toTs);
+        }
+        return attendanceService.getHistory(fromTs, toTs);
+    }
+
+    @GetMapping("/location-latest")
+    public List<WffLocationTracking> getLatestPerUser() {
+        return attendanceService.getLatestPerUser();
+    }
+
+    @GetMapping("/location-latest/{userName}")
+    public List<WffLocationTracking> getLatestForUser(@PathVariable String userName) {
+
+        return attendanceService.getLatestForUser(userName);
+
     }
 
 }

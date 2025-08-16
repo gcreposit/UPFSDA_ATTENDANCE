@@ -2,11 +2,14 @@ package com.example.demo.config;
 
 import com.example.demo.security.JwtAuthenticationFilter;
 import com.example.demo.security.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -97,36 +101,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    @Order(2)
-    public SecurityFilterChain webFilterChain(
-            HttpSecurity http,
-            DaoAuthenticationProvider authenticationProvider) throws Exception {
-        log.info("Configuring Web Security filter chain");
-
-        http.securityMatcher("/**")
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // Allow public pages
-                        .requestMatchers("/login", "/css/**", "/js/**", "/images/**","/api/web/**","/attendance/**").permitAll()
-                        // Require authentication for everything else
-                        .anyRequest().authenticated()
-                )
-                .authenticationProvider(authenticationProvider)
-                .formLogin(form -> form
-                        .loginPage("/login")           // your custom login page
-                        .permitAll()
-                )
-                .logout(logout -> logout.permitAll());
-
-
-        log.info("Web Security configuration completed");
-        return http.build();
-    }
-
-
-//    // Web Security Configuration (Allow attendance pages, protect with client-side JWT)
 //    @Bean
 //    @Order(2)
 //    public SecurityFilterChain webFilterChain(
@@ -138,12 +112,72 @@ public class SecurityConfig {
 //                .csrf(AbstractHttpConfigurer::disable)
 //                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 //                .authorizeHttpRequests(auth -> auth
-//                        .anyRequest().permitAll()  // Allow all web requests, handle auth client-side
+//                        // Allow public pages
+//                        .requestMatchers("/login", "/css/**", "/js/**", "/images/**","/api/web/**","/attendance/**").permitAll()
+//                        // Require authentication for everything else
+//                        .anyRequest().authenticated()
 //                )
-//                .authenticationProvider(authenticationProvider);
+//                .authenticationProvider(authenticationProvider)
+//                .formLogin(form -> form
+//                        .loginPage("/login")           // your custom login page
+//                        .permitAll()
+//                )
+//                .logout(logout -> logout.permitAll());
+//
 //
 //        log.info("Web Security configuration completed");
 //        return http.build();
 //    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain webFilterChain(HttpSecurity http,
+                                              DaoAuthenticationProvider authenticationProvider) throws Exception {
+        http
+                // If your UI and API are same-origin, keep CORS default; otherwise configure a CorsConfigurationSource bean
+                .cors(Customizer.withDefaults())
+
+                // SockJS uses POSTs to /ws/**; ignore CSRF there (or disable globally if you prefer)
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/ws/**"))
+
+                // If you keep SockJS iframe fallback enabled, allow same-origin frames
+                .headers(h -> h.frameOptions(f -> f.sameOrigin()))
+
+                // formLogin requires a session; STATELESS causes 302/HTML for XHR transports
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+
+                .authorizeHttpRequests(auth -> auth
+                        // static resources
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+
+                        // your public endpoints
+                        .requestMatchers("/login", "/api/web/**", "/attendance/**").permitAll()
+
+                        // **critical**: allow STOMP/SockJS handshake + info/XHR/websocket endpoints
+                        .requestMatchers("/ws/**").permitAll()
+
+                        // dev hot-reload (optional)
+                        .requestMatchers("/sockjs-node/**").permitAll()
+
+                        .anyRequest().authenticated()
+                )
+
+                .authenticationProvider(authenticationProvider)
+
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll()
+                )
+                .logout(logout -> logout.permitAll())
+
+                // Optional: make APIs return 401 instead of redirecting HTML to /login
+                .exceptionHandling(e -> e.defaultAuthenticationEntryPointFor(
+                        (req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED),
+                        new AntPathRequestMatcher("/api/**")
+                ));
+
+        return http.build();
+    }
 
 }

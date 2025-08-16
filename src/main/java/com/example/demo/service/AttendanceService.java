@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +45,7 @@ public interface AttendanceService {
 
     List<WffLocationTracking> fetchWffEmployeesLocationHistory(String userName);
 
-    SseEmitter createEmitter(String userName);
+
 
     WffLocationTracking getLatest(String userName);
 
@@ -53,4 +54,12 @@ public interface AttendanceService {
     Map<String, Object> getMonthlyCategoryDetails(String username, int year, int month, String category);
 
 
+    List<WffLocationTracking> getHistoryForUser(String userName, LocalDateTime fromTs, LocalDateTime toTs);
+
+
+    List<WffLocationTracking> getHistory(LocalDateTime fromTs, LocalDateTime toTs);
+
+    List<WffLocationTracking> getLatestPerUser();
+
+    List<WffLocationTracking> getLatestForUser(String userName);
 }
