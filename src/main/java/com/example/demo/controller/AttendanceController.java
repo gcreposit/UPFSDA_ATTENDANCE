@@ -111,6 +111,33 @@ public class AttendanceController {
         return "attendance/monthly-report"; // Thymeleaf template name
     }
 
+    @GetMapping("/monthly/details")
+    public String showMonthlyCategoryDetailsPage(
+            @RequestParam String username,
+            @RequestParam int year,
+            @RequestParam int month,
+            @RequestParam String category,
+            Model model) {
+
+        String usernames = "MasterAdmin"; // Change to dynamic retrieval later
+        String userRole = usernames.equals("admin") ? "Administrator" : "employee";
+
+        Map<String, Object> user = getMockUserData(usernames);
+
+        model.addAttribute("pageTitle", "Dashboard");
+        model.addAttribute("currentPage", "dashboard");
+        model.addAttribute("user", user);
+        model.addAttribute("userRole", userRole);
+
+        model.addAttribute("username", username);
+        model.addAttribute("year", year);
+        model.addAttribute("month", month);
+        model.addAttribute("category", category);
+
+        return "attendance/detailed-attendance-report"; // Thymeleaf/HTML template
+    }
+
+
     @GetMapping("/projects")
     public String projects(Model model) {
         Map<String, Object> user = getMockUserData("user");

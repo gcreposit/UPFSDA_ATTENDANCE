@@ -30,27 +30,27 @@
 
             <!-- Table section -->
             <div class="dashboard-main">
-
-                <!-- Employee Table -->
-                <div class="table-responsive">
-                    <table id="reportTable" class="table table-bordered display nowrap" style="width:100%">
-                        <thead>
-                        <tr>
-                            <th>On Time</th>
-                            <th>Late Entry</th>
-                            <th>Late & Half</th>
-                            <th>Half Day</th>
-                            <th>Absent</th>
-                            <th>Work From Home</th>
-                            <th>Work From Office</th>
-                            <th>Work From Field</th>
-                            <th>Total Days</th>
-                        </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                <div class="bg-white rounded-xl shadow-lg p-2">
+                    <!-- Employee Table -->
+                    <div class="table-responsive">
+                        <table id="reportTable" class="table table-bordered display nowrap" style="width:100%">
+                            <thead>
+                            <tr>
+                                <th>On Time</th>
+                                <th>Late Entry</th>
+                                <th>Late & Half</th>
+                                <th>Half Day</th>
+                                <th>Absent</th>
+                                <th>Work From Home</th>
+                                <th>Work From Office</th>
+                                <th>Work From Field</th>
+                                <th>Total Days</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
-
             </div>
         </div>
 
@@ -73,19 +73,12 @@
 
 <script th:inline="none">
     document.addEventListener('DOMContentLoaded', function () {
-        // Get the full URL path from the browser's address bar
         const path = window.location.pathname;
-
-        // Split the path by '/' to get the parts of the URL
         const pathParts = path.split('/');
-
-        // The username is the last part of the URL, so we can access it by the last element of the pathParts array
         const username = pathParts[pathParts.length - 1];
 
-        // Get the current date
         const today = new Date();
         const year = today.getFullYear();
-        // JavaScript months are 0-indexed (0 for January, 11 for December), so we add 1
         const month = today.getMonth() + 1;
 
         const formData = new URLSearchParams();
@@ -95,28 +88,34 @@
 
         fetch('/api/data/dashboard/monthly', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: formData.toString()
         })
             .then(res => res.json())
             .then(data => {
-
-                console.log("Check Data ",data);
-
                 if (data.flag === 'success') {
                     const d = data.data;
+
+                    // Function to create hyperlink for each category
+                    function linkify(value, category) {
+                        return `<a href="/attendance/monthly/details?username=${encodeURIComponent(username)}&year=${year}&month=${month}&category=${encodeURIComponent(category)}">${value}</a>`;
+                    }
+
                     $('#reportTable').DataTable({
                         data: [[
-                            d.on_time,
-                            d.late_entry,
-                            d.late_and_half,
-                            d.half_day,
-                            d.absent,
-                            d.total_work_from_home,
-                            d.total_work_from_office,
-                            d.total_work_from_field,
-                            d.total_days_in_month
-                        ]]
+                            linkify(d.on_time, 'on_time'),
+                            linkify(d.late_entry, 'late_entry'),
+                            linkify(d.late_and_half, 'late_and_half'),
+                            linkify(d.half_day, 'half_day'),
+                            linkify(d.absent, 'absent'),
+                            linkify(d.total_work_from_home, 'wfh'),
+                            linkify(d.total_work_from_office, 'wfo'),
+                            linkify(d.total_work_from_field, 'wff'),
+                            d.total_days_in_month // total days probably doesn't need a link
+                        ]],
+                        columnDefs: [
+                            {targets: '_all', className: 'text-center'}
+                        ]
                     });
                 } else {
                     alert(data.message);
