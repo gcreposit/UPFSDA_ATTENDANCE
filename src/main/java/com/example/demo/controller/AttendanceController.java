@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -93,15 +94,22 @@ public class AttendanceController {
         return "attendance/attendance-details"; // Thymeleaf view
     }
 
-//    @GetMapping("/monthly-report")
-//    public String showMonthlyReportPage(@RequestParam("username") String username, Model model) {
-//        // Pass the username to the view
-//        model.addAttribute("username", username);
-//
-////        model.addAttribute("year", year);
-////        model.addAttribute("month", month);
-//        return "attendance/monthly-report"; // This is the Thymeleaf template name
-//    }
+    @GetMapping("/monthly-report/{username}")
+    public String showMonthlyReportPage(@PathVariable String username, Model model) {
+
+        String usernames = "MasterAdmin"; // Change to dynamic retrieval later
+        String userRole = usernames.equals("admin") ? "Administrator" : "employee";
+
+        Map<String, Object> user = getMockUserData(usernames);
+
+        model.addAttribute("pageTitle", "Dashboard");
+        model.addAttribute("currentPage", "dashboard");
+        model.addAttribute("user", user);
+        model.addAttribute("userRole", userRole);
+
+        model.addAttribute("username", username);
+        return "attendance/monthly-report"; // Thymeleaf template name
+    }
 
     @GetMapping("/projects")
     public String projects(Model model) {

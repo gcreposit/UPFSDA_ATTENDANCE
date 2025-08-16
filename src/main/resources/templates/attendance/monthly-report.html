@@ -1,47 +1,92 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/layout :: head}">
-    <title>Monthly Attendance Report</title>
+    <title>Admin Dashboard - UPFSDA Attendance System</title>
+
+    <!-- Include DataTables CSS -->
     <link th:href="@{/webjars/datatables/1.13.6/css/jquery.dataTables.min.css}" rel="stylesheet"/>
+    <!-- If you want responsive -->
+    <link th:href="@{/webjars/datatables-responsive/2.5.0/css/responsive.dataTables.min.css}" rel="stylesheet"/>
 </head>
+
 <body>
 <nav th:replace="~{fragments/layout :: sidebar}"></nav>
 <header th:replace="~{fragments/layout :: header}"></header>
 
 <main class="main-content">
-    <div class="dashboard-center">
-        <h3 th:text="'Monthly Attendance Report for ' + ${username}"></h3>
-        <small th:text="'Month: ' + ${month} + ', Year: ' + ${year}"></small>
+    <div class="dashboard-grid-admin">
+        <div class="dashboard-center">
+            <div class="welcome-card">
+                <div class="welcome-content">
+                    <h3 th:text="${username} + ' Monthly Attendance Report'">Monthly Attendance Report</h3>
+                    <p th:text="'Overview for ' + ${#dates.format(#dates.createNow(), 'MMMM yyyy')}"></p>
+                    <small th:text="'Generated on ' + ${#dates.format(#dates.createNow(), 'EEEE, MMMM dd, yyyy')}"></small>
+                </div>
+                <div class="welcome-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
 
-        <div class="table-responsive">
-            <table id="reportTable" class="table table-bordered display nowrap" style="width:100%">
-                <thead>
-                <tr>
-                    <th>On Time</th>
-                    <th>Late Entry</th>
-                    <th>Half Day</th>
-                    <th>Absent</th>
-                    <th>Work From Home</th>
-                    <th>Work From Office</th>
-                    <th>Work From Field</th>
-                    <th>Total Days</th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <!-- Table section -->
+            <div class="dashboard-main">
+
+                <!-- Employee Table -->
+                <div class="table-responsive">
+                    <table id="reportTable" class="table table-bordered display nowrap" style="width:100%">
+                        <thead>
+                        <tr>
+                            <th>On Time</th>
+                            <th>Late Entry</th>
+                            <th>Late & Half</th>
+                            <th>Half Day</th>
+                            <th>Absent</th>
+                            <th>Work From Home</th>
+                            <th>Work From Office</th>
+                            <th>Work From Field</th>
+                            <th>Total Days</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="dashboard-right">
+            <div class="simple-calendar-card">
+                <div class="simple-calendar-header">
+                    <button class="simple-nav" id="simplePrevMonth"><i class="fas fa-chevron-left"></i></button>
+                    <span class="simple-month-year" id="simpleCurrentMonth">August 2025</span>
+                    <button class="simple-nav" id="simpleNextMonth"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="simple-calendar-grid" id="simpleCalendarGrid"></div>
+            </div>
         </div>
     </div>
 </main>
 
-<footer th:replace="~{fragments/layout :: footer}"></footer>
 
-<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
-<script th:src="@{/webjars/datatables/1.13.6/js/jquery.dataTables.min.js}"></script>
-<script>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+<script th:inline="none">
     document.addEventListener('DOMContentLoaded', function () {
-        const username = /*[[${username}]]*/ '';
-        const year = /*[[${year}]]*/ 0;
-        const month = /*[[${month}]]*/ 0;
+        // Get the full URL path from the browser's address bar
+        const path = window.location.pathname;
+
+        // Split the path by '/' to get the parts of the URL
+        const pathParts = path.split('/');
+
+        // The username is the last part of the URL, so we can access it by the last element of the pathParts array
+        const username = pathParts[pathParts.length - 1];
+
+        // Get the current date
+        const today = new Date();
+        const year = today.getFullYear();
+        // JavaScript months are 0-indexed (0 for January, 11 for December), so we add 1
+        const month = today.getMonth() + 1;
 
         const formData = new URLSearchParams();
         formData.append('username', username);
@@ -55,12 +100,16 @@
         })
             .then(res => res.json())
             .then(data => {
+
+                console.log("Check Data ",data);
+
                 if (data.flag === 'success') {
                     const d = data.data;
                     $('#reportTable').DataTable({
                         data: [[
                             d.on_time,
                             d.late_entry,
+                            d.late_and_half,
                             d.half_day,
                             d.absent,
                             d.total_work_from_home,
@@ -76,5 +125,6 @@
             .catch(err => console.error('Error:', err));
     });
 </script>
+
 </body>
 </html>

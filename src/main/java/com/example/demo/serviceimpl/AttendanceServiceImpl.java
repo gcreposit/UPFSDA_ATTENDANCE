@@ -398,7 +398,8 @@ public class AttendanceServiceImpl implements AttendanceService {
         // Step 6: Prepare the detailed data
         Map<String, Object> data = new HashMap<>();
         data.put("on_time", onTime);
-        data.put("late_entry", lateEntry + lateAndHalf);
+        data.put("late_entry", lateEntry);
+        data.put("late_and_half", lateAndHalf);
         data.put("half_day", halfDay);
         data.put("absent", absent);
         data.put("total_work_from_home", wfh);

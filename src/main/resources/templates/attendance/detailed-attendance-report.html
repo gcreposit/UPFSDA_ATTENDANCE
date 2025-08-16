@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head}">
+    <title>Admin Dashboard - UPFSDA Attendance System</title>
+
+    <!-- Include DataTables CSS -->
+    <link th:href="@{/webjars/datatables/1.13.6/css/jquery.dataTables.min.css}" rel="stylesheet"/>
+    <!-- If you want responsive -->
+    <link th:href="@{/webjars/datatables-responsive/2.5.0/css/responsive.dataTables.min.css}" rel="stylesheet"/>
+</head>
+
+<body>
+<nav th:replace="~{fragments/layout :: sidebar}"></nav>
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main class="main-content">
+    <div class="dashboard-grid-admin">
+        <div class="dashboard-center">
+            <div class="welcome-card">
+                <div class="welcome-content">
+                    <h3 th:text="${username} + ' Monthly Attendance Report'">Monthly Attendance Report</h3>
+                    <p th:text="'Overview for ' + ${#dates.format(#dates.createNow(), 'MMMM yyyy')}"></p>
+                    <small th:text="'Generated on ' + ${#dates.format(#dates.createNow(), 'EEEE, MMMM dd, yyyy')}"></small>
+                </div>
+                <div class="welcome-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+
+            <div class="dashboard-grid-detail">
+                <div class="dashboard-center">
+                    <div class="bg-white rounded-xl shadow-lg p-6 flex items-center justify-between mb-6">
+                        <div class="flex-1">
+                            <h3 id="reportTitle" class="text-2xl font-bold text-gray-800">Loading Report...</h3>
+                            <p id="reportSubTitle" class="text-gray-500">Retrieving details...</p>
+                        </div>
+                        <div class="text-gray-400 text-4xl">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Table section -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="table-responsive">
+                            <table id="detailTable" class="table table-bordered display nowrap" style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>In Time</th>
+                                    <th>Out Time</th>
+                                    <th>Status</th>
+                                    <th>Attendance Type</th>
+                                    <th>Remarks</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Data will be loaded by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <a href="#" onclick="history.back()"
+                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back to Monthly Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-right">
+                <div class="simple-calendar-card">
+                    <div class="simple-calendar-header">
+                        <button class="simple-nav" id="simplePrevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <span class="simple-month-year" id="simpleCurrentMonth">August 2025</span>
+                        <button class="simple-nav" id="simpleNextMonth"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="simple-calendar-grid" id="simpleCalendarGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+        const year = urlParams.get('year');
+        const month = urlParams.get('month');
+        const countType = urlParams.get('count_type');
+
+        // Map the count_type to a human-readable title
+        const titleMap = {
+            'on_time': 'On Time Entries',
+            'late_entry': 'Late Entries',
+            'half_day': 'Half Day Entries',
+            'absent': 'Absent Days',
+            'total_work_from_home': 'Work From Home',
+            'total_work_from_office': 'Work From Office',
+            'total_work_from_field': 'Work From Field',
+            'total_days_in_month': 'All Entries'
+        };
+
+        // Update the welcome card titles
+        document.getElementById('reportTitle').textContent = `${titleMap[countType]} for ${username}`;
+        document.getElementById('reportSubTitle').textContent = `Details for ${new Date(year, month - 1).toLocaleString('default', { month: 'long' })} ${year}`;
+
+        // Prepare the data for the API call, using the new 'category' parameter
+        const formData = new URLSearchParams();
+        formData.append('username', username);
+        formData.append('year', year);
+        formData.append('month', month);
+        formData.append('category', countType); // Updated parameter name
+
+        // Fetch the detailed data from the new API endpoint
+        fetch('/attendance/dashboard/monthly/details', { // Updated API path
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.statusCode === 200 && data.data) {
+                    // Map the API response data to a format DataTables can use
+                    const mappedData = data.data.map(item => [
+                        item.date,
+                        item.in_time ? new Date(item.in_time).toLocaleTimeString() : 'N/A',
+                        item.out_time ? new Date(item.out_time).toLocaleTimeString() : 'N/A',
+                        item.status,
+                        item.attendance_type,
+                        item.remarks
+                    ]);
+
+                    // Initialize the DataTable with the new data
+                    $('#detailTable').DataTable({
+                        data: mappedData,
+                        responsive: true
+                    });
+                } else {
+                    document.getElementById('reportTitle').textContent = "Data Not Found";
+                    document.getElementById('reportSubTitle').textContent = data.message || "Could not retrieve details.";
+                    // Optionally, hide the table
+                    $('#detailTable').hide();
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                document.getElementById('reportTitle').textContent = "Error Loading Report";
+                document.getElementById('reportSubTitle').textContent = "An error occurred while fetching the data.";
+                $('#detailTable').hide();
+            });
+    });
+</script>
+
+</body>
+</html>

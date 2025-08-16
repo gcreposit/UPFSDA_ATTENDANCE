@@ -39,7 +39,8 @@
                         <thead>
                         <tr>
                             <th>Action</th>
-                            <th>ID Card No</th>
+                            <th>Username</th>
+                            <th hidden>ID Card No</th>
                             <th>Name</th>
                             <th>Designation</th>
                             <th hidden>Date of Birth</th>
@@ -60,23 +61,11 @@
                         <tbody>
                         <tr th:each="record : ${records}">
                             <td>
-                                <button class="btn btn-primary btn-sm"
-                                        th:data-username="${record.username}"
-                                        onclick="showMonthlyReportFromButton(this)">
-                                    Show Monthly Report
-                                </button>
+                                <a th:href="@{/attendance/monthly-report/{username}(username=${record.username})}"
+                                   th:text="${record.username}"></a>
                             </td>
-
-<!--                            <td>-->
-<!--                                <button class="btn btn-primary btn-sm"-->
-<!--                                        th:onclick="'window.location.href=\'/attendance/dashboard/monthly-report?username='-->
-<!--                        + ${#urls.urlEncode(record.username)} + '\''">-->
-<!--                                    Show Monthly Report-->
-<!--                                </button>-->
-<!--                            </td>-->
-
-
-                            <td th:text="${record.identityCardNo}"></td>
+                            <td th:text="${record.username}"></td>
+                            <td hidden th:text="${record.identityCardNo}"></td>
                             <td th:text="${record.name}"></td>
                             <td th:text="${record.designation}"></td>
                             <td hidden th:text="${record.dateOfBirth}"></td>
@@ -94,7 +83,6 @@
                             <td th:text="${record.emergencyContactNo}"></td>
                         </tr>
                         </tbody>
-
                     </table>
                 </div>
 
@@ -152,8 +140,6 @@
                                 View Image
                             </button>
                         </td>
-
-
                     </tr>
                     </tbody>
                 </table>
