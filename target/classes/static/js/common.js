@@ -1,30 +1,30 @@
 // Common JavaScript functionality for UPFSDA Attendance System
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Initialize theme
     initTheme();
-    
+
     // Initialize sidebar toggle
     initSidebarToggle();
-    
+
     // Initialize tooltips
     initTooltips();
-    
+
     // Initialize common event listeners
     initCommonEvents();
-    
+
     // Initialize time updates
     initTimeUpdates();
-    
+
     // Initialize authentication check
     initAuthCheck();
-    
+
     // Prevent back button access after logout
     preventBackButtonAccess();
-    
+
     // Check authentication when page becomes visible (tab switching)
     initVisibilityCheck();
-    
+
     // Session timeout disabled - using JWT expiration (24 hours) instead
 });
 
@@ -32,19 +32,19 @@ document.addEventListener('DOMContentLoaded', function() {
 function preventBackButtonAccess() {
     // Add state to history to detect back button
     window.history.pushState(null, null, window.location.href);
-    
-    window.addEventListener('popstate', function(event) {
+
+    window.addEventListener('popstate', function (event) {
         // Check if user is authenticated when using back button
         const token = localStorage.getItem('authToken');
         const protectedPaths = ['/attendance/dashboard', '/attendance/projects', '/attendance/leave', '/attendance/team'];
         const currentPath = window.location.pathname;
-        
+
         if (protectedPaths.some(path => currentPath.startsWith(path)) && !token) {
             console.log('Back button detected on protected page without auth, redirecting to login');
             window.location.replace('/login?error=Session expired. Please login again.');
             return;
         }
-        
+
         // Re-validate authentication
         if (token) {
             validateAuthToken(token);
@@ -59,39 +59,39 @@ function initSidebarToggle() {
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     const mainContent = document.querySelector('.main-content');
-    
+
     // Desktop sidebar toggle (collapse/expand)
     if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', function() {
+        sidebarToggle.addEventListener('click', function () {
             sidebar.classList.toggle('collapsed');
             if (mainContent) {
                 mainContent.classList.toggle('sidebar-collapsed');
             }
         });
     }
-    
+
     // Mobile sidebar toggle (show/hide)
     if (mobileMenuBtn && sidebar) {
-        mobileMenuBtn.addEventListener('click', function() {
+        mobileMenuBtn.addEventListener('click', function () {
             sidebar.classList.toggle('show');
             if (sidebarOverlay) {
                 sidebarOverlay.classList.toggle('show');
             }
         });
     }
-    
+
     // Close sidebar when clicking overlay
     if (sidebarOverlay && sidebar) {
-        sidebarOverlay.addEventListener('click', function() {
+        sidebarOverlay.addEventListener('click', function () {
             sidebar.classList.remove('show');
             sidebarOverlay.classList.remove('show');
         });
     }
-    
+
     // Close sidebar when clicking nav links on mobile
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function () {
             if (window.innerWidth <= 768) {
                 sidebar.classList.remove('show');
                 if (sidebarOverlay) {
@@ -115,7 +115,7 @@ function initCommonEvents() {
     // Handle form submissions with loading states
     const forms = document.querySelectorAll('form[data-loading]');
     forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.disabled = true;
@@ -123,13 +123,13 @@ function initCommonEvents() {
             }
         });
     });
-    
+
     // Handle punch in/out buttons
     const punchButtons = document.querySelectorAll('.punch-btn');
     punchButtons.forEach(btn => {
         btn.addEventListener('click', handlePunchAction);
     });
-    
+
     // Handle project timer buttons
     const timerButtons = document.querySelectorAll('.timer-btn');
     timerButtons.forEach(btn => {
@@ -142,7 +142,7 @@ function initTimeUpdates() {
     // Update current time every second
     updateCurrentTime();
     setInterval(updateCurrentTime, 1000);
-    
+
     // Update working hours for active employees
     updateWorkingHours();
     setInterval(updateWorkingHours, 60000); // Update every minute
@@ -152,13 +152,13 @@ function initTimeUpdates() {
 function updateCurrentTime() {
     const timeElements = document.querySelectorAll('.current-time');
     const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', { 
-        hour12: false, 
-        hour: '2-digit', 
+    const timeString = now.toLocaleTimeString('en-US', {
+        hour12: false,
+        hour: '2-digit',
         minute: '2-digit',
         second: '2-digit'
     });
-    
+
     timeElements.forEach(element => {
         element.textContent = timeString;
     });
@@ -167,7 +167,7 @@ function updateCurrentTime() {
 // Update working hours for employees who are currently working
 function updateWorkingHours() {
     const workingHoursElements = document.querySelectorAll('.working-hours[data-punch-in]');
-    
+
     workingHoursElements.forEach(element => {
         const punchInTime = element.dataset.punchIn;
         if (punchInTime && !element.dataset.punchOut) {
@@ -183,12 +183,12 @@ function calculateWorkingHours(punchInTime) {
     const punchIn = new Date();
     const [hours, minutes] = punchInTime.split(':');
     punchIn.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-    
+
     const diffMs = now - punchIn;
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
     const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-    
+
     return `${diffHours.toString().padStart(2, '0')}:${diffMinutes.toString().padStart(2, '0')}:${diffSeconds.toString().padStart(2, '0')}`;
 }
 
@@ -198,18 +198,18 @@ async function handlePunchAction(event) {
     const button = event.target.closest('.punch-btn');
     const action = button.dataset.action;
     const employeeId = button.dataset.employeeId;
-    
+
     try {
         button.disabled = true;
         button.innerHTML = '<span class="spinner"></span> Processing...';
-        
+
         let result;
         if (action === 'punch-in') {
             result = await mockAPI.punchIn(employeeId);
         } else {
             result = await mockAPI.punchOut(employeeId);
         }
-        
+
         if (result.success) {
             showNotification('Success', `Successfully ${action.replace('-', ' ')}ed!`, 'success');
             // Reload page to update UI
@@ -221,8 +221,8 @@ async function handlePunchAction(event) {
         showNotification('Error', 'An error occurred. Please try again.', 'error');
     } finally {
         button.disabled = false;
-        button.innerHTML = action === 'punch-in' ? 
-            '<i class="fas fa-play"></i> Punch In' : 
+        button.innerHTML = action === 'punch-in' ?
+            '<i class="fas fa-play"></i> Punch In' :
             '<i class="fas fa-stop"></i> Punch Out';
     }
 }
@@ -233,16 +233,16 @@ async function handleTimerAction(event) {
     const button = event.target.closest('.timer-btn');
     const action = button.dataset.action;
     const projectId = button.dataset.projectId;
-    
+
     try {
         button.disabled = true;
         button.innerHTML = '<span class="spinner"></span> Processing...';
-        
+
         // Simulate API call
         await mockAPI.delay(1000);
-        
+
         showNotification('Success', `Project timer ${action}ed!`, 'success');
-        
+
         // Update button state
         if (action === 'start') {
             button.dataset.action = 'stop';
@@ -271,7 +271,7 @@ function showNotification(title, message, type = 'info') {
         <strong>${title}:</strong> ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
-    
+
     // Add to notification container or body
     let container = document.querySelector('.notification-container');
     if (!container) {
@@ -279,9 +279,9 @@ function showNotification(title, message, type = 'info') {
         container.className = 'notification-container';
         document.body.appendChild(container);
     }
-    
+
     container.appendChild(notification);
-    
+
     // Auto remove after 5 seconds
     setTimeout(() => {
         if (notification.parentNode) {
@@ -364,14 +364,14 @@ function debounce(func, wait) {
 function initTheme() {
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
-    
+
     if (!themeToggle) return; // Not on a page with theme toggle
-    
+
     // Load saved theme or default to light
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
-    
-    themeToggle.addEventListener('click', function() {
+
+    themeToggle.addEventListener('click', function () {
         const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
@@ -380,7 +380,7 @@ function initTheme() {
 
 function setTheme(theme) {
     const themeIcon = document.getElementById('themeIcon');
-    
+
     if (theme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
         if (themeIcon) {
@@ -394,7 +394,7 @@ function setTheme(theme) {
             themeIcon.classList.add('fa-moon');
         }
     }
-    
+
     localStorage.setItem('theme', theme);
 }
 
@@ -404,22 +404,22 @@ function initAuthCheck() {
     if (window.location.pathname === '/login') {
         return;
     }
-    
+
     // Check if user is on a protected page
     const protectedPaths = ['/attendance/dashboard', '/attendance/projects', '/attendance/leave', '/attendance/team'];
     const currentPath = window.location.pathname;
-    
+
     if (protectedPaths.some(path => currentPath.startsWith(path))) {
         const token = localStorage.getItem('authToken');
         const username = localStorage.getItem('username');
-        
+
         if (!token || !username) {
             console.log('No authentication data found, redirecting to login');
             // No token, redirect to login immediately
             window.location.replace('/login?error=Please login to access this page');
             return;
         }
-        
+
         // Validate token with backend
         validateAuthToken(token);
     }
@@ -428,36 +428,36 @@ function initAuthCheck() {
 async function validateAuthToken(token) {
     try {
         console.log('Validating token:', token.substring(0, 20) + '...');
-        
+
         const response = await fetch('/api/web/validate-token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ token: token })
+            body: JSON.stringify({token: token})
         });
-        
+
         console.log('Token validation response status:', response.status);
-        
+
         if (!response.ok) {
             throw new Error('Token validation request failed');
         }
-        
+
         const data = await response.json();
         console.log('Token validation response:', data);
-        
+
         if (!data.valid) {
             console.log('Token is invalid, clearing auth data and redirecting');
             // Token is invalid, clear all auth data and redirect
             localStorage.removeItem('authToken');
             localStorage.removeItem('username');
             sessionStorage.clear();
-            
+
             // Use replace to prevent back button access
             window.location.replace('/login?error=Session expired. Please login again.');
             return;
         }
-        
+
         console.log('Token is valid, checking role-based access');
         // Token is valid, check role-based access
         const username = localStorage.getItem('username');
@@ -489,13 +489,13 @@ function handleLogout() {
         // Clear all authentication data
         localStorage.removeItem('authToken');
         localStorage.removeItem('username');
-        
+
         // Clear any session storage
         sessionStorage.clear();
-        
+
         // Show logout message
         showNotification('Success', 'Logged out successfully!', 'success');
-        
+
         // Redirect to login page
         setTimeout(() => {
             window.location.href = '/login?message=You have been logged out successfully';
@@ -505,13 +505,13 @@ function handleLogout() {
 
 // Check authentication when page becomes visible (prevents tab switching bypass)
 function initVisibilityCheck() {
-    document.addEventListener('visibilitychange', function() {
+    document.addEventListener('visibilitychange', function () {
         if (!document.hidden) {
             // Page became visible, re-check authentication
             const token = localStorage.getItem('authToken');
             const protectedPaths = ['/attendance/dashboard', '/attendance/projects', '/attendance/leave', '/attendance/team'];
             const currentPath = window.location.pathname;
-            
+
             if (protectedPaths.some(path => currentPath.startsWith(path))) {
                 if (!token) {
                     console.log('Page visible but no auth token, redirecting to login');
