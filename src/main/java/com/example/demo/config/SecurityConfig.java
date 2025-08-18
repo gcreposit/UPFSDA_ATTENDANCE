@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 public class SecurityConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
-
     private final JwtUtil jwtUtil;
 
     public SecurityConfig(JwtUtil jwtUtil) {
@@ -101,77 +100,47 @@ public class SecurityConfig {
         return http.build();
     }
 
-//    @Bean
-//    @Order(2)
-//    public SecurityFilterChain webFilterChain(
-//            HttpSecurity http,
-//            DaoAuthenticationProvider authenticationProvider) throws Exception {
-//        log.info("Configuring Web Security filter chain");
-//
-//        http.securityMatcher("/**")
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(auth -> auth
-//                        // Allow public pages
-//                        .requestMatchers("/login", "/css/**", "/js/**", "/images/**","/api/web/**","/attendance/**").permitAll()
-//                        // Require authentication for everything else
-//                        .anyRequest().authenticated()
-//                )
-//                .authenticationProvider(authenticationProvider)
-//                .formLogin(form -> form
-//                        .loginPage("/login")           // your custom login page
-//                        .permitAll()
-//                )
-//                .logout(logout -> logout.permitAll());
-//
-//
-//        log.info("Web Security configuration completed");
-//        return http.build();
-//    }
-
+    // Web Security Configuration (UI + static resources)
     @Bean
     @Order(2)
     public SecurityFilterChain webFilterChain(HttpSecurity http,
                                               DaoAuthenticationProvider authenticationProvider) throws Exception {
         http
-                // If your UI and API are same-origin, keep CORS default; otherwise configure a CorsConfigurationSource bean
                 .cors(Customizer.withDefaults())
-
-                // SockJS uses POSTs to /ws/**; ignore CSRF there (or disable globally if you prefer)
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/ws/**"))
-
-                // If you keep SockJS iframe fallback enabled, allow same-origin frames
-                .headers(h -> h.frameOptions(f -> f.sameOrigin()))
-
-                // formLogin requires a session; STATELESS causes 302/HTML for XHR transports
+                .headers(h -> h
+                        .frameOptions(f -> f.sameOrigin())
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("default-src 'self'; " +
+                                        "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
+                                        "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://maps.googleapis.com " +
+                                        "https://cdn.datatables.net https://code.jquery.com; " +
+                                        "style-src 'self' 'unsafe-inline' " +
+                                        "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://cdn.datatables.net; " +
+                                        "style-src-elem 'self' 'unsafe-inline' " +
+                                        "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://cdn.datatables.net; " +
+                                        "font-src 'self' https://fonts.gstatic.com data:; " +
+                                        "img-src 'self' data: https://cdn.datatables.net; " +
+                                        // ✅ allow ajax/json calls to CDNs + APIs
+                                        "connect-src 'self' https://cdn.datatables.net https://code.jquery.com https://cdnjs.cloudflare.com https://maps.googleapis.com; " +
+                                        "frame-ancestors 'self';")
+                        )
+                )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-
                 .authorizeHttpRequests(auth -> auth
-                        // static resources
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-
-                        // your public endpoints
                         .requestMatchers("/login", "/api/web/**", "/attendance/**").permitAll()
-
-                        // **critical**: allow STOMP/SockJS handshake + info/XHR/websocket endpoints
                         .requestMatchers("/ws/**").permitAll()
-
-                        // dev hot-reload (optional)
                         .requestMatchers("/sockjs-node/**").permitAll()
-
                         .anyRequest().authenticated()
                 )
-
                 .authenticationProvider(authenticationProvider)
-
                 .formLogin(form -> form
                         .loginPage("/login")
                         .permitAll()
                 )
                 .logout(logout -> logout.permitAll())
-
-                // Optional: make APIs return 401 instead of redirecting HTML to /login
                 .exceptionHandling(e -> e.defaultAuthenticationEntryPointFor(
                         (req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED),
                         new AntPathRequestMatcher("/api/**")
@@ -179,5 +148,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
 }

@@ -45,17 +45,13 @@ public interface AttendanceService {
 
     List<WffLocationTracking> fetchWffEmployeesLocationHistory(String userName);
 
-
-
     WffLocationTracking getLatest(String userName);
 
     List<WffLocationTracking> findAllLocationHistory();
 
     Map<String, Object> getMonthlyCategoryDetails(String username, int year, int month, String category);
 
-
     List<WffLocationTracking> getHistoryForUser(String userName, LocalDateTime fromTs, LocalDateTime toTs);
-
 
     List<WffLocationTracking> getHistory(LocalDateTime fromTs, LocalDateTime toTs);
 

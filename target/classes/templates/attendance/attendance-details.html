@@ -61,8 +61,9 @@
                             <tbody>
                             <tr th:each="record : ${records}">
                                 <td>
-                                    <a th:href="@{/attendance/monthly-report(username=${record.username})}"
-                                       th:text="${record.username}"></a>
+                                    <a class="btn btn-primary"
+                                       th:href="@{/attendance/monthly-report(username=${record.username})}">Show Monthly
+                                        Report</a>
                                 </td>
 
                                 <td th:text="${record.username}"></td>
@@ -88,66 +89,112 @@
                     </div>
 
                     <!-- Attendance Table -->
-                    <table id="attendanceTable"
-                           th:if="${attendances != null and !attendances.isEmpty()}"
-                           class="datatable table table-bordered mb-0 display nowrap" style="width:100%">
-                        <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Attendance Type</th>
-                            <th>Reason</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Morning Time</th>
-                            <th>Evening Time</th>
-                            <th>Morning Image</th>
-                            <th>Evening Image</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="record : ${attendances}">
-                            <td th:text="${record.userName}"></td>
-                            <td th:text="${record.attendanceType}"></td>
-                            <td th:text="${record.reason}"></td>
-                            <td th:text="${record.date != null ? #temporals.format(record.date, 'dd-MM-yyyy') : ''}"></td>
-                            <td th:text="${record.status}"></td>
-                            <td th:text="${#temporals.format(record.morningTime, 'HH:mm')}"></td>
-                            <td th:text="${#temporals.format(record.eveningTime, 'HH:mm')}"></td>
+                    <div class="table-responsive">
+                        <table id="attendanceTable"
+                               th:if="${attendances != null and !attendances.isEmpty()}"
+                               class="datatable table table-bordered mb-0 display nowrap" style="width:100%">
+                            <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Attendance Type</th>
+                                <th>Reason</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Morning Time</th>
+                                <th>Evening Time</th>
+                                <th>Morning Image</th>
+                                <th>Evening Image</th>
 
-                            <!-- Morning Image -->
-                            <td>
-    <span th:if="${record.morningImagePath == null or record.morningImagePath.isEmpty()}">
-        No Image Available
-    </span>
-                                <button type="button" class="btn btn-primary btn-sm open-image-modal"
-                                        th:if="${record.morningImagePath != null and !record.morningImagePath.isEmpty()}"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#imageModal"
-                                        th:attr="data-id=${record.id}, data-type='morning', data-img-title='Morning Image - ' + ${record.userName}">
-                                    View Image
-                                </button>
-                            </td>
+                                <!-- Extra Headers for WFF -->
+                                <th>Field Image</th>
+                                <th>Field Image 1</th>
+                                <th>Field Image 2</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="record : ${attendances}">
+                                <td th:text="${record.userName}"></td>
+                                <td th:text="${record.attendanceType}"></td>
+                                <td th:text="${record.reason}"></td>
+                                <td th:text="${record.date != null ? #temporals.format(record.date, 'dd-MM-yyyy') : ''}"></td>
+                                <td th:text="${record.status}"></td>
+                                <td th:text="${#temporals.format(record.morningTime, 'HH:mm')}"></td>
+                                <td th:text="${#temporals.format(record.eveningTime, 'HH:mm')}"></td>
 
-                            <!-- Evening Image -->
-                            <td>
-    <span th:if="${record.eveningImagePath == null or record.eveningImagePath.isEmpty()}">
-        No Image Available
-    </span>
-                                <button type="button" class="btn btn-primary btn-sm open-image-modal"
-                                        th:if="${record.eveningImagePath != null and !record.eveningImagePath.isEmpty()}"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#imageModal"
-                                        th:attr="data-id=${record.id}, data-type='evening', data-img-title='Evening Image - ' + ${record.userName}">
-                                    View Image
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                                <!-- Morning Image -->
+                                <td>
+                <span th:if="${record.morningImagePath == null or record.morningImagePath.isEmpty()}">
+                    No Image Available
+                </span>
+                                    <button type="button" class="btn btn-primary btn-sm open-image-modal"
+                                            th:if="${record.morningImagePath != null and !record.morningImagePath.isEmpty()}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#imageModal"
+                                            th:attr="data-id=${record.id}, data-type='morning', data-img-title='Morning Image - ' + ${record.userName}">
+                                        View Image
+                                    </button>
+                                </td>
+
+                                <!-- Evening Image -->
+                                <td>
+                <span th:if="${record.eveningImagePath == null or record.eveningImagePath.isEmpty()}">
+                    No Image Available
+                </span>
+                                    <button type="button" class="btn btn-primary btn-sm open-image-modal"
+                                            th:if="${record.eveningImagePath != null and !record.eveningImagePath.isEmpty()}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#imageModal"
+                                            th:attr="data-id=${record.id}, data-type='evening', data-img-title='Evening Image - ' + ${record.userName}">
+                                        View Image
+                                    </button>
+                                </td>
+
+                                <!-- Field Image -->
+                                <td th:text="${record.fieldImageUploaded != null ? record.fieldImageUploaded : 'No Image Uploaded'}"></td>
+
+                                <td>
+                                    <!-- Field Image 1 -->
+                                    <button type="button" class="btn btn-success btn-sm open-image-modal"
+                                            th:if="${record.fieldImagePath != null and !record.fieldImagePath.isEmpty()}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#imageModal"
+                                            th:attr="data-id=${record.id}, data-type='field1', data-img-title='Field Image 1 - ' + ${record.userName}">
+                                        View Image 1
+                                    </button>
+
+                                    <!-- Show No Image button if path is missing -->
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                            th:unless="${record.fieldImagePath != null and !record.fieldImagePath.isEmpty()}">
+                                        No Image
+                                    </button>
+                                </td>
+
+                                <td>
+                                    <!-- Field Image 2 -->
+                                    <button type="button" class="btn btn-success btn-sm open-image-modal"
+                                            th:if="${record.fieldImagePath1 != null and !record.fieldImagePath1.isEmpty()}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#imageModal"
+                                            th:attr="data-id=${record.id}, data-type='field2', data-img-title='Field Image 2 - ' + ${record.userName}">
+                                        View Image 2
+                                    </button>
+
+                                    <!-- Show No Image button if path is missing -->
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                            th:unless="${record.fieldImagePath1 != null and !record.fieldImagePath1.isEmpty()}">
+                                        No Image
+                                    </button>
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                     <!-- Show message if both lists are empty or null -->
-                    <div th:if="(${records == null or records.isEmpty()}) and (${attendances == null or attendances.isEmpty()})">
-                        <p>No records found.</p>
+                    <div th:if="(${records == null or records.isEmpty()}) and (${attendances == null or attendances.isEmpty()})"
+                         class="alert alert-info text-center">
+                        No records found.
                     </div>
 
                 </div>
@@ -175,15 +222,13 @@
                 <h5 class="modal-title" id="imageModalLabel">Attendance Image</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
-                <img id="attendanceImage" src="" alt="Attendance Image"
-                     style="max-width:100%; max-height:500px; display:block; margin:0 auto; object-fit: contain;"/>
+            <div class="modal-body text-center" id="imageContainer">
+                <!-- Images will be injected here -->
             </div>
         </div>
     </div>
 </div>
 
-<!--Modal to Show The Monthly Report Data-->
 <!-- Modal to Show The Monthly Report Data -->
 <div id="monthlyReportModal" class="custom-modal">
     <div class="custom-modal-content">
@@ -235,106 +280,73 @@
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 
-
-<!--js For See Monthly Report On Click of the Button-->
-<script>
-    function showMonthlyReportFromButton(button) {
-        const username = button.getAttribute('data-username');
-        const now = new Date();
-        const month = now.getMonth() + 1;
-        const year = now.getFullYear();
-
-        // Prepare form data
-        const formData = new URLSearchParams();
-        formData.append('username', username);
-        formData.append('year', year);
-        formData.append('month', month);
-
-        fetch('/api/data/dashboard/monthly', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: formData.toString()
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.flag === "success") {
-                    const d = data.data;
-
-                    const content = `
-                <h5>Monthly Attendance Report for ${username}</h5>
-                <ul>
-                    <li>On Time: ${d.on_time}</li>
-                    <li>Late Entry: ${d.late_entry}</li>
-                    <li>Half Day: ${d.half_day}</li>
-                    <li>Absent: ${d.absent}</li>
-                    <li>Work From Home: ${d.total_work_from_home}</li>
-                    <li>Work From Office: ${d.total_work_from_office}</li>
-                    <li>Work From Field: ${d.total_work_from_field}</li>
-                    <li>Total Days in Month: ${d.total_days_in_month}</li>
-                </ul>
-            `;
-
-                    document.getElementById('monthlyReportContainer').innerHTML = content;
-
-                    // Show modal
-                    const modal = document.getElementById('monthlyReportModal');
-                    modal.style.display = "block";
-
-                    // Close modal when clicking 'X'
-                    modal.querySelector('.custom-modal-close').onclick = () => {
-                        modal.style.display = "none";
-                    }
-
-                    // Close modal when clicking outside modal content
-                    window.onclick = (event) => {
-                        if (event.target === modal) {
-                            modal.style.display = "none";
-                        }
-                    }
-
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(err => console.error('Error fetching monthly report:', err));
-    }
-</script>
-
 <!--Js For Show Image-->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const buttons = document.querySelectorAll('.open-image-modal');
         const modalLabel = document.getElementById('imageModalLabel');
-        const attendanceImage = document.getElementById('attendanceImage');
+        const imageContainer = document.getElementById('imageContainer');
         const imageModal = document.getElementById('imageModal');
-
-        // Add inline styles dynamically via JS
-        attendanceImage.style.maxWidth = "100%";
-        attendanceImage.style.maxHeight = "500px";
-        attendanceImage.style.display = "block";
-        attendanceImage.style.margin = "0 auto";
-        attendanceImage.style.objectFit = "contain";
 
         buttons.forEach(function (button) {
             button.addEventListener('click', function () {
                 const attendanceId = button.getAttribute('data-id');
-                const imageType = button.getAttribute('data-type');
+                const imageType = button.getAttribute('data-type'); // morning, evening, field1, field2
                 const imageTitle = button.getAttribute('data-img-title');
 
-                // Set modal title
                 modalLabel.textContent = imageTitle;
+                imageContainer.innerHTML = ""; // clear old content
 
-                // Construct image URL
-                const imageUrl = `/api/data/attendance/image/${attendanceId}?type=${imageType}`;
+                if (imageType.startsWith("field")) {
+                    // Fetch all field images
+                    fetch(`/api/data/attendance/field-images/${attendanceId}`)
+                        .then(res => res.json())
+                        .then(images => {
+                            let imgSrc = null;
+                            if (imageType === "field" && images.image1) {
+                                imgSrc = images.image1;
+                            } else if (imageType === "field1" && images.image1) {
+                                imgSrc = images.image1;
+                            } else if (imageType === "field2" && images.image2) {
+                                imgSrc = images.image2;
+                            }
 
-                // Set image src
-                attendanceImage.setAttribute('src', imageUrl);
+                            if (imgSrc) {
+                                const img = document.createElement("img");
+                                img.src = imgSrc;
+                                img.alt = "Field Image";
+                                img.style.maxWidth = "100%";
+                                img.style.maxHeight = "500px";
+                                img.style.display = "block";
+                                img.style.margin = "0 auto";
+                                img.style.objectFit = "contain";
+                                imageContainer.appendChild(img);
+                            } else {
+                                imageContainer.innerHTML = "<p class='text-danger'>Image not available</p>";
+                            }
+                        })
+                        .catch(() => {
+                            imageContainer.innerHTML = "<p class='text-danger'>Failed to load field images</p>";
+                        });
+                } else {
+                    // Morning/Evening images (old API)
+                    const imageUrl = `/api/data/attendance/image/${attendanceId}?type=${imageType}`;
+                    const img = document.createElement("img");
+                    img.src = imageUrl;
+                    img.alt = "Attendance Image";
+                    img.style.maxWidth = "100%";
+                    img.style.maxHeight = "500px";
+                    img.style.display = "block";
+                    img.style.margin = "0 auto";
+                    img.style.objectFit = "contain";
+                    imageContainer.appendChild(img);
+                }
             });
         });
 
-        // Clear image on modal hide event (Bootstrap 5)
+        // Clear on modal close
         imageModal.addEventListener('hidden.bs.modal', function () {
-            attendanceImage.setAttribute('src', '');
+            imageContainer.innerHTML = "";
         });
     });
 </script>

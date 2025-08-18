@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${pageTitle} ?: 'UPFSDA Attendance System'">UPFSDA Attendance System</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -20,215 +20,232 @@
 
     <link th:href="@{/css/dashboard.css}" rel="stylesheet">
 
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.13.6/css/jquery.dataTables.min.css" />-->
+
+
+    <link th:href="@{/css/dataTables.bootstrap5.min.css}" rel="stylesheet">
+
     <link th:href="@{/css/datatables.css}" rel="stylesheet">
 
     <link th:href="@{/css/datatables.min.css}" rel="stylesheet">
 
+<!--    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">-->
+
 </head>
 
 <body>
-    <!-- Mobile Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    
-    <!-- Sidebar Fragment -->
-    <nav th:fragment="sidebar" class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <a href="/attendance/dashboard" class="logo text-decoration-none">
-                <i class="fas fa-clock text-warning"></i>
-                <span class="logo-text">UPFSDA</span>
-            </a>
-            <button class="sidebar-toggle" id="sidebarToggle">
+<!-- Mobile Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Sidebar Fragment -->
+<nav th:fragment="sidebar" class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <a href="/attendance/dashboard" class="logo text-decoration-none">
+            <i class="fas fa-clock text-warning"></i>
+            <span class="logo-text">UPFSDA</span>
+        </a>
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-menu">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a th:href="@{/attendance/dashboard}" class="nav-link"
+                   th:classappend="${currentPage == 'dashboard'} ? 'active' : ''">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <!--                <li class="nav-item">-->
+            <!--                    <a th:href="@{/attendance/projects}" class="nav-link" th:classappend="${currentPage == 'projects'} ? 'active' : ''">-->
+            <!--                        <i class="fas fa-project-diagram"></i>-->
+            <!--                        <span class="nav-text">Projects</span>-->
+            <!--                    </a>-->
+            <!--                </li>-->
+            <!--                <li class="nav-item">-->
+            <!--                    <a th:href="@{/attendance/leave}" class="nav-link" th:classappend="${currentPage == 'leave'} ? 'active' : ''">-->
+            <!--                        <i class="fas fa-calendar-alt"></i>-->
+            <!--                        <span class="nav-text">Leave Management</span>-->
+            <!--                    </a>-->
+            <!--                </li>-->
+            <!--                <li class="nav-item">-->
+            <!--                    <a th:href="@{/attendance/todo}" class="nav-link" th:classappend="${currentPage == 'todo'} ? 'active' : ''">-->
+            <!--                        <i class="fas fa-tasks"></i>-->
+            <!--                        <span class="nav-text">To-Do List</span>-->
+            <!--                    </a>-->
+            <!--                </li>-->
+            <!--                <li class="nav-item">-->
+            <!--                    <a th:href="@{/attendance/calendar}" class="nav-link" th:classappend="${currentPage == 'calendar'} ? 'active' : ''">-->
+            <!--                        <i class="fas fa-calendar"></i>-->
+            <!--                        <span class="nav-text">Calendar</span>-->
+            <!--                    </a>-->
+            <!--                </li>-->
+            <li class="nav-item">
+                <a th:href="@{/attendance/location-tracking}" class="nav-link"
+                   th:classappend="${currentPage == 'location'} ? 'active' : ''">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span class="nav-text">Employee Details</span>
+                </a>
+            </li>
+            <!--                <li class="nav-item" th:if="${userRole == 'admin'}">-->
+            <!--                    <a th:href="@{/attendance/team}" class="nav-link" th:classappend="${currentPage == 'team'} ? 'active' : ''">-->
+            <!--                        <i class="fas fa-users"></i>-->
+            <!--                        <span class="nav-text">Team Management</span>-->
+            <!--                    </a>-->
+            <!--                </li>-->
+        </ul>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <img th:src="${user?.profileImage} ?: 'https://via.placeholder.com/40'" alt="User Avatar"
+                 class="user-avatar">
+            <div class="user-details">
+                <div class="user-name" th:text="${user?.name} ?: 'User'">User Name</div>
+                <div class="user-role" th:text="${user?.role} ?: 'Role'">Role</div>
+            </div>
+        </div>
+        <button onclick="handleLogout()" class="btn btn-outline-danger btn-sm logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="nav-text">Logout</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Header Fragment -->
+<header th:fragment="header" class="main-header">
+    <div class="header-content">
+        <div class="header-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <i class="fas fa-bars"></i>
             </button>
+            <h1 class="page-title" th:text="${pageTitle} ?: 'Dashboard'">Dashboard</h1>
+            <nav aria-label="breadcrumb" th:if="${breadcrumbs}">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" th:each="crumb : ${breadcrumbs}"
+                        th:classappend="${crumbStat.last} ? 'active' : ''">
+                        <a th:if="${!crumbStat.last}" th:href="${crumb.url}" th:text="${crumb.name}">Home</a>
+                        <span th:if="${crumbStat.last}" th:text="${crumb.name}">Current</span>
+                    </li>
+                </ol>
+            </nav>
         </div>
-        
-        <div class="sidebar-menu">
-            <ul class="nav-list">
-                <li class="nav-item">
-                    <a th:href="@{/attendance/dashboard}" class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active' : ''">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span class="nav-text">Dashboard</span>
-                    </a>
-                </li>
-<!--                <li class="nav-item">-->
-<!--                    <a th:href="@{/attendance/projects}" class="nav-link" th:classappend="${currentPage == 'projects'} ? 'active' : ''">-->
-<!--                        <i class="fas fa-project-diagram"></i>-->
-<!--                        <span class="nav-text">Projects</span>-->
-<!--                    </a>-->
-<!--                </li>-->
-<!--                <li class="nav-item">-->
-<!--                    <a th:href="@{/attendance/leave}" class="nav-link" th:classappend="${currentPage == 'leave'} ? 'active' : ''">-->
-<!--                        <i class="fas fa-calendar-alt"></i>-->
-<!--                        <span class="nav-text">Leave Management</span>-->
-<!--                    </a>-->
-<!--                </li>-->
-<!--                <li class="nav-item">-->
-<!--                    <a th:href="@{/attendance/todo}" class="nav-link" th:classappend="${currentPage == 'todo'} ? 'active' : ''">-->
-<!--                        <i class="fas fa-tasks"></i>-->
-<!--                        <span class="nav-text">To-Do List</span>-->
-<!--                    </a>-->
-<!--                </li>-->
-<!--                <li class="nav-item">-->
-<!--                    <a th:href="@{/attendance/calendar}" class="nav-link" th:classappend="${currentPage == 'calendar'} ? 'active' : ''">-->
-<!--                        <i class="fas fa-calendar"></i>-->
-<!--                        <span class="nav-text">Calendar</span>-->
-<!--                    </a>-->
-<!--                </li>-->
-                <li class="nav-item">
-                    <a th:href="@{/attendance/location-tracking}" class="nav-link" th:classappend="${currentPage == 'location'} ? 'active' : ''">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span class="nav-text">Employee Details</span>
-                    </a>
-                </li>
-<!--                <li class="nav-item" th:if="${userRole == 'admin'}">-->
-<!--                    <a th:href="@{/attendance/team}" class="nav-link" th:classappend="${currentPage == 'team'} ? 'active' : ''">-->
-<!--                        <i class="fas fa-users"></i>-->
-<!--                        <span class="nav-text">Team Management</span>-->
-<!--                    </a>-->
-<!--                </li>-->
-            </ul>
-        </div>
-        
-        <div class="sidebar-footer">
-            <div class="user-info">
-                <img th:src="${user?.profileImage} ?: 'https://via.placeholder.com/40'" alt="User Avatar" class="user-avatar">
-                <div class="user-details">
-                    <div class="user-name" th:text="${user?.name} ?: 'User'">User Name</div>
-                    <div class="user-role" th:text="${user?.role} ?: 'Role'">Role</div>
-                </div>
-            </div>
-            <button onclick="handleLogout()" class="btn btn-outline-danger btn-sm logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span class="nav-text">Logout</span>
-            </button>
-        </div>
-    </nav>
 
-    <!-- Header Fragment -->
-    <header th:fragment="header" class="main-header">
-        <div class="header-content">
-            <div class="header-left">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="page-title" th:text="${pageTitle} ?: 'Dashboard'">Dashboard</h1>
-                <nav aria-label="breadcrumb" th:if="${breadcrumbs}">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item" th:each="crumb : ${breadcrumbs}" 
-                            th:classappend="${crumbStat.last} ? 'active' : ''">
-                            <a th:if="${!crumbStat.last}" th:href="${crumb.url}" th:text="${crumb.name}">Home</a>
-                            <span th:if="${crumbStat.last}" th:text="${crumb.name}">Current</span>
+        <div class="header-right">
+            <div class="header-actions">
+                <!-- Notifications -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge bg-danger notification-count">3</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <li><a class="dropdown-item" href="#">New leave request pending</a></li>
+                        <li><a class="dropdown-item" href="#">Project deadline approaching</a></li>
+                        <li><a class="dropdown-item" href="#">Team meeting in 30 minutes</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
                         </li>
-                    </ol>
-                </nav>
-            </div>
-            
-            <div class="header-right">
-                <div class="header-actions">
-                    <!-- Notifications -->
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-bell"></i>
-                            <span class="badge bg-danger notification-count">3</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">Notifications</h6></li>
-                            <li><a class="dropdown-item" href="#">New leave request pending</a></li>
-                            <li><a class="dropdown-item" href="#">Project deadline approaching</a></li>
-                            <li><a class="dropdown-item" href="#">Team meeting in 30 minutes</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center" href="#">View all notifications</a></li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Theme Toggle -->
-                    <div class="theme-toggle-container">
-                        <button class="btn btn-outline-secondary theme-toggle" id="themeToggle" title="Toggle Theme">
-                            <i class="fas fa-moon" id="themeIcon"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- User Profile -->
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <img th:src="${user?.profileImage} ?: 'https://via.placeholder.com/32'" alt="Profile" class="profile-img">
-                            <span th:text="${user?.name} ?: 'User'">User</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <button onclick="handleLogout()" class="dropdown-item logout-btn">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
+                        <li><a class="dropdown-item text-center" href="#">View all notifications</a></li>
+                    </ul>
+                </div>
+
+                <!-- Theme Toggle -->
+                <div class="theme-toggle-container">
+                    <button class="btn btn-outline-secondary theme-toggle" id="themeToggle" title="Toggle Theme">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                </div>
+
+                <!-- User Profile -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <img th:src="${user?.profileImage} ?: 'https://via.placeholder.com/32'" alt="Profile"
+                             class="profile-img">
+                        <span th:text="${user?.name} ?: 'User'">User</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <button onclick="handleLogout()" class="dropdown-item logout-btn">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </button>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </header>
-
-    <!-- Footer Fragment -->
-    <footer th:fragment="footer" class="main-footer">
-        <div class="footer-content">
-            <div class="footer-left">
-                <p>&copy; 2025 UPFSDA Attendance System. All rights reserved.</p>
-            </div>
-            <div class="footer-right">
-                <span>Version 1.0.0</span>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scripts Fragment -->
-    <div th:fragment="scripts">
-        <!-- Bootstrap JS -->
-
-        <!-- Load jQuery First -->
-<!--        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>-->
-
-        <script src="/js/jquery-3.7.1.min.js"></script>
-        <script src="/js/jquery.dataTables.min.js"></script>
-
-
-        <!-- Then Load Bootstrap JS (Optional for jQuery) -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-        <!-- Then Load DataTables JS -->
-<!--        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>-->
-
-        <!-- Initialize DataTables (Make sure this script is loaded after DataTables JS) -->
-        <script>
-            $(document).ready(function() {
-                console.log("Initializing DataTables...");
-                initializeDataTables('.datatable');
-            });
-
-            function initializeDataTables(selector = '.table') {
-                console.log("Selected tables: ", $(selector)); // Log selected tables
-                console.log($.fn); // Check if DataTable function is available
-
-                $(selector).each(function () {
-                    console.log("Initializing DataTable on: ", this); // Log each table being initialized
-                    if (!$.fn.DataTable.isDataTable(this)) {
-                        $(this).DataTable({
-                            pageLength: 10,
-                            ordering: true,
-                            searching: true,
-                            lengthChange: true,
-                            autoWidth: false
-                        });
-                    }
-                });
-            }
-        </script>
-
-        <!-- Mock Data -->
-        <script th:src="@{/js/mock.js}"></script>
-        <!-- Common JS -->
-        <script th:src="@{/js/common.js}"></script>
     </div>
+</header>
+
+<!-- Footer Fragment -->
+<footer th:fragment="footer" class="main-footer">
+    <div class="footer-content">
+        <div class="footer-left">
+            <p>&copy; 2025 UPFSDA Attendance System. All rights reserved.</p>
+        </div>
+        <div class="footer-right">
+            <span>Version 1.0.0</span>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts Fragment -->
+<div th:fragment="scripts">
+    <!-- Bootstrap JS -->
+
+    <!-- Load jQuery First -->
+    <!--        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>-->
+
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/jquery.dataTables.min.js}"></script>
+
+    <script th:src="@{/js/dataTables.bootstrap5.min.js}"></script>
+
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>-->
+
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.13.6/js/jquery.dataTables.min.js"></script>-->
+
+
+    <!-- Then Load Bootstrap JS (Optional for jQuery) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!--     Then Load DataTables JS -->
+<!--            <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>-->
+
+<!--     Initialize DataTables (Make sure this script is loaded after DataTables JS) -->
+            <script>
+                $(document).ready(function() {
+                    initializeDataTables('.datatable');
+                });
+
+                function initializeDataTables(selector = '.table') {
+                    $(selector).each(function () {
+                        if (!$.fn.DataTable.isDataTable(this)) {
+                            $(this).DataTable({
+                                pageLength: 10,
+                                ordering: true,
+                                searching: true,
+                                lengthChange: true,
+                                autoWidth: false,
+                                responsive: true
+                            });
+                        }
+                    });
+                }
+            </script>
+
+    <!-- Mock Data -->
+    <script th:src="@{/js/mock.js}"></script>
+    <!-- Common JS -->
+    <script th:src="@{/js/common.js}"></script>
+</div>
 </body>
 </html>

@@ -182,8 +182,7 @@
 
                 <div class=" w-full  text-gray-800 mt-4">
                     <div class="text-center mb-10">
-                        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-indigo-700">Today Attendance Trend</h1>
-                        <p class="text-lg text-gray-600">Dynamic visualization for your attendance data.</p>
+                        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-indigo-700">Today's Attendance Trend</h1>
                     </div>
 
                     <div class="grid md:grid-cols-1 gap-8">
@@ -221,69 +220,8 @@
 <!-- Chart.js Library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<!--js For Fetch Dashboard and Chart-->
 <script>
-
-
-    // // Data for the weekly line chart
-    // const weeklyData = {
-    //     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-    //     datasets: [{
-    //         label: 'Present Students',
-    //         data: [45, 48, 42, 49, 46],
-    //         borderColor: '#3b82f6',
-    //         backgroundColor: 'rgba(59, 130, 246, 0.2)',
-    //         tension: 0.4,
-    //         fill: true
-    //     }, {
-    //         label: 'Absent Students',
-    //         data: [5, 2, 8, 1, 4],
-    //         borderColor: '#f87171',
-    //         backgroundColor: 'rgba(248, 113, 129, 0.2)',
-    //         tension: 0.4,
-    //         fill: true
-    //     }]
-    // };
-    //
-    // // Function to create a chart
-    // function createChart(chartId, type, data) {
-    //     const ctx = document.getElementById(chartId).getContext('2d');
-    //     new Chart(ctx, {
-    //         type: type,
-    //         data: data,
-    //         options: {
-    //             responsive: true,
-    //             maintainAspectRatio: false,
-    //             plugins: {
-    //                 legend: {
-    //                     display: true,
-    //                     position: 'bottom',
-    //                     labels: { color: '#343a40' }
-    //                 },
-    //                 title: {
-    //                     display: false,
-    //                 }
-    //             },
-    //             scales: {
-    //                 y: {
-    //                     beginAtZero: true,
-    //                     grid: { color: '#e0e0e0' }
-    //                 },
-    //                 x: {
-    //                     grid: { color: '#e0e0e0' }
-    //                 }
-    //             }
-    //         }
-    //     });
-    // }
-    //
-    // // Initialize charts on window load
-    // window.onload = function() {
-    //     createChart('weeklyChart', 'line', weeklyData);
-    // };
-
-
-
-
 
     // Function to fetch the API data and update the chart
     async function fetchDataAndUpdateChart() {
@@ -365,8 +303,6 @@
         fetchDataAndUpdateChart(); // Fetch the data and update the chart on page load
     };
 
-
-
     document.addEventListener('DOMContentLoaded', function () {
         loadAdminDashboardData();
         initializeCalendar();
@@ -385,7 +321,6 @@
             const response = await fetch('/api/data/dashboard-stats-admin');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const apiResponse = await response.json();
-            console.log(apiResponse , "llll")
 
             if (apiResponse.statusCode === 200 && apiResponse.data) {
                 updateDashboardStats(apiResponse.data);
@@ -450,6 +385,7 @@
     }
 
     function initializeCalendar() {
+
         const currentDate = new Date();
         let currentMonth = currentDate.getMonth();
         let currentYear = currentDate.getFullYear();
@@ -464,7 +400,6 @@
         });
 
         document.getElementById('simpleNextMonth').addEventListener('click', () => {
-            console.log("Clicked")
             currentMonth++;
             if (currentMonth > 11) {
                 currentMonth = 0;
@@ -474,48 +409,7 @@
 
         });
 
-        // function renderSimpleCalendar() {
-        //     console.log('clicked 1')
-        //     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-        //         'July', 'August', 'September', 'October', 'November', 'December'];
-        //     const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-        //
-        //     document.getElementById('simpleCurrentMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
-        //     const calendarGrid = document.getElementById('simpleCalendarGrid');
-        //
-        //     calendarGrid.innerHTML = '';
-        //
-        //     weekdays.forEach(day => {
-        //         const dayElement = document.createElement('div');
-        //         dayElement.className = 'simple-weekday';
-        //         dayElement.textContent = day;
-        //         calendarGrid.appendChild(dayElement);
-        //     });
-        //
-        //     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-        //     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-        //
-        //     for (let i = 0; i < firstDay; i++) {
-        //         const dayElement = document.createElement('div');
-        //         dayElement.className = 'simple-day other-month';
-        //         calendarGrid.appendChild(dayElement);
-        //     }
-        //
-        //     for (let day = 1; day <= daysInMonth; day++) {
-        //         const dayElement = document.createElement('div');
-        //         dayElement.className = 'simple-day';
-        //         dayElement.textContent = day;
-        //         if (currentYear === currentDate.getFullYear() &&
-        //             currentMonth === currentDate.getMonth() &&
-        //             day === currentDate.getDate()) {
-        //             dayElement.classList.add('today');
-        //         }
-        //         calendarGrid.appendChild(dayElement);
-        //     }
-        // }
-
         function renderSimpleCalendar() {
-            console.log('clicked 1');
             const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                 'July', 'August', 'September', 'October', 'November', 'December'];
             const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -542,7 +436,6 @@
                 calendarGrid.appendChild(dayElement);
             }
 
-
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayElement = document.createElement('div');
                 dayElement.className = 'simple-day';
@@ -557,7 +450,6 @@
 
                 // Add event listener to show popup when day is clicked
                 dayElement.addEventListener('click', function () {
-                    console.log(`Day ${day} clicked`);  // Check if this log appears
                     showPopup(day);  // Show popup with the clicked day
                 });
 
@@ -568,7 +460,7 @@
         }
 
         function showPopup(day) {
-            // Get current date to match with clicked day
+            // Get the current date to match with clicked day
             const currentDate = new Date();
             const currentDay = currentDate.getDate();
             const currentMonth = currentDate.getMonth();
@@ -576,7 +468,6 @@
 
             // If it's not today's day, do not show popup
             if (day !== currentDay || currentMonth !== currentDate.getMonth() || currentYear !== currentDate.getFullYear()) {
-                console.log('Popup not displayed for this day.');
                 return;
             }
 
@@ -589,9 +480,9 @@
             <p id="popup-date">${currentDate.toDateString()}</p>
         </div>
         <div class="popup-content">
+           <p><i class="fas fa-users"></i> <strong>Total Employees:</strong> <span id="total-employees">Loading...</span></p>
             <p><i class="fas fa-user-times"></i> <strong>Absent Today:</strong> <span id="absent-today">Loading...</span></p>
             <p><i class="fas fa-check-circle"></i> <strong>Present Today:</strong> <span id="present-today">Loading...</span></p>
-            <p><i class="fas fa-users"></i> <strong>Total Employees:</strong> <span id="total-employees">Loading...</span></p>
             <p><i class="fas fa-briefcase"></i> <strong>Work From Office:</strong> <span id="work-from-office">Loading...</span></p>
             <p><i class="fas fa-home"></i> <strong>Work From Home:</strong> <span id="work-from-home">Loading...</span></p>
             <p><i class="fas fa-map-marker-alt"></i> <strong>Work From Field:</strong> <span id="work-from-field">Loading...</span></p>
@@ -613,10 +504,9 @@
             fetch('/api/data/dashboard-stats-admin')
                 .then(response => response.json())
                 .then(data => {
-                    // Dynamically update the popup content with the fetched data
+                    document.getElementById('total-employees').textContent = data.data.total_employees;
                     document.getElementById('absent-today').textContent = data.data.absent_today;
                     document.getElementById('present-today').textContent = data.data.present_today;
-                    document.getElementById('total-employees').textContent = data.data.total_employees;
                     document.getElementById('work-from-office').textContent = data.data.total_work_from_office;
                     document.getElementById('work-from-home').textContent = data.data.total_work_from_home;
                     document.getElementById('work-from-field').textContent = data.data.total_work_from_field;
@@ -640,10 +530,6 @@
                 document.body.removeChild(overlay);
             });
         }
-
-
-
-
 
         renderSimpleCalendar();
     }

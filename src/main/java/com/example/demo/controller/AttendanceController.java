@@ -66,10 +66,16 @@ public class AttendanceController {
             attendances = attendanceService.getAttendanceByType(type);
         }
 
+// check if any attendanceType is WFF
+        boolean hasWff = attendances != null && attendances.stream()
+                .anyMatch(a -> "WFF".equalsIgnoreCase(a.getAttendanceType()));
+
         model.addAttribute("records", records);
         model.addAttribute("attendances", attendances);
+        model.addAttribute("hasWff", hasWff);
 
         return "attendance/attendance-details"; // Thymeleaf view
+
     }
 
     //    Attendance Monthly Report Page for On Click

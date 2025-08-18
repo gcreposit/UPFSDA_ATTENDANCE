@@ -80,10 +80,10 @@ public class EmployeeExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
     
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
-        log.error("Unexpected error: {}", ex.getMessage(), ex);
-        ErrorResponse errorResponse = ErrorResponse.of("An unexpected error occurred. Please try again later.");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
+//        log.error("Unexpected error: {}", ex.getMessage(), ex);
+//        ErrorResponse errorResponse = ErrorResponse.of("An unexpected error occurred. Please try again later.");
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+//    }
 }
