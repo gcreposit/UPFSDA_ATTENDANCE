@@ -31,7 +31,7 @@ public class Employee {
 
     private String designation;
 
-//    @NotBlank
+    //    @NotBlank
     @Pattern(regexp = "\\d{2}/\\d{2}/\\d{4}", message = "Date format should be dd/MM/yyyy")
     private String dateOfBirth;
 

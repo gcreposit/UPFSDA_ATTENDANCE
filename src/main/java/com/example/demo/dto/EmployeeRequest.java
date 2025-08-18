@@ -7,19 +7,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class EmployeeRequest {
-    
+
     @NotBlank(message = "Employee name is required")
     private String name;
-    
-//    @NotBlank(message = "Date of birth is required")
+
+    //    @NotBlank(message = "Date of birth is required")
     private String dateOfBirth;
-    
+
     @NotBlank(message = "Identity card number is required")
     private String identityCardNo;
-    
-//    @NotBlank(message = "Address is required")
+
+    //    @NotBlank(message = "Address is required")
     private String address;
-    
+
     @NotBlank(message = "Post is required")
     private String post;
 
@@ -27,7 +27,7 @@ public class EmployeeRequest {
 
     @NotBlank(message = "District is required")
     private String district;
-    
+
     @NotBlank(message = "Tehsil is required")
     private String tehsil;
 
@@ -39,7 +39,7 @@ public class EmployeeRequest {
     private String emergencyContactNo;
     private String labName;
     private String officeName;
-    
+
     @NotNull(message = "Face photo is required")
     private MultipartFile uploadFacePhoto;
 

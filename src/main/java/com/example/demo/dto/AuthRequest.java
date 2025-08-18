@@ -19,4 +19,5 @@ public class AuthRequest {
     public void logRequest(String action) {
         log.info("Auth request received for action: {} with username: {}", action, username);
     }
+
 }

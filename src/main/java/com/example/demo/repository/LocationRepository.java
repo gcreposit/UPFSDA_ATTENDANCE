@@ -10,10 +10,11 @@ import java.util.List;
 
 @Repository
 public interface LocationRepository extends JpaRepository<DstTehVil, Long> {
-    
+
     @Query("SELECT DISTINCT d.dst FROM DstTehVil d ORDER BY d.dst")
     List<String> findAllDistricts();
-    
+
     @Query("SELECT DISTINCT d.teh FROM DstTehVil d WHERE d.dst = :district ORDER BY d.teh")
     List<String> findTehsilsByDistrict(@Param("district") String district);
+
 }

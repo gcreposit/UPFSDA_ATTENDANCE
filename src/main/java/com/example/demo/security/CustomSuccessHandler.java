@@ -28,7 +28,6 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
     private RequestCache requestCache = new HttpSessionRequestCache();  // Manually instantiate RequestCache
 
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
@@ -87,6 +86,5 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
         session.removeAttribute("SPRING_SECURITY_SAVED_REQUEST");
     }
-
 
 }

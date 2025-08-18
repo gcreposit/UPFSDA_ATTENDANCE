@@ -453,7 +453,7 @@ async function validateAuthToken(token) {
             localStorage.removeItem('username');
             sessionStorage.clear();
 
-            // Use replace to prevent back button access
+            // Use replacement to prevent back button access
             window.location.replace('/login?error=Session expired. Please login again.');
             return;
         }

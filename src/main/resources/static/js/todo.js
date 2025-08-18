@@ -6,25 +6,25 @@ let taskIdCounter = 1;
 let currentFilter = 'all';
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeTodoApp();
 });
 
 function initializeTodoApp() {
     console.log('Initializing To-Do App...');
-    
+
     // Load mock tasks
     loadMockTasks();
-    
+
     // Initialize event listeners
     initializeEventListeners();
-    
+
     // Render tasks
     renderTasks();
-    
+
     // Update statistics
     updateTaskStatistics();
-    
+
     console.log('To-Do App initialized successfully');
 }
 
@@ -87,7 +87,7 @@ function loadMockTasks() {
             completedAt: null
         }
     ];
-    
+
     taskIdCounter = Math.max(...tasks.map(t => t.id)) + 1;
 }
 
@@ -97,19 +97,19 @@ function initializeEventListeners() {
     if (addTaskForm) {
         addTaskForm.addEventListener('submit', handleAddTask);
     }
-    
+
     // Task filters
     const filterButtons = document.querySelectorAll('input[name="taskFilter"]');
     filterButtons.forEach(button => {
         button.addEventListener('change', handleFilterChange);
     });
-    
+
     // Search functionality
     const searchInput = document.getElementById('taskSearch');
     if (searchInput) {
         searchInput.addEventListener('input', debounce(handleSearch, 300));
     }
-    
+
     // Delete task button in modal
     const deleteTaskBtn = document.getElementById('deleteTaskBtn');
     if (deleteTaskBtn) {
@@ -119,18 +119,18 @@ function initializeEventListeners() {
 
 function handleAddTask(event) {
     event.preventDefault();
-    
+
     const title = document.getElementById('taskTitle').value.trim();
     const description = document.getElementById('taskDescription').value.trim();
     const priority = document.getElementById('taskPriority').value;
     const category = document.getElementById('taskCategory').value;
     const dueDate = document.getElementById('taskDueDate').value;
-    
+
     if (!title) {
         showNotification('Error', 'Task title is required', 'error');
         return;
     }
-    
+
     const newTask = {
         id: taskIdCounter++,
         title: title,
@@ -142,16 +142,16 @@ function handleAddTask(event) {
         createdAt: new Date(),
         completedAt: null
     };
-    
+
     tasks.unshift(newTask); // Add to beginning of array
-    
+
     // Clear form
     document.getElementById('addTaskForm').reset();
-    
+
     // Re-render tasks
     renderTasks();
     updateTaskStatistics();
-    
+
     showNotification('Success', 'Task added successfully!', 'success');
 }
 
@@ -168,9 +168,9 @@ function handleSearch(event) {
 function renderTasks(searchTerm = '') {
     const tasksList = document.getElementById('tasksList');
     const noTasksMessage = document.getElementById('noTasksMessage');
-    
+
     if (!tasksList) return;
-    
+
     // Filter tasks based on current filter and search term
     let filteredTasks = tasks.filter(task => {
         // Apply filter
@@ -189,18 +189,18 @@ function renderTasks(searchTerm = '') {
             default:
                 matchesFilter = true;
         }
-        
+
         // Apply search
         let matchesSearch = true;
         if (searchTerm) {
             matchesSearch = task.title.toLowerCase().includes(searchTerm) ||
-                          task.description.toLowerCase().includes(searchTerm) ||
-                          task.category.toLowerCase().includes(searchTerm);
+                task.description.toLowerCase().includes(searchTerm) ||
+                task.category.toLowerCase().includes(searchTerm);
         }
-        
+
         return matchesFilter && matchesSearch;
     });
-    
+
     // Show/hide no tasks message
     if (filteredTasks.length === 0) {
         tasksList.style.display = 'none';
@@ -209,10 +209,10 @@ function renderTasks(searchTerm = '') {
         tasksList.style.display = 'block';
         noTasksMessage.style.display = 'none';
     }
-    
+
     // Render tasks
     tasksList.innerHTML = filteredTasks.map(task => createTaskHTML(task)).join('');
-    
+
     // Add event listeners to task items
     addTaskEventListeners();
 }
@@ -221,7 +221,7 @@ function createTaskHTML(task) {
     const isOverdue = !task.completed && task.dueDate && new Date(task.dueDate) < new Date();
     const priorityClass = `priority-${task.priority}`;
     const statusClass = task.completed ? 'completed' : (isOverdue ? 'overdue' : 'pending');
-    
+
     return `
         <div class="task-item ${statusClass}" data-task-id="${task.id}">
             <div class="task-checkbox">
@@ -271,10 +271,10 @@ function toggleTaskComplete(taskId) {
     if (task) {
         task.completed = !task.completed;
         task.completedAt = task.completed ? new Date() : null;
-        
+
         renderTasks();
         updateTaskStatistics();
-        
+
         const message = task.completed ? 'Task marked as completed!' : 'Task marked as pending!';
         showNotification('Success', message, 'success');
     }
@@ -283,12 +283,12 @@ function toggleTaskComplete(taskId) {
 function showTaskDetail(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
-    
+
     const modal = new bootstrap.Modal(document.getElementById('taskDetailModal'));
     const content = document.getElementById('taskDetailContent');
-    
+
     const isOverdue = !task.completed && task.dueDate && new Date(task.dueDate) < new Date();
-    
+
     content.innerHTML = `
         <div class="task-detail">
             <div class="task-detail-header">
@@ -326,14 +326,14 @@ function showTaskDetail(taskId) {
             </div>
         </div>
     `;
-    
+
     // Set up delete button
     const deleteBtn = document.getElementById('deleteTaskBtn');
     deleteBtn.onclick = () => {
         deleteTask(taskId);
         modal.hide();
     };
-    
+
     modal.show();
 }
 
@@ -362,13 +362,13 @@ function updateTaskStatistics() {
     const completed = tasks.filter(t => t.completed).length;
     const pending = tasks.filter(t => !t.completed).length;
     const overdue = tasks.filter(t => !t.completed && t.dueDate && new Date(t.dueDate) < new Date()).length;
-    
+
     // Update stat cards
     const totalElement = document.getElementById('totalTasks');
     const pendingElement = document.getElementById('pendingTasks');
     const completedElement = document.getElementById('completedTasks');
     const overdueElement = document.getElementById('overdueTasks');
-    
+
     if (totalElement) totalElement.textContent = total;
     if (pendingElement) pendingElement.textContent = pending;
     if (completedElement) completedElement.textContent = completed;
@@ -378,10 +378,14 @@ function updateTaskStatistics() {
 // Utility functions
 function getPriorityColor(priority) {
     switch (priority) {
-        case 'high': return 'danger';
-        case 'medium': return 'warning';
-        case 'low': return 'info';
-        default: return 'secondary';
+        case 'high':
+            return 'danger';
+        case 'medium':
+            return 'warning';
+        case 'low':
+            return 'info';
+        default:
+            return 'secondary';
     }
 }
 

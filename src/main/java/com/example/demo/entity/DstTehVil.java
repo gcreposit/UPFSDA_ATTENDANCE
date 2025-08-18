@@ -11,17 +11,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DstTehVil {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "dst")
     private String dst;  // District
-    
+
     @Column(name = "teh")
     private String teh;  // Tehsil
-    
+
     @Column(name = "vil")
     private String vil;  // Village
+
 }

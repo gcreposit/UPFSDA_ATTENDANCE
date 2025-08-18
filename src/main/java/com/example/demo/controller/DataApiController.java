@@ -23,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -603,7 +602,6 @@ public class DataApiController {
         return ResponseEntity.ok(imagesBase64);
     }
 
-
     //    Api for fetch Details By Username
     @PostMapping("/detailsByUsername")
     public ResponseEntity<ApiResponse> getDetailsByUsername(@RequestParam String username) {
@@ -656,7 +654,6 @@ public class DataApiController {
             );
         }
     }
-
 
     //    Api for fetch District For Dropdown
     @PostMapping("/fetchDistricts")
@@ -831,7 +828,6 @@ public class DataApiController {
             );
         }
     }
-
 
 //    Location Works - Currently These are in work
 

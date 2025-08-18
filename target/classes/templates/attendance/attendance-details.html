@@ -104,8 +104,6 @@
                                 <th>Evening Time</th>
                                 <th>Morning Image</th>
                                 <th>Evening Image</th>
-
-                                <!-- Extra Headers for WFF -->
                                 <th>Field Image</th>
                                 <th>Field Image 1</th>
                                 <th>Field Image 2</th>
@@ -148,10 +146,8 @@
                                         View Image
                                     </button>
                                 </td>
-
                                 <!-- Field Image -->
                                 <td th:text="${record.fieldImageUploaded != null ? record.fieldImageUploaded : 'No Image Uploaded'}"></td>
-
                                 <td>
                                     <!-- Field Image 1 -->
                                     <button type="button" class="btn btn-success btn-sm open-image-modal"
@@ -168,7 +164,6 @@
                                         No Image
                                     </button>
                                 </td>
-
                                 <td>
                                     <!-- Field Image 2 -->
                                     <button type="button" class="btn btn-success btn-sm open-image-modal"
@@ -185,7 +180,6 @@
                                         No Image
                                     </button>
                                 </td>
-
                             </tr>
                             </tbody>
                         </table>
@@ -196,7 +190,6 @@
                          class="alert alert-info text-center">
                         No records found.
                     </div>
-
                 </div>
             </div>
 
@@ -229,58 +222,10 @@
     </div>
 </div>
 
-<!-- Modal to Show The Monthly Report Data -->
-<div id="monthlyReportModal" class="custom-modal">
-    <div class="custom-modal-content">
-        <div class="custom-modal-header">
-            <h5>Monthly Report</h5>
-            <span class="custom-modal-close">&times;</span>
-        </div>
-        <div class="custom-modal-body" id="monthlyReportContainer">
-            <!-- Report content will be injected here by JS -->
-        </div>
-    </div>
-</div>
-
-<!-- Modal CSS -->
-<style>
-    .custom-modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .custom-modal-content {
-        background-color: #fff;
-        margin: 10% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 50%;
-        border-radius: 8px;
-    }
-
-    .custom-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .custom-modal-close {
-        cursor: pointer;
-        font-size: 1.5rem;
-    }
-</style>
-
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 
-<!--Js For Show Image-->
+<!--Js For Show Image Field Images or Morning Image and Evening Image -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const buttons = document.querySelectorAll('.open-image-modal');

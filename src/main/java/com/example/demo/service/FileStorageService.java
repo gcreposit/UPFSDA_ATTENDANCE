@@ -21,16 +21,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class FileStorageService {
-    
+
     @Value("${file.storage.path}")
     private String basePath;
-    
+
     private static final List<String> ALLOWED_IMAGE_TYPES = Arrays.asList(
-        "image/jpeg", "image/jpg", "image/png"
+            "image/jpeg", "image/jpg", "image/png"
     );
-    
+
     private static final long MAX_FILE_SIZE = 50 * 1024 * 1024; // 5MB
-    
+
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public FileStorageResult storeEmployeeFiles(String userName, MultipartFile facePhoto) {
@@ -86,16 +86,16 @@ public class FileStorageService {
         String currentDate = LocalDate.now().format(DATE_FORMATTER);
         return userName.replaceAll("[^a-zA-Z0-9]", "_") + "_" + currentDate;
     }
-    
+
     private String generateFileName(String originalFileName) {
         if (originalFileName == null) {
             return UUID.randomUUID().toString() + ".jpg";
         }
-        
+
         String extension = getFileExtension(originalFileName);
         return UUID.randomUUID().toString() + extension;
     }
-    
+
     private String getFileExtension(String fileName) {
         int lastDotIndex = fileName.lastIndexOf('.');
         if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
@@ -103,11 +103,11 @@ public class FileStorageService {
         }
         return ".jpg"; // Default extension
     }
-    
+
     public Path getAbsolutePath(String relativePath) {
         return Paths.get(basePath, relativePath);
     }
-    
+
     public boolean fileExists(String relativePath) {
         return Files.exists(getAbsolutePath(relativePath));
     }
@@ -132,18 +132,27 @@ public class FileStorageService {
         }
 
         // Getters
-        public String getFacePhotoPath() { return facePhotoPath; }
-        public boolean isSuccess() { return success; }
-        public String getErrorMessage() { return errorMessage; }
+        public String getFacePhotoPath() {
+            return facePhotoPath;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
     }
 
     public static class FileStorageException extends RuntimeException {
         public FileStorageException(String message) {
             super(message);
         }
-        
+
         public FileStorageException(String message, Throwable cause) {
             super(message, cause);
         }
     }
+
 }

@@ -16,4 +16,5 @@ public interface UserService extends UserDetailsService {
     boolean existsByUsername(String username);
     
     boolean existsByEmail(String email);
+
 }

@@ -3,12 +3,9 @@ package com.example.demo.controller;
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Employee;
 import com.example.demo.service.AttendanceService;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -17,6 +14,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/attendance")
 public class AttendanceController {
+
     private final AttendanceService attendanceService;
 
     public AttendanceController(AttendanceService attendanceService) {
@@ -66,7 +64,7 @@ public class AttendanceController {
             attendances = attendanceService.getAttendanceByType(type);
         }
 
-// check if any attendanceType is WFF
+        // check if any attendanceType is WFF
         boolean hasWff = attendances != null && attendances.stream()
                 .anyMatch(a -> "WFF".equalsIgnoreCase(a.getAttendanceType()));
 
@@ -96,7 +94,7 @@ public class AttendanceController {
         return "attendance/monthly-report"; // Thymeleaf template name
     }
 
-    //Full Detailed Page For Full Monthly Report
+    //Full-Detailed Page For Full Monthly Report
     @GetMapping("/monthly/details")
     public String showMonthlyCategoryDetailsPage(
             @RequestParam String username,
@@ -124,7 +122,6 @@ public class AttendanceController {
     }
 
     //These pages are Not Currently in Use
-
     @GetMapping("/projects")
     public String projects(Model model) {
         Map<String, Object> user = getMockUserData("user");
@@ -141,6 +138,7 @@ public class AttendanceController {
 
         return "projects/projects";
     }
+
 
     @GetMapping("/leave")
     public String leaveManagement(Model model) {
@@ -177,6 +175,7 @@ public class AttendanceController {
         return "team/team-management";
     }
 
+
     @GetMapping("/todo")
     public String todo(Model model) {
         Map<String, Object> user = getMockUserData("user");
@@ -194,6 +193,7 @@ public class AttendanceController {
         return "attendance/todo";
     }
 
+
     @GetMapping("/calendar")
     public String calendar(Model model) {
         Map<String, Object> user = getMockUserData("user");
@@ -210,6 +210,7 @@ public class AttendanceController {
 
         return "attendance/calendar";
     }
+
 
     @GetMapping("/location-tracking")
     public String locationTracking(Model model) {

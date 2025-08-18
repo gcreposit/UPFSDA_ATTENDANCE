@@ -21,71 +21,72 @@ import java.util.Collections;
 @AllArgsConstructor
 @Builder
 public class User implements UserDetails {
-    
+
     private static final Logger log = LoggerFactory.getLogger(User.class);
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(unique = true, nullable = false)
     private String username;
-    
+
     @Column(nullable = false)
     private String password;
-    
+
     @Column(unique = true, nullable = false)
     private String email;
-    
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(unique = true, nullable = false)
     private String role;
-    
+
     private boolean enabled = true;
     private boolean accountNonExpired = true;
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;
-    
+
     @PrePersist
     protected void onCreate() {
         log.info("Creating new user entity with username: {}", username);
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
-    
+
     @PreUpdate
     protected void onUpdate() {
         log.info("Updating user entity with id: {}", id);
         updatedAt = LocalDateTime.now();
     }
-    
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
     }
-    
+
     @Override
     public boolean isAccountNonExpired() {
         return accountNonExpired;
     }
-    
+
     @Override
     public boolean isAccountNonLocked() {
         return accountNonLocked;
     }
-    
+
     @Override
     public boolean isCredentialsNonExpired() {
         return credentialsNonExpired;
     }
-    
+
     @Override
     public boolean isEnabled() {
         return enabled;
     }
+
 }

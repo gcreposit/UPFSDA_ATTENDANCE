@@ -11,26 +11,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface WffLocationTrackingRepository extends JpaRepository<WffLocationTracking,Long> {
+public interface WffLocationTrackingRepository extends JpaRepository<WffLocationTracking, Long> {
 
     List<WffLocationTracking> findByUserNameOrderByTimestampAsc(String userName);
 
     WffLocationTracking findTopByUserNameOrderByTimestampDesc(String userName);
 
     @Query(value = """
-    SELECT w.*
-    FROM wff_location_tracking w
-    INNER JOIN (
-        SELECT user_name, MAX(timestamp) AS latest_time
-        FROM wff_location_tracking
-        WHERE date = ?1
-        GROUP BY user_name
-    ) latest
-    ON w.user_name = latest.user_name
-    AND w.timestamp = latest.latest_time
-""", nativeQuery = true)
+                SELECT w.*
+                FROM wff_location_tracking w
+                INNER JOIN (
+                    SELECT user_name, MAX(timestamp) AS latest_time
+                    FROM wff_location_tracking
+                    WHERE date = ?1
+                    GROUP BY user_name
+                ) latest
+                ON w.user_name = latest.user_name
+                AND w.timestamp = latest.latest_time
+            """, nativeQuery = true)
     List<WffLocationTracking> findLatestTrackingDataByDate(LocalDate today);
-
 
     // Get history for all users in a time window
     List<WffLocationTracking> findByTimestampBetweenOrderByTimestampDesc(
@@ -47,21 +46,20 @@ public interface WffLocationTrackingRepository extends JpaRepository<WffLocation
 
     // Latest record per user
     @Query("""
-        SELECT w FROM WffLocationTracking w
-        WHERE w.timestamp = (
-            SELECT MAX(w2.timestamp) FROM WffLocationTracking w2
-            WHERE w2.userName = w.userName
-        )
-    """)
+                SELECT w FROM WffLocationTracking w
+                WHERE w.timestamp = (
+                    SELECT MAX(w2.timestamp) FROM WffLocationTracking w2
+                    WHERE w2.userName = w.userName
+                )
+            """)
     List<WffLocationTracking> findLatestPerUser();
 
     // All records for a user, newest first
     @Query("""
-        SELECT w FROM WffLocationTracking w
-        WHERE w.userName = :userName
-        ORDER BY w.timestamp DESC
-    """)
+                SELECT w FROM WffLocationTracking w
+                WHERE w.userName = :userName
+                ORDER BY w.timestamp DESC
+            """)
     List<WffLocationTracking> findLatestForUser(@Param("userName") String userName);
-
 
 }
