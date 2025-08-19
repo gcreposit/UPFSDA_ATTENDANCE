@@ -37,7 +37,10 @@ function connectLiveSocket() {
         {}, // headers if needed
         () => {
             // connected
-            if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+            if (reconnectTimer) {
+                clearTimeout(reconnectTimer);
+                reconnectTimer = null;
+            }
 
             stompClient.subscribe('/topic/location.latest', msg => {
                 const ev = JSON.parse(msg.body);
@@ -326,7 +329,7 @@ async function loadMockData() {
 
         const latestHistory = (latestData || []).map(item => ({
             username: item.userName,
-            location: item.location ?? ((item.lat != null && item.lon != null) ? { lat: item.lat, lng: item.lon } : null),
+            location: item.location ?? ((item.lat != null && item.lon != null) ? {lat: item.lat, lng: item.lon} : null),
             timestamp: new Date(item.timestamp),
             // was: isActive: false
             isActive: isRecentlyActive(item.timestamp)

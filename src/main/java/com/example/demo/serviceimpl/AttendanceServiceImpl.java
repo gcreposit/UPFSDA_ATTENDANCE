@@ -972,4 +972,10 @@ public class AttendanceServiceImpl implements AttendanceService {
         return locationTrackingRepository.findLatestForUser(userName);
     }
 
+    @Override
+    public WffLocationTracking getLatestForUserOne(String userName) {
+
+        return locationTrackingRepository.findLatestForUserOne(userName);
+    }
+
 }

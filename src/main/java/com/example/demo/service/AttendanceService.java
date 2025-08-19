@@ -59,4 +59,7 @@ public interface AttendanceService {
 
     List<WffLocationTracking> getLatestForUser(String userName);
 
+    WffLocationTracking getLatestForUserOne(String userName);
+
+
 }

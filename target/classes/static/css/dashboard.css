@@ -97,9 +97,15 @@
 
 /* Animated Gradient Keyframes */
 @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* --- Specific Card Colors & Gradients --- */
@@ -228,11 +234,6 @@
 }
 
 
-
-
-
-
-
 /* General Popup Styling */
 .popup {
     position: fixed;
@@ -251,8 +252,12 @@
 
 /* Animation for Popup */
 @keyframes popupFadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 /* Popup Header */
@@ -334,6 +339,10 @@
 
 /* Fade-In Effect for Overlay */
 @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }

@@ -7,25 +7,25 @@ let events = [];
 let eventIdCounter = 1;
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeCalendar();
 });
 
 function initializeCalendar() {
     console.log('Initializing Calendar...');
-    
+
     // Load mock events
     loadMockEvents();
-    
+
     // Initialize event listeners
     initializeEventListeners();
-    
+
     // Render current view
     renderCurrentView();
-    
+
     // Update upcoming events
     updateUpcomingEvents();
-    
+
     console.log('Calendar initialized successfully');
 }
 
@@ -34,7 +34,7 @@ function loadMockEvents() {
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
-    
+
     events = [
         {
             id: 1,
@@ -103,7 +103,7 @@ function loadMockEvents() {
             createdAt: new Date()
         }
     ];
-    
+
     eventIdCounter = Math.max(...events.map(e => e.id)) + 1;
 }
 
@@ -112,21 +112,21 @@ function initializeEventListeners() {
     document.getElementById('prevBtn')?.addEventListener('click', navigatePrevious);
     document.getElementById('nextBtn')?.addEventListener('click', navigateNext);
     document.getElementById('todayBtn')?.addEventListener('click', goToToday);
-    
+
     // View toggle
     const viewButtons = document.querySelectorAll('input[name="calendarView"]');
     viewButtons.forEach(button => {
         button.addEventListener('change', handleViewChange);
     });
-    
+
     // Add event button
     document.getElementById('addEventBtn')?.addEventListener('click', showAddEventModal);
-    
+
     // Event form
     document.getElementById('saveEventBtn')?.addEventListener('click', handleSaveEvent);
     document.getElementById('deleteEventBtn')?.addEventListener('click', handleDeleteEvent);
     document.getElementById('editEventBtn')?.addEventListener('click', handleEditEvent);
-    
+
     // All day checkbox
     document.getElementById('allDayEvent')?.addEventListener('change', handleAllDayToggle);
 }
@@ -173,12 +173,12 @@ function handleViewChange(event) {
 
 function renderCurrentView() {
     updateCurrentMonthDisplay();
-    
+
     // Hide all views
     document.getElementById('monthViewContainer').style.display = 'none';
     document.getElementById('weekViewContainer').style.display = 'none';
     document.getElementById('dayViewContainer').style.display = 'none';
-    
+
     // Show current view
     switch (currentView) {
         case 'month':
@@ -201,7 +201,7 @@ function updateCurrentMonthDisplay() {
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
     ];
-    
+
     let displayText = '';
     switch (currentView) {
         case 'month':
@@ -217,37 +217,37 @@ function updateCurrentMonthDisplay() {
             displayText = formatDate(currentDate);
             break;
     }
-    
+
     document.getElementById('currentMonth').textContent = displayText;
 }
 
 function renderMonthView() {
     const calendarDays = document.getElementById('calendarDays');
     if (!calendarDays) return;
-    
+
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    
+
     // Get first day of month and number of days
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay();
-    
+
     // Get previous month's last days
     const prevMonth = new Date(year, month, 0);
     const daysInPrevMonth = prevMonth.getDate();
-    
+
     let html = '';
     let dayCount = 1;
     let nextMonthDay = 1;
-    
+
     // Generate 6 weeks (42 days)
     for (let week = 0; week < 6; week++) {
         for (let day = 0; day < 7; day++) {
             const cellIndex = week * 7 + day;
             let cellDate, cellDay, isCurrentMonth = true, isToday = false;
-            
+
             if (cellIndex < startingDayOfWeek) {
                 // Previous month days
                 cellDay = daysInPrevMonth - startingDayOfWeek + cellIndex + 1;
@@ -258,7 +258,7 @@ function renderMonthView() {
                 cellDay = dayCount;
                 cellDate = new Date(year, month, cellDay);
                 dayCount++;
-                
+
                 // Check if today
                 const today = new Date();
                 isToday = cellDate.toDateString() === today.toDateString();
@@ -269,10 +269,10 @@ function renderMonthView() {
                 nextMonthDay++;
                 isCurrentMonth = false;
             }
-            
+
             // Get events for this day
             const dayEvents = getEventsForDate(cellDate);
-            
+
             html += `
                 <div class="calendar-day ${isCurrentMonth ? 'current-month' : 'other-month'} ${isToday ? 'today' : ''}" 
                      data-date="${formatDateForData(cellDate)}" onclick="handleDayClick('${formatDateForData(cellDate)}')">
@@ -287,7 +287,7 @@ function renderMonthView() {
             `;
         }
     }
-    
+
     calendarDays.innerHTML = html;
 }
 
@@ -296,16 +296,16 @@ function renderWeekView() {
     const weekStart = getWeekStart(currentDate);
     const weekDays = document.getElementById('weekDays');
     const weekEvents = document.getElementById('weekEvents');
-    
+
     if (!weekDays || !weekEvents) return;
-    
+
     // Render week days header
     let daysHtml = '';
     for (let i = 0; i < 7; i++) {
         const day = new Date(weekStart);
         day.setDate(day.getDate() + i);
         const isToday = day.toDateString() === new Date().toDateString();
-        
+
         daysHtml += `
             <div class="week-day ${isToday ? 'today' : ''}" data-date="${formatDateForData(day)}">
                 <div class="day-name">${getDayName(day.getDay())}</div>
@@ -314,10 +314,10 @@ function renderWeekView() {
         `;
     }
     weekDays.innerHTML = daysHtml;
-    
+
     // Render time slots
     renderTimeSlots('timeSlots');
-    
+
     // Render events
     renderWeekEvents();
 }
@@ -327,10 +327,10 @@ function renderDayView() {
     if (dayViewDate) {
         dayViewDate.textContent = formatDate(currentDate);
     }
-    
+
     // Render time slots
     renderTimeSlots('dayTimeSlots');
-    
+
     // Render day events
     renderDayEvents();
 }
@@ -338,7 +338,7 @@ function renderDayView() {
 function renderTimeSlots(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    
+
     let html = '';
     for (let hour = 0; hour < 24; hour++) {
         const timeString = `${hour.toString().padStart(2, '0')}:00`;
@@ -360,14 +360,14 @@ function renderWeekEvents() {
 function renderDayEvents() {
     const dayEvents = document.getElementById('dayEvents');
     if (!dayEvents) return;
-    
+
     const todayEvents = getEventsForDate(currentDate);
-    
+
     let html = '';
     todayEvents.forEach(event => {
         const startTime = event.allDay ? 'All Day' : formatTime(event.startTime);
         const endTime = event.allDay ? '' : ` - ${formatTime(event.endTime)}`;
-        
+
         html += `
             <div class="day-event ${event.category}" onclick="showEventDetail(${event.id})">
                 <div class="event-time">${startTime}${endTime}</div>
@@ -376,7 +376,7 @@ function renderDayEvents() {
             </div>
         `;
     });
-    
+
     dayEvents.innerHTML = html || '<div class="no-events">No events for this day</div>';
 }
 
@@ -397,13 +397,13 @@ function handleTimeSlotClick(timeString) {
 function showAddEventModal(dateString = '', timeString = '') {
     const modal = new bootstrap.Modal(document.getElementById('eventModal'));
     const form = document.getElementById('eventForm');
-    
+
     // Reset form
     form.reset();
     document.getElementById('eventId').value = '';
     document.getElementById('eventModalTitle').textContent = 'Add New Event';
     document.getElementById('deleteEventBtn').style.display = 'none';
-    
+
     // Set date and time if provided
     if (dateString) {
         document.getElementById('eventDate').value = dateString;
@@ -415,19 +415,19 @@ function showAddEventModal(dateString = '', timeString = '') {
         endTime.setHours(endTime.getHours() + 1);
         document.getElementById('eventEndTime').value = endTime.toTimeString().slice(0, 5);
     }
-    
+
     modal.show();
 }
 
 function showEventDetail(eventId) {
     const event = events.find(e => e.id === eventId);
     if (!event) return;
-    
+
     const modal = new bootstrap.Modal(document.getElementById('eventDetailModal'));
     const content = document.getElementById('eventDetailContent');
-    
+
     const timeDisplay = event.allDay ? 'All Day' : `${formatTime(event.startTime)} - ${formatTime(event.endTime)}`;
-    
+
     content.innerHTML = `
         <div class="event-detail">
             <div class="event-detail-header">
@@ -457,24 +457,24 @@ function showEventDetail(eventId) {
             </div>
         </div>
     `;
-    
+
     // Set up edit button
     const editBtn = document.getElementById('editEventBtn');
     editBtn.onclick = () => {
         modal.hide();
         editEvent(eventId);
     };
-    
+
     modal.show();
 }
 
 function editEvent(eventId) {
     const event = events.find(e => e.id === eventId);
     if (!event) return;
-    
+
     const modal = new bootstrap.Modal(document.getElementById('eventModal'));
     const form = document.getElementById('eventForm');
-    
+
     // Populate form with event data
     document.getElementById('eventId').value = event.id;
     document.getElementById('eventTitle').value = event.title;
@@ -484,12 +484,12 @@ function editEvent(eventId) {
     document.getElementById('eventEndTime').value = event.endTime;
     document.getElementById('eventCategory').value = event.category;
     document.getElementById('allDayEvent').checked = event.allDay;
-    
+
     document.getElementById('eventModalTitle').textContent = 'Edit Event';
     document.getElementById('deleteEventBtn').style.display = 'inline-block';
-    
+
     handleAllDayToggle(); // Update time fields visibility
-    
+
     modal.show();
 }
 
@@ -502,17 +502,17 @@ function handleSaveEvent() {
     const endTime = document.getElementById('eventEndTime').value;
     const category = document.getElementById('eventCategory').value;
     const allDay = document.getElementById('allDayEvent').checked;
-    
+
     if (!title || !date) {
         showNotification('Error', 'Title and date are required', 'error');
         return;
     }
-    
+
     if (!allDay && (!startTime || !endTime)) {
         showNotification('Error', 'Start and end times are required for non-all-day events', 'error');
         return;
     }
-    
+
     const eventData = {
         title,
         description,
@@ -522,12 +522,12 @@ function handleSaveEvent() {
         category,
         allDay
     };
-    
+
     if (eventId) {
         // Update existing event
         const eventIndex = events.findIndex(e => e.id === parseInt(eventId));
         if (eventIndex !== -1) {
-            events[eventIndex] = { ...events[eventIndex], ...eventData };
+            events[eventIndex] = {...events[eventIndex], ...eventData};
             showNotification('Success', 'Event updated successfully!', 'success');
         }
     } else {
@@ -540,7 +540,7 @@ function handleSaveEvent() {
         events.push(newEvent);
         showNotification('Success', 'Event created successfully!', 'success');
     }
-    
+
     // Close modal and refresh view
     bootstrap.Modal.getInstance(document.getElementById('eventModal')).hide();
     renderCurrentView();
@@ -550,14 +550,14 @@ function handleSaveEvent() {
 function handleDeleteEvent() {
     const eventId = document.getElementById('eventId').value;
     if (!eventId) return;
-    
+
     if (confirm('Are you sure you want to delete this event?')) {
         events = events.filter(e => e.id !== parseInt(eventId));
-        
+
         bootstrap.Modal.getInstance(document.getElementById('eventModal')).hide();
         renderCurrentView();
         updateUpcomingEvents();
-        
+
         showNotification('Success', 'Event deleted successfully!', 'success');
     }
 }
@@ -570,10 +570,10 @@ function handleAllDayToggle() {
     const allDayChecked = document.getElementById('allDayEvent').checked;
     const startTimeField = document.getElementById('eventStartTime');
     const endTimeField = document.getElementById('eventEndTime');
-    
+
     startTimeField.disabled = allDayChecked;
     endTimeField.disabled = allDayChecked;
-    
+
     if (allDayChecked) {
         startTimeField.value = '';
         endTimeField.value = '';
@@ -583,12 +583,12 @@ function handleAllDayToggle() {
 function updateUpcomingEvents() {
     const upcomingEvents = document.getElementById('upcomingEvents');
     if (!upcomingEvents) return;
-    
+
     // Get events for the next 7 days
     const today = new Date();
     const nextWeek = new Date();
     nextWeek.setDate(today.getDate() + 7);
-    
+
     const upcoming = events
         .filter(event => {
             const eventDate = new Date(event.date);
@@ -596,15 +596,15 @@ function updateUpcomingEvents() {
         })
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .slice(0, 5);
-    
+
     if (upcoming.length === 0) {
         upcomingEvents.innerHTML = '<p class="text-muted">No upcoming events</p>';
         return;
     }
-    
+
     const html = upcoming.map(event => {
         const timeDisplay = event.allDay ? 'All Day' : `${formatTime(event.startTime)} - ${formatTime(event.endTime)}`;
-        
+
         return `
             <div class="upcoming-event" onclick="showEventDetail(${event.id})">
                 <div class="event-date">
@@ -619,7 +619,7 @@ function updateUpcomingEvents() {
             </div>
         `;
     }).join('');
-    
+
     upcomingEvents.innerHTML = html;
 }
 

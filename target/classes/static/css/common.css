@@ -647,8 +647,8 @@ ebar Styles */
     transition: left 0.3s ease;
 }
 
-.sidebar.collapsed+.main-header,
-.main-content.sidebar-collapsed~.main-header {
+.sidebar.collapsed + .main-header,
+.main-content.sidebar-collapsed ~ .main-header {
     left: 80px;
 }
 
@@ -1137,464 +1137,469 @@ ebar Styles */
     background-color: rgba(59, 130, 246, 0.1);
     border-color: var(--info-color);
     color: var(--info-color);
-}/* Dashboa
+}
+
+/* Dashboa
 rd Grid Layout */
 .dashboard-grid {
-  display: grid;
-  grid-template-columns: 300px 1fr 280px;
-  gap: 2rem;
-  margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 300px 1fr 280px;
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
 /* Left Column - Attendance */
 .dashboard-left {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .attendance-card {
-  background-color: var(--bg-secondary);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
 }
 
 .attendance-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
 }
 
 .attendance-header h6 {
-  margin: 0;
-  font-weight: 600;
-  color: var(--text-primary);
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .circular-progress {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
 }
 
 .progress-circle {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: conic-gradient(var(--primary-orange) 0deg 180deg, var(--border-color) 180deg 360deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary-orange) 0deg 180deg, var(--border-color) 180deg 360deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
 .progress-circle::before {
-  content: '';
-  position: absolute;
-  width: 140px;
-  height: 140px;
-  background-color: var(--bg-secondary);
-  border-radius: 50%;
+    content: '';
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    background-color: var(--bg-secondary);
+    border-radius: 50%;
 }
 
 .progress-content {
-  position: relative;
-  z-index: 1;
-  text-align: center;
+    position: relative;
+    z-index: 1;
+    text-align: center;
 }
 
 .working-hours {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.25rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
 }
 
 .working-label {
-  font-size: 0.875rem;
-  color: var(--text-muted);
+    font-size: 0.875rem;
+    color: var(--text-muted);
 }
 
 .punch-times {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background-color: var(--bg-tertiary);
-  border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: var(--bg-tertiary);
+    border-radius: 12px;
 }
 
 .punch-time {
-  text-align: center;
+    text-align: center;
 }
 
 .punch-label {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-bottom: 0.25rem;
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
 }
 
 .punch-value {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text-primary);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .punch-btn-main {
-  width: 100%;
-  padding: 1rem;
-  background-color: var(--primary-orange);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--primary-orange);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
 }
 
 .punch-btn-main:hover {
-  background-color: var(--primary-orange-hover);
-  transform: translateY(-2px);
+    background-color: var(--primary-orange-hover);
+    transform: translateY(-2px);
 }
 
 /* Center Column */
 .dashboard-center {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .welcome-card {
-  background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-light) 100%);
-  border-radius: 16px;
-  padding: 2rem;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-light) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .welcome-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 200px;
-  height: 200px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
 }
 
 .welcome-content h3 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
 .welcome-content p {
-  font-size: 1.25rem;
-  margin-bottom: 0.25rem;
-  opacity: 0.9;
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+    opacity: 0.9;
 }
 
 .welcome-content small {
-  opacity: 0.8;
+    opacity: 0.8;
 }
 
 .welcome-icon {
-  font-size: 3rem;
-  opacity: 0.3;
+    font-size: 3rem;
+    opacity: 0.3;
 }
 
 .quick-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
 }
 
 .stat-card-small {
-  background-color: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 1.5rem;
-  border: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .stat-card-small:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 15px var(--shadow-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px var(--shadow-hover);
 }
 
 .stat-card-small .stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: white;
 }
 
 .project-card .stat-icon {
-  background-color: var(--primary-orange);
+    background-color: var(--primary-orange);
 }
 
 .leave-card .stat-icon {
-  background-color: var(--error-color);
+    background-color: var(--error-color);
 }
 
 .holiday-card .stat-icon {
-  background-color: var(--success-color);
+    background-color: var(--success-color);
 }
 
 .meeting-card .stat-icon {
-  background-color: var(--info-color);
+    background-color: var(--info-color);
 }
 
 .stat-content {
-  flex: 1;
+    flex: 1;
 }
 
 .stat-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
 }
 
 .stat-subtitle {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+    font-size: 0.75rem;
+    color: var(--text-muted);
 }
 
 /* Right Column */
 .dashboard-right {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .calendar-card, .leave-balance-card {
-  background-color: var(--bg-secondary);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
 }
 
 .calendar-header, .leave-balance-header {
-  margin-bottom: 1rem;
+    margin-bottom: 1rem;
 }
 
 .calendar-header h6, .leave-balance-header h6 {
-  margin: 0;
-  font-weight: 600;
-  color: var(--text-primary);
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .calendar-month {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
 .calendar-nav {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
 }
 
 .calendar-nav:hover {
-  background-color: var(--bg-tertiary);
+    background-color: var(--bg-tertiary);
 }
 
 .month-year {
-  font-weight: 600;
-  color: var(--text-primary);
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.25rem;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
 }
 
 .calendar-day {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .calendar-day:hover {
-  background-color: var(--bg-tertiary);
+    background-color: var(--bg-tertiary);
 }
 
 .calendar-day.today {
-  background-color: var(--primary-orange);
-  color: white;
-  font-weight: 600;
+    background-color: var(--primary-orange);
+    color: white;
+    font-weight: 600;
 }
 
 .calendar-day.other-month {
-  color: var(--text-muted);
-  opacity: 0.5;
+    color: var(--text-muted);
+    opacity: 0.5;
 }
 
 .calendar-weekday {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-align: center;
-  padding: 0.5rem 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 0.5rem 0;
 }
 
 .leave-balance-circle {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
 }
 
 .balance-progress {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: conic-gradient(var(--primary-orange) 0deg 288deg, var(--border-color) 288deg 360deg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary-orange) 0deg 288deg, var(--border-color) 288deg 360deg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
 .balance-progress::before {
-  content: '';
-  position: absolute;
-  width: 90px;
-  height: 90px;
-  background-color: var(--bg-secondary);
-  border-radius: 50%;
+    content: '';
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    background-color: var(--bg-secondary);
+    border-radius: 50%;
 }
 
 .balance-number {
-  position: relative;
-  z-index: 1;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--primary-orange);
+    position: relative;
+    z-index: 1;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-orange);
 }
 
 .balance-label {
-  position: relative;
-  z-index: 1;
-  font-size: 0.75rem;
-  color: var(--text-muted);
+    position: relative;
+    z-index: 1;
+    font-size: 0.75rem;
+    color: var(--text-muted);
 }
 
 .leave-balance-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .balance-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.875rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
 }
 
 .balance-row span:first-child {
-  color: var(--text-secondary);
+    color: var(--text-secondary);
 }
 
 .balance-row span:last-child {
-  font-weight: 600;
-  color: var(--text-primary);
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  
-  .dashboard-center {
-    order: -1;
-  }
-  
-  .quick-stats {
-    grid-template-columns: repeat(4, 1fr);
-  }
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .dashboard-center {
+        order: -1;
+    }
+
+    .quick-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
-  .dashboard-grid {
-    gap: 1rem;
-  }
-  
-  .quick-stats {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .attendance-card,
-  .calendar-card,
-  .leave-balance-card {
-    padding: 1rem;
-  }
-  
-  .welcome-card {
-    padding: 1.5rem;
-  }
-  
-  .welcome-content h3 {
-    font-size: 1.5rem;
-  }
-  
-  .progress-circle {
-    width: 150px;
-    height: 150px;
-  }
-  
-  .progress-circle::before {
-    width: 120px;
-    height: 120px;
-  }
-}/* Lo
+    .dashboard-grid {
+        gap: 1rem;
+    }
+
+    .quick-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .attendance-card,
+    .calendar-card,
+    .leave-balance-card {
+        padding: 1rem;
+    }
+
+    .welcome-card {
+        padding: 1.5rem;
+    }
+
+    .welcome-content h3 {
+        font-size: 1.5rem;
+    }
+
+    .progress-circle {
+        width: 150px;
+        height: 150px;
+    }
+
+    .progress-circle::before {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+/* Lo
 gout button styles */
 .logout-btn {
-  cursor: pointer;
-  transition: all 0.2s ease;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
-  background-color: var(--error-color) !important;
-  color: white !important;
-  border-color: var(--error-color) !important;
+    background-color: var(--error-color) !important;
+    color: white !important;
+    border-color: var(--error-color) !important;
 }
+
 /* =====
  TO-DO LIST STYLES ===== */
 .tasks-container {
@@ -2240,40 +2245,40 @@ gout button styles */
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .task-badges {
         margin-left: 0;
         margin-top: 0.5rem;
     }
-    
+
     .task-meta {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
     }
-    
+
     .calendar-day {
         min-height: 80px;
         font-size: 0.8rem;
     }
-    
+
     .upcoming-event {
         flex-direction: column;
         align-items: flex-start;
         text-align: left;
     }
-    
+
     .event-date {
         margin-right: 0;
         margin-bottom: 0.5rem;
     }
-    
+
     .live-user-item {
         flex-direction: column;
         align-items: flex-start;
         text-align: left;
     }
-    
+
     .user-avatar {
         margin-right: 0;
         margin-bottom: 0.5rem;
@@ -2371,9 +2376,14 @@ gout button styles */
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
+
 /* ===== CA
 LENDAR WIDGET STYLES ===== */
 .calendar-card {
@@ -2522,16 +2532,16 @@ LENDAR WIDGET STYLES ===== */
         padding: 16px;
         border-radius: 12px;
     }
-    
+
     .calendar-day {
         font-size: 14px;
         min-height: 36px;
     }
-    
+
     .month-year {
         font-size: 18px;
     }
-    
+
     .calendar-weekday {
         font-size: 12px;
         padding: 8px 0;
@@ -2877,7 +2887,7 @@ LENDAR WIDGET STYLES ===== */
         grid-template-columns: 1fr;
         gap: 20px;
     }
-    
+
     .quick-stats {
         grid-template-columns: repeat(4, 1fr);
     }
@@ -2888,22 +2898,24 @@ LENDAR WIDGET STYLES ===== */
         padding: 16px;
         gap: 16px;
     }
-    
+
     .quick-stats {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .welcome-card {
         padding: 24px;
         flex-direction: column;
         text-align: center;
         gap: 16px;
     }
-    
+
     .welcome-content h3 {
         font-size: 24px;
     }
-}/* ==
+}
+
+/* ==
 === SIMPLE CALENDAR WIDGET (LEFT COLUMN) ===== */
 .simple-calendar-card {
     background: var(--bg-primary);
@@ -3029,16 +3041,18 @@ LENDAR WIDGET STYLES ===== */
         padding: 16px;
         margin-top: 16px;
     }
-    
+
     .simple-day {
         font-size: 11px;
         min-height: 28px;
     }
-    
+
     .simple-month-year {
         font-size: 14px;
     }
-}/* ==
+}
+
+/* ==
 === SIMPLE CALENDAR WIDGET (LEFT COLUMN) ===== */
 .simple-calendar-card {
     background: white;
@@ -3168,21 +3182,23 @@ LENDAR WIDGET STYLES ===== */
         padding: 12px;
         margin-top: 16px;
     }
-    
+
     .simple-day {
         font-size: 12px;
         min-height: 32px;
     }
-    
+
     .simple-month-year {
         font-size: 13px;
     }
-    
+
     .simple-weekday {
         font-size: 9px;
         padding: 6px 2px;
     }
-}/* ===== R
+}
+
+/* ===== R
 ESPONSIVE DESIGN ===== */
 
 /* Large Desktop (1200px and up) */
@@ -3192,7 +3208,7 @@ ESPONSIVE DESIGN ===== */
         gap: 32px;
         padding: 32px;
     }
-    
+
     .main-content {
         padding: 2.5rem;
     }
@@ -3205,7 +3221,7 @@ ESPONSIVE DESIGN ===== */
         gap: 24px;
         padding: 24px;
     }
-    
+
     .main-content {
         padding: 2rem;
     }
@@ -3217,7 +3233,7 @@ ESPONSIVE DESIGN ===== */
         margin-left: 0;
         padding: 1.5rem;
     }
-    
+
     .sidebar {
         transform: translateX(-100%);
         position: fixed;
@@ -3225,63 +3241,63 @@ ESPONSIVE DESIGN ===== */
         height: 100vh;
         transition: transform 0.3s ease;
     }
-    
+
     .sidebar.show {
         transform: translateX(0);
     }
-    
+
     .dashboard-grid {
         grid-template-columns: 1fr;
         gap: 20px;
         padding: 20px;
     }
-    
+
     .dashboard-left,
     .dashboard-center,
     .dashboard-right {
         order: 0;
     }
-    
+
     .dashboard-center {
         order: -1; /* Show center content first on mobile */
     }
-    
+
     .quick-stats {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
-    
+
     .stat-card-small {
         padding: 16px;
     }
-    
+
     .welcome-card {
         padding: 24px;
         text-align: center;
     }
-    
+
     .welcome-content h3 {
         font-size: 24px;
     }
-    
+
     .attendance-card {
         padding: 20px;
     }
-    
+
     .circular-progress {
         margin: 20px 0;
     }
-    
+
     .progress-circle {
         width: 140px;
         height: 140px;
     }
-    
+
     .progress-circle::before {
         width: 100px;
         height: 100px;
     }
-    
+
     .working-hours {
         font-size: 18px;
     }
@@ -3292,121 +3308,121 @@ ESPONSIVE DESIGN ===== */
     .main-content {
         padding: 1rem;
     }
-    
+
     .dashboard-grid {
         gap: 16px;
         padding: 16px;
     }
-    
+
     .quick-stats {
         grid-template-columns: 1fr;
         gap: 12px;
     }
-    
+
     .stat-card-small {
         padding: 12px;
         flex-direction: column;
         text-align: center;
         gap: 8px;
     }
-    
+
     .stat-icon {
         width: 40px;
         height: 40px;
         font-size: 18px;
     }
-    
+
     .welcome-card {
         padding: 20px;
         flex-direction: column;
         gap: 16px;
     }
-    
+
     .welcome-content h3 {
         font-size: 20px;
         margin-bottom: 4px;
     }
-    
+
     .welcome-content p {
         font-size: 16px;
     }
-    
+
     .welcome-icon {
         font-size: 36px;
     }
-    
+
     .attendance-card {
         padding: 16px;
     }
-    
+
     .circular-progress {
         margin: 16px 0;
     }
-    
+
     .progress-circle {
         width: 120px;
         height: 120px;
     }
-    
+
     .progress-circle::before {
         width: 90px;
         height: 90px;
     }
-    
+
     .working-hours {
         font-size: 16px;
     }
-    
+
     .working-label {
         font-size: 10px;
     }
-    
+
     .punch-times {
         margin: 16px 0;
         padding: 0 8px;
     }
-    
+
     .punch-value {
         font-size: 14px;
     }
-    
+
     .punch-btn-main {
         padding: 12px 24px;
         font-size: 14px;
     }
-    
+
     .leave-balance-card {
         padding: 16px;
     }
-    
+
     .balance-progress {
         width: 100px;
         height: 100px;
     }
-    
+
     .balance-progress::before {
         width: 75px;
         height: 75px;
     }
-    
+
     .balance-number {
         font-size: 20px;
     }
-    
+
     .simple-calendar-card {
         padding: 12px;
         margin-top: 16px;
     }
-    
+
     .simple-day {
         font-size: 12px;
         min-height: 32px;
     }
-    
+
     .simple-month-year {
         font-size: 13px;
     }
-    
+
     .simple-weekday {
         font-size: 9px;
         padding: 6px 2px;
@@ -3418,83 +3434,83 @@ ESPONSIVE DESIGN ===== */
     .main-content {
         padding: 0.75rem;
     }
-    
+
     .dashboard-grid {
         gap: 12px;
         padding: 12px;
     }
-    
+
     .card {
         padding: 1rem;
         margin-bottom: 1rem;
     }
-    
+
     .welcome-card {
         padding: 16px;
     }
-    
+
     .welcome-content h3 {
         font-size: 18px;
     }
-    
+
     .welcome-content p {
         font-size: 14px;
     }
-    
+
     .stat-card-small {
         padding: 10px;
     }
-    
+
     .stat-icon {
         width: 36px;
         height: 36px;
         font-size: 16px;
     }
-    
+
     .stat-title {
         font-size: 12px;
     }
-    
+
     .stat-subtitle {
         font-size: 11px;
     }
-    
+
     .attendance-card {
         padding: 12px;
     }
-    
+
     .progress-circle {
         width: 100px;
         height: 100px;
     }
-    
+
     .progress-circle::before {
         width: 75px;
         height: 75px;
     }
-    
+
     .working-hours {
         font-size: 14px;
     }
-    
+
     .punch-btn-main {
         padding: 10px 20px;
         font-size: 13px;
     }
-    
+
     .simple-calendar-card {
         padding: 10px;
     }
-    
+
     .simple-day {
         font-size: 11px;
         min-height: 28px;
     }
-    
+
     .simple-month-year {
         font-size: 12px;
     }
-    
+
     .simple-weekday {
         font-size: 8px;
         padding: 4px 1px;
@@ -3506,18 +3522,18 @@ ESPONSIVE DESIGN ===== */
     .main-header {
         padding: 0 1rem;
     }
-    
+
     .header-content {
         flex-direction: column;
         gap: 1rem;
         align-items: flex-start;
     }
-    
+
     .header-right {
         width: 100%;
         justify-content: space-between;
     }
-    
+
     .page-title {
         font-size: 1.5rem;
     }
@@ -3527,20 +3543,20 @@ ESPONSIVE DESIGN ===== */
     .main-header {
         padding: 0 0.75rem;
     }
-    
+
     .page-title {
         font-size: 1.25rem;
     }
-    
+
     .header-actions {
         gap: 0.5rem;
     }
-    
+
     .dropdown-toggle {
         padding: 0.375rem 0.5rem;
         font-size: 0.875rem;
     }
-    
+
     .profile-img {
         width: 28px;
         height: 28px;
@@ -3552,33 +3568,33 @@ ESPONSIVE DESIGN ===== */
     .sidebar {
         width: 280px;
     }
-    
+
     .sidebar-header {
         padding: 1rem;
     }
-    
+
     .logo {
         font-size: 1.25rem;
     }
-    
+
     .nav-link {
         padding: 0.75rem 1rem;
         font-size: 0.9rem;
     }
-    
+
     .sidebar-footer {
         padding: 1rem;
     }
-    
+
     .user-avatar {
         width: 36px;
         height: 36px;
     }
-    
+
     .user-name {
         font-size: 0.875rem;
     }
-    
+
     .user-role {
         font-size: 0.75rem;
     }
@@ -3590,21 +3606,21 @@ ESPONSIVE DESIGN ===== */
         padding: 0.5rem 1rem;
         font-size: 0.875rem;
     }
-    
+
     .btn-sm {
         padding: 0.375rem 0.75rem;
         font-size: 0.8125rem;
     }
-    
+
     .form-control {
         padding: 0.5rem 0.75rem;
         font-size: 0.875rem;
     }
-    
+
     .dropdown-menu {
         font-size: 0.875rem;
     }
-    
+
     .badge {
         font-size: 0.7rem;
         padding: 0.25rem 0.4rem;
@@ -3616,12 +3632,12 @@ ESPONSIVE DESIGN ===== */
     .calendar-grid {
         gap: 2px;
     }
-    
+
     .calendar-day {
         min-height: 40px;
         font-size: 14px;
     }
-    
+
     .calendar-weekday {
         padding: 10px 0;
         font-size: 12px;
@@ -3632,17 +3648,17 @@ ESPONSIVE DESIGN ===== */
     .calendar-card {
         padding: 16px;
     }
-    
+
     .calendar-day {
         min-height: 36px;
         font-size: 13px;
     }
-    
+
     .calendar-weekday {
         padding: 8px 0;
         font-size: 11px;
     }
-    
+
     .month-year {
         font-size: 18px;
     }
@@ -3656,11 +3672,11 @@ ESPONSIVE DESIGN ===== */
         align-items: flex-start;
         gap: 8px;
     }
-    
+
     .todo-content {
         width: 100%;
     }
-    
+
     .todo-actions {
         width: 100%;
         justify-content: flex-end;
@@ -3672,16 +3688,16 @@ ESPONSIVE DESIGN ===== */
     .location-card {
         padding: 16px;
     }
-    
+
     .map-container {
         height: 250px;
     }
-    
+
     .location-info {
         flex-direction: column;
         gap: 12px;
     }
-    
+
     .location-details {
         width: 100%;
     }
@@ -3700,17 +3716,17 @@ ESPONSIVE DESIGN ===== */
         grid-template-columns: 1fr;
         gap: 12px;
     }
-    
+
     .project-card {
         padding: 16px;
     }
-    
+
     .project-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
     }
-    
+
     .project-title {
         font-size: 1.1rem;
     }
@@ -3729,17 +3745,17 @@ ESPONSIVE DESIGN ===== */
         grid-template-columns: 1fr;
         gap: 12px;
     }
-    
+
     .team-member-card {
         padding: 16px;
         text-align: center;
     }
-    
+
     .member-avatar {
         width: 60px;
         height: 60px;
     }
-    
+
     .member-info {
         margin-top: 12px;
     }
@@ -3758,7 +3774,7 @@ ESPONSIVE DESIGN ===== */
     .d-mobile-none {
         display: none;
     }
-    
+
     .d-mobile-block {
         display: block;
     }
@@ -3766,17 +3782,34 @@ ESPONSIVE DESIGN ===== */
 
 /* Text Responsive */
 @media (max-width: 767px) {
-    h1 { font-size: 1.75rem; }
-    h2 { font-size: 1.5rem; }
-    h3 { font-size: 1.25rem; }
-    h4 { font-size: 1.1rem; }
-    h5 { font-size: 1rem; }
-    h6 { font-size: 0.9rem; }
-    
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    h4 {
+        font-size: 1.1rem;
+    }
+
+    h5 {
+        font-size: 1rem;
+    }
+
+    h6 {
+        font-size: 0.9rem;
+    }
+
     .lead {
         font-size: 1.1rem;
     }
-    
+
     small, .small {
         font-size: 0.8rem;
     }

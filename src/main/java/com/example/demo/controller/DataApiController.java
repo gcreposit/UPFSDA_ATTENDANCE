@@ -867,4 +867,46 @@ public class DataApiController {
 
     }
 
+//    This api For Mobile App - For Getting Latest Lat Long Data of the User
+    @GetMapping("/location-latest-one/{userName}")
+    public ResponseEntity<ApiResponse> getLatestForUserOne(@PathVariable String userName) {
+        try {
+            // Call service to get latest location for the user
+            WffLocationTracking latestLocation = attendanceService.getLatestForUserOne(userName);
+
+            // Check if service returned null or some error
+            if (latestLocation == null) {
+                return ResponseEntity.badRequest().body(
+                        ApiResponse.builder()
+                                .message("No location found for user: " + userName)
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .data(null)
+                                .build()
+                );
+            }
+
+            // Return success response
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("Latest location fetched successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(latestLocation)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error fetching latest location")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
+
 }

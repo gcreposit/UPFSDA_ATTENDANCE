@@ -62,4 +62,12 @@ public interface WffLocationTrackingRepository extends JpaRepository<WffLocation
             """)
     List<WffLocationTracking> findLatestForUser(@Param("userName") String userName);
 
+    @Query("""
+                SELECT w FROM WffLocationTracking w
+                WHERE w.userName = :userName
+                ORDER BY w.timestamp DESC LIMIT 1
+            """)
+    WffLocationTracking findLatestForUserOne(@Param("userName") String userName);
+
+
 }
