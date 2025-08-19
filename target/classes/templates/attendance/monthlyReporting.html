@@ -258,7 +258,7 @@
                 </select>
 
                 <!-- Show Report Button -->
-                <button id="showReportBtn" class="bg-success px-4 py-1 rounded">Show Report</button>
+                <button id="showReportBtn" class="bg-primary px-4 py-1 rounded">Show Report</button>
             </div>
 
             <!-- Cards section (replaces the Table section) -->
@@ -333,10 +333,12 @@
         const title = document.createElement('div');
         title.className = 'stat-title';
         title.textContent = label;
+        title.style.setProperty('color', 'black', 'important');
 
         const valueEl = document.createElement('div');
         valueEl.className = 'stat-value';
         valueEl.textContent = value ?? 0;
+        valueEl.style.setProperty('color', 'black', 'important');
 
         const footer = document.createElement('div');
         footer.className = 'stat-footer';
