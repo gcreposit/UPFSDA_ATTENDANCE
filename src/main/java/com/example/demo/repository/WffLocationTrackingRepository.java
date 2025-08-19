@@ -44,27 +44,33 @@ public interface WffLocationTrackingRepository extends JpaRepository<WffLocation
             LocalDateTime to
     );
 
-    // Latest record per user
+    // Latest record per user where lat/lon are not null
     @Query("""
-                SELECT w FROM WffLocationTracking w
-                WHERE w.timestamp = (
-                    SELECT MAX(w2.timestamp) FROM WffLocationTracking w2
-                    WHERE w2.userName = w.userName
-                )
-            """)
+    SELECT w FROM WffLocationTracking w
+    WHERE w.timestamp = (
+        SELECT MAX(w2.timestamp)
+        FROM WffLocationTracking w2
+        WHERE w2.userName = w.userName
+          AND w2.lat IS NOT NULL
+          AND w2.lon IS NOT NULL
+    )
+      AND w.lat IS NOT NULL
+      AND w.lon IS NOT NULL
+    """)
     List<WffLocationTracking> findLatestPerUser();
+
 
     // All records for a user, newest first
     @Query("""
                 SELECT w FROM WffLocationTracking w
-                WHERE w.userName = :userName
-                ORDER BY w.timestamp DESC
+                WHERE w.userName = :userName AND w.lat IS NOT NULL
+                AND w.lon IS NOT NULL ORDER BY w.timestamp DESC
             """)
     List<WffLocationTracking> findLatestForUser(@Param("userName") String userName);
 
     @Query("""
                 SELECT w FROM WffLocationTracking w
-                WHERE w.userName = :userName
+                WHERE w.userName = :userName AND w.lat IS NOT NULL AND w.lon IS NOT NULL
                 ORDER BY w.timestamp DESC LIMIT 1
             """)
     WffLocationTracking findLatestForUserOne(@Param("userName") String userName);

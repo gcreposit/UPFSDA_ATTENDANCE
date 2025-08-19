@@ -240,7 +240,6 @@ public class DataApiController {
         }
     }
 
-
     //    Api For Submit Field Image When AttendanceType is WFF
     @PostMapping("/attendance/field-images")
     public ResponseEntity<ApiResponse> uploadFieldImages(
@@ -838,6 +837,7 @@ public class DataApiController {
         return employeeService.findAllEmployeeDetails();
     }
 
+    //    Api for Location History
     @GetMapping("/location-history")
     public List<WffLocationTracking> getHistory(
             @RequestParam(required = false) String userName,
@@ -855,11 +855,13 @@ public class DataApiController {
         return attendanceService.getHistory(fromTs, toTs);
     }
 
+    //    Api For Location Latest
     @GetMapping("/location-latest")
     public List<WffLocationTracking> getLatestPerUser() {
         return attendanceService.getLatestPerUser();
     }
 
+    //    Api For Location History By Username
     @GetMapping("/location-latest/{userName}")
     public List<WffLocationTracking> getLatestForUser(@PathVariable String userName) {
 
@@ -867,7 +869,7 @@ public class DataApiController {
 
     }
 
-//    This api For Mobile App - For Getting Latest Lat Long Data of the User
+    //    This api For Mobile App - For Getting Latest Lat Long Data of the User
     @GetMapping("/location-latest-one/{userName}")
     public ResponseEntity<ApiResponse> getLatestForUserOne(@PathVariable String userName) {
         try {

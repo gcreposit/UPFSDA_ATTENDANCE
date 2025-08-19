@@ -203,7 +203,6 @@
             margin-top: 12px;
         }
     </style>
-
 </head>
 
 <body>
@@ -268,9 +267,12 @@
                 </label>
 
                 <!-- Show Report Button -->
-                <button id="showReportBtn" class="bg-primary px-4 py-1 rounded">Show Report</button>
-            </div>
+                <button id="showReportBtn" class="bg-primary text-white px-4 py-1 rounded">Show Report</button>
 
+                <!-- Download PDF Button -->
+                <button id="downloadPdfBtn" class="bg-secondary text-white px-4 py-1 rounded">Download PDF</button>
+
+            </div>
 
             <!-- Cards section (replaces the Table section) -->
             <div class="dashboard-main">
@@ -312,22 +314,153 @@
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <div th:replace="~{fragments/layout :: scripts}"></div>
 
+<!--Js for Download PDF-->
+<script th:inline="none">
+    document.getElementById('downloadPdfBtn').addEventListener('click', function () {
+        const {jsPDF} = window.jspdf;
+        const doc = new jsPDF();
+
+        const username = document.getElementById('usernameSelect').value;
+        const month = document.getElementById('monthSelect').options[document.getElementById('monthSelect').selectedIndex].text;
+        const year = document.getElementById('yearSelect').value;
+
+        // Header
+        doc.setFontSize(16);
+        doc.text("Monthly Attendance Report", 14, 20);
+        doc.setFontSize(12);
+        doc.text("User: " + username, 14, 30);
+        doc.text("Month: " + month + " " + year, 14, 38);
+
+        // Collect data
+        const cards = document.querySelectorAll('#statsGrid .stat-card');
+        let rows = [];
+
+        cards.forEach(card => {
+            const title = card.querySelector('.stat-title')?.innerText || '';
+            const value = card.querySelector('.stat-value')?.innerText || '';
+            if (title && value) rows.push([title, value]);
+        });
+
+        console.log(rows); // Debugging
+
+        // Build table
+        if (rows.length > 0) {
+            doc.autoTable({
+                startY: 50,
+                head: [["Metric", "Value"]],
+                body: rows,
+            });
+        } else {
+            doc.text("⚠ No data available", 14, 60);
+        }
+
+        // Save file
+        const fileName = username + "-" + month + "-" + year + ".pdf";
+        doc.save(fileName);
+    });
+</script>
+
+<!--Js For Load Reports-->
 <script>
     // Card config mapping
     function cardConfig(d) {
         return [
-            { key: 'total_days_in_month', label: 'Total Days', icon: 'fa-solid fa-calendar-days', slug: null, accent: 'total', hint: 'Calendar days in month' },
-            { key: 'working_days_in_month', label: 'Working Days', icon: 'fa-solid fa-briefcase', slug: null, accent: 'working', hint: 'Excludes Sundays/holidays' },
-            { key: 'holidays', label: 'Holidays', icon: 'fa-solid fa-umbrella-beach', slug: 'holiday', accent: 'holiday', hint: 'Weekly offs (Sundays) / holidays' },
-            { key: 'present', label: 'Present Days', icon: 'fa-solid fa-user-check', slug: 'present', accent: 'present', hint: 'Days employee was present' },
-            { key: 'on_time', label: 'On Time', icon: 'fa-regular fa-clock', slug: 'on_time', accent: 'on_time', hint: 'Arrived on or before start time' },
-            { key: 'late_entry', label: 'Late Entry', icon: 'fa-solid fa-person-walking', slug: 'late_entry', accent: 'late_entry', hint: 'Late arrivals without half day' },
-            { key: 'late_and_half', label: 'Late & Half', icon: 'fa-solid fa-person-running', slug: 'late_and_half', accent: 'late_and_half', hint: 'Late arrivals counted as half day' },
-            { key: 'half_day', label: 'Half Day', icon: 'fa-solid fa-hourglass-half', slug: 'half_day', accent: 'half_day', hint: 'Approved or computed half days' },
-            { key: 'absent', label: 'Absent', icon: 'fa-solid fa-user-xmark', slug: 'absent', accent: 'absent', hint: 'Unapproved or marked absences' },
-            { key: 'total_work_from_home', label: 'Work From Home', icon: 'fa-solid fa-house-laptop', slug: 'wfh', accent: 'wfh', hint: 'WFH days logged' },
-            { key: 'total_work_from_office', label: 'Work From Office', icon: 'fa-solid fa-building', slug: 'wfo', accent: 'wfo', hint: 'Office presence days' },
-            { key: 'total_work_from_field', label: 'Work From Field', icon: 'fa-solid fa-map-location', slug: 'wff', accent: 'wff', hint: 'On-field work days' }
+            {
+                key: 'total_days_in_month',
+                label: 'Total Days',
+                icon: 'fa-solid fa-calendar-days',
+                slug: null,
+                accent: 'total',
+                hint: 'Calendar days in month'
+            },
+            {
+                key: 'working_days_in_month',
+                label: 'Working Days',
+                icon: 'fa-solid fa-briefcase',
+                slug: null,
+                accent: 'working',
+                hint: 'Excludes Sundays/holidays'
+            },
+            {
+                key: 'holidays',
+                label: 'Holidays',
+                icon: 'fa-solid fa-umbrella-beach',
+                slug: 'holiday',
+                accent: 'holiday',
+                hint: 'Weekly offs (Sundays) / holidays'
+            },
+            {
+                key: 'present',
+                label: 'Present Days',
+                icon: 'fa-solid fa-user-check',
+                slug: 'present',
+                accent: 'present',
+                hint: 'Days employee was present'
+            },
+            {
+                key: 'on_time',
+                label: 'On Time',
+                icon: 'fa-regular fa-clock',
+                slug: 'on_time',
+                accent: 'on_time',
+                hint: 'Arrived on or before start time'
+            },
+            {
+                key: 'late_entry',
+                label: 'Late Entry',
+                icon: 'fa-solid fa-person-walking',
+                slug: 'late_entry',
+                accent: 'late_entry',
+                hint: 'Late arrivals without half day'
+            },
+            {
+                key: 'late_and_half',
+                label: 'Late & Half',
+                icon: 'fa-solid fa-person-running',
+                slug: 'late_and_half',
+                accent: 'late_and_half',
+                hint: 'Late arrivals counted as half day'
+            },
+            {
+                key: 'half_day',
+                label: 'Half Day',
+                icon: 'fa-solid fa-hourglass-half',
+                slug: 'half_day',
+                accent: 'half_day',
+                hint: 'Approved or computed half days'
+            },
+            {
+                key: 'absent',
+                label: 'Absent',
+                icon: 'fa-solid fa-user-xmark',
+                slug: 'absent',
+                accent: 'absent',
+                hint: 'Unapproved or marked absences'
+            },
+            {
+                key: 'total_work_from_home',
+                label: 'Work From Home',
+                icon: 'fa-solid fa-house-laptop',
+                slug: 'wfh',
+                accent: 'wfh',
+                hint: 'WFH days logged'
+            },
+            {
+                key: 'total_work_from_office',
+                label: 'Work From Office',
+                icon: 'fa-solid fa-building',
+                slug: 'wfo',
+                accent: 'wfo',
+                hint: 'Office presence days'
+            },
+            {
+                key: 'total_work_from_field',
+                label: 'Work From Field',
+                icon: 'fa-solid fa-map-location',
+                slug: 'wff',
+                accent: 'wff',
+                hint: 'On-field work days'
+            }
         ];
     }
 
