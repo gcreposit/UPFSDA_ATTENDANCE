@@ -61,5 +61,7 @@ public interface AttendanceService {
 
     WffLocationTracking getLatestForUserOne(String userName);
 
+    List<String> fetchEmployeesUsernames();
+
 
 }

@@ -388,7 +388,7 @@ public class DataApiController {
             @RequestParam(required = false) String lat,
             @RequestParam(required = false) String lon,
             @RequestParam(required = false) String timestamp,
-            boolean isActive
+            @RequestParam boolean isActive
     ) {
         try {
             ApiResponse<Object> response = attendanceService.saveLocationForTracking(userName, lat, lon, timestamp, isActive);

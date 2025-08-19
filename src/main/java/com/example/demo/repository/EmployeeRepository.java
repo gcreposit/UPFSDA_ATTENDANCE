@@ -36,5 +36,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             "WHERE attendance.attendance_date = ?1 ;", nativeQuery = true)
     List<Employee> findAllEmployeeDetailsForToday(LocalDate today);
 
+    @Query(value = "SELECT username FROM employee ORDER BY username;;", nativeQuery = true)
+    List<String> fetchEmployeesUsernames();
+
 
 }

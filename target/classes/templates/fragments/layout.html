@@ -89,12 +89,13 @@
                     <span class="nav-text">Employee Details</span>
                 </a>
             </li>
-            <!--                <li class="nav-item" th:if="${userRole == 'admin'}">-->
-            <!--                    <a th:href="@{/attendance/team}" class="nav-link" th:classappend="${currentPage == 'team'} ? 'active' : ''">-->
-            <!--                        <i class="fas fa-users"></i>-->
-            <!--                        <span class="nav-text">Team Management</span>-->
-            <!--                    </a>-->
-            <!--                </li>-->
+            <li class="nav-item">
+                <a th:href="@{/attendance/monthlyReporting}" class="nav-link"
+                   th:classappend="${currentPage == 'reporting'} ? 'active' : ''">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="nav-text">Monthly Reporting</span>
+                </a>
+            </li>
         </ul>
     </div>
 

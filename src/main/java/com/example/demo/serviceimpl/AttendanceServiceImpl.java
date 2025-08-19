@@ -167,6 +167,74 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     }
 
+//    @Override
+//    @Transactional
+//    public ApiResponse<Object> saveLocationForTracking(
+//            String userName,
+//            String lat,
+//            String lon,
+//            String timestamp,
+//            boolean isActive
+//    ) {
+//        try {
+//            // 1️⃣ Parse timestamp (or default to now if null/blank)
+//            LocalDateTime parsedTimestamp;
+//            if (timestamp != null && !timestamp.isBlank()) {
+//                parsedTimestamp = LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME);
+//            } else {
+//                parsedTimestamp = LocalDateTime.now();
+//            }
+//
+//            // 2️⃣ Find employee by username
+//            Employee employee = employeeRepository.findByUsername(userName);
+//
+//            // 3️⃣ Update isActive in employee
+//            employee.setActive(isActive);
+//            employeeRepository.save(employee);
+//
+//            // 4️⃣ Save location tracking record
+//            WffLocationTracking tracking = WffLocationTracking.builder()
+//                    .userName(userName)
+//                    .lat(lat != null && !lat.isBlank() ? Double.valueOf(lat) : null)
+//                    .lon(lon != null && !lon.isBlank() ? Double.valueOf(lon) : null)
+//                    .date(LocalDate.now())
+//                    .timestamp(parsedTimestamp)
+//                    .build();
+//
+//            WffLocationTracking saved = locationTrackingRepository.save(tracking);
+//
+//            publisher.publish(saved);
+//
+//            Map<String, Object> responseData = new HashMap<>();
+//            responseData.put("flag", "success");
+//
+//            return ApiResponse.builder()
+//                    .message("Location saved and employee status updated successfully")
+//                    .statusCode(HttpStatus.OK.value())
+//                    .data(responseData)
+//                    .build();
+//
+//        } catch (DateTimeParseException e) {
+//            Map<String, Object> error = new HashMap<>();
+//            error.put("error", "Invalid timestamp format. Use ISO format: yyyy-MM-dd'T'HH:mm:ss");
+//
+//            return ApiResponse.builder()
+//                    .message("Invalid timestamp format")
+//                    .statusCode(HttpStatus.BAD_REQUEST.value())
+//                    .data(error)
+//                    .build();
+//        } catch (Exception e) {
+//            Map<String, Object> error = new HashMap<>();
+//            error.put("error", e.getMessage());
+//
+//            return ApiResponse.builder()
+//                    .message("Failed to save location and update employee status")
+//                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                    .data(error)
+//                    .build();
+//        }
+//    }
+
     @Override
     @Transactional
     public ApiResponse<Object> saveLocationForTracking(
@@ -177,22 +245,27 @@ public class AttendanceServiceImpl implements AttendanceService {
             boolean isActive
     ) {
         try {
-            // 1️⃣ Parse timestamp (or default to now if null/blank)
-            LocalDateTime parsedTimestamp;
-            if (timestamp != null && !timestamp.isBlank()) {
-                parsedTimestamp = LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME);
-            } else {
-                parsedTimestamp = LocalDateTime.now();
+            // 1️⃣ Parse timestamp
+            LocalDateTime parsedTimestamp =
+                    (timestamp != null && !timestamp.isBlank())
+                            ? LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME)
+                            : LocalDateTime.now();
+
+            // 2️⃣ Find employee
+            Employee employee = employeeRepository.findByUsername(userName);
+            if (employee == null) {
+                return ApiResponse.builder()
+                        .message("Employee not found")
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .data(Map.of("error", "No employee with username: " + userName))
+                        .build();
             }
 
-            // 2️⃣ Find employee by username
-            Employee employee = employeeRepository.findByUsername(userName);
-
-            // 3️⃣ Update isActive in employee
+            // 3️⃣ Update active flag
             employee.setActive(isActive);
             employeeRepository.save(employee);
 
-            // 4️⃣ Save location tracking record
+            // 4️⃣ Save location
             WffLocationTracking tracking = WffLocationTracking.builder()
                     .userName(userName)
                     .lat(lat != null && !lat.isBlank() ? Double.valueOf(lat) : null)
@@ -203,37 +276,39 @@ public class AttendanceServiceImpl implements AttendanceService {
 
             WffLocationTracking saved = locationTrackingRepository.save(tracking);
 
-            publisher.publish(saved);
+            // 5️⃣ Try publishing, but don't break API if it fails
+            try {
+                if (publisher != null) {
+                    publisher.publish(saved);
+                }
+            } catch (Exception pubEx) {
+                // log it, but don't rollback the transaction
+                log.error("Failed to publish location tracking", pubEx);
+            }
 
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("flag", "success");
-
+            // ✅ Success response
             return ApiResponse.builder()
                     .message("Location saved and employee status updated successfully")
                     .statusCode(HttpStatus.OK.value())
-                    .data(responseData)
+                    .data(Map.of("flag", "success"))
                     .build();
 
         } catch (DateTimeParseException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("error", "Invalid timestamp format. Use ISO format: yyyy-MM-dd'T'HH:mm:ss");
-
             return ApiResponse.builder()
                     .message("Invalid timestamp format")
                     .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .data(error)
+                    .data(Map.of("error", "Invalid timestamp format. Use ISO format: yyyy-MM-dd'T'HH:mm:ss"))
                     .build();
         } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("error", e.getMessage());
-
+            // ⚡ Use e.toString() so you don’t get "error": null
             return ApiResponse.builder()
                     .message("Failed to save location and update employee status")
                     .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                    .data(error)
+                    .data(Map.of("error", e.toString()))
                     .build();
         }
     }
+
 
     @Override
     @Transactional
@@ -976,6 +1051,13 @@ public class AttendanceServiceImpl implements AttendanceService {
     public WffLocationTracking getLatestForUserOne(String userName) {
 
         return locationTrackingRepository.findLatestForUserOne(userName);
+    }
+
+    @Override
+    public List<String> fetchEmployeesUsernames() {
+
+        return employeeRepository.fetchEmployeesUsernames();
+
     }
 
 }

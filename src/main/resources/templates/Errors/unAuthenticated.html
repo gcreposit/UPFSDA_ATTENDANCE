@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>401 Unauthorized</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff4e50, #f9d423);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            font-size: 100px;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .hindi-text {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff4e50;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        a:hover {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hindi-text">आपका पासवर्ड गलत है। कृपया सही पासवर्ड भरें या पासवर्ड भूल विकल्प का उपयोग करें।</div>
+    <h1>401</h1>
+    <h2>Unauthorized Access</h2>
+    <p style="margin-bottom: 20px;">Sorry, you are not authorized to view this page. Please check your login credentials or return to the home page.</p>
+    <a href="/attendance/dashboard" style="margin-top: 10px; display: inline-block;">Go Back Home</a>
+</div>
+</body>
+</html>

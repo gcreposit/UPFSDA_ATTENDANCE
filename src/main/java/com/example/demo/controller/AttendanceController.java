@@ -94,7 +94,7 @@ public class AttendanceController {
         return "attendance/monthly-report"; // Thymeleaf template name
     }
 
-    //Full-Detailed Page For Full Monthly Report
+    // Full-Detailed Page For Full Monthly Report - these are on click based
     @GetMapping("/monthly/details")
     public String showMonthlyCategoryDetailsPage(
             @RequestParam String username,
@@ -119,6 +119,27 @@ public class AttendanceController {
         model.addAttribute("category", category);
 
         return "attendance/detailed-attendance-report"; // Thymeleaf/HTML template
+    }
+
+    //    Monthly Reporting Page - Separate Page With Filters
+    @GetMapping("/monthlyReporting")
+    public String monthlyReporting(Model model) {
+
+        // Decide role dynamically (example: fetch from logged-in user's session or authentication)
+        String username = "MasterAdmin"; // Change to dynamic retrieval later
+        String userRole = username.equals("admin") ? "Administrator" : "employee";
+
+        Map<String, Object> user = getMockUserData(username);
+
+        List<String> employeesUsernames = attendanceService.fetchEmployeesUsernames();
+        model.addAttribute("empUsernames",employeesUsernames);
+
+        model.addAttribute("pageTitle", "Dashboard");
+        model.addAttribute("currentPage", "dashboard");
+        model.addAttribute("user", user);
+        model.addAttribute("userRole", userRole);
+
+        return "attendance/monthlyReporting";
     }
 
     //These pages are Not Currently in Use

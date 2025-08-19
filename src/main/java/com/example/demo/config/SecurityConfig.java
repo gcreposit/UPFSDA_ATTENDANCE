@@ -130,15 +130,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/login", "/api/web/**", "/attendance/**").permitAll()
+                        .requestMatchers("/login", "/api/web/**", "/attendance/**","/error/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/sockjs-node/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)
                 .formLogin(form -> form
-                        .loginPage("/login")
-                        .permitAll()
+                        .loginPage("/login") .permitAll()
+                        .failureUrl("/error/unauthenticated")
+                )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedPage("/error/unauthorised")
                 )
                 .logout(logout -> logout.permitAll())
                 .exceptionHandling(e -> e.defaultAuthenticationEntryPointFor(
