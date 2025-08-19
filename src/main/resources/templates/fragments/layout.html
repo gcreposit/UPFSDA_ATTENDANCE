@@ -22,7 +22,6 @@
 
 <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.13.6/css/jquery.dataTables.min.css" />-->
 
-
     <link th:href="@{/css/dataTables.bootstrap5.min.css}" rel="stylesheet">
 
     <link th:href="@{/css/datatables.css}" rel="stylesheet">
@@ -58,6 +57,7 @@
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
+
             <!--                <li class="nav-item">-->
             <!--                    <a th:href="@{/attendance/projects}" class="nav-link" th:classappend="${currentPage == 'projects'} ? 'active' : ''">-->
             <!--                        <i class="fas fa-project-diagram"></i>-->
@@ -82,6 +82,7 @@
             <!--                        <span class="nav-text">Calendar</span>-->
             <!--                    </a>-->
             <!--                </li>-->
+
             <li class="nav-item">
                 <a th:href="@{/attendance/location-tracking}" class="nav-link"
                    th:classappend="${currentPage == 'location'} ? 'active' : ''">

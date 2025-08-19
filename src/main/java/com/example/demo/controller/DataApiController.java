@@ -908,5 +908,56 @@ public class DataApiController {
         }
     }
 
+    //    Api For Delete Attendance By Username
+    @DeleteMapping("/attendanceDeleteByUsername")
+    public ResponseEntity<ApiResponse> attendanceDeleteByUsername(@RequestParam Long id) {
+
+        try {
+
+            Attendance attendance = attendanceService.attendanceDeleteById(id);
+
+            if (attendance == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        ApiResponse.builder()
+                                .username(String.valueOf(id))
+                                .message("No username found with given username: " + id)
+                                .statusCode(HttpStatus.NOT_FOUND.value())
+                                .data(null)
+                                .build()
+                );
+            }
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .username(String.valueOf(id))
+                            .message("Attendance Deleted successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(attendance)
+                            .build()
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .username(String.valueOf(id))
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error fetching user details")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
 
 }

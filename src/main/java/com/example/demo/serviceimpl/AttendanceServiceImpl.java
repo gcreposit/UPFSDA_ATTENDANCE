@@ -9,6 +9,7 @@ import com.example.demo.repository.EmployeeRepository;
 import com.example.demo.repository.WffLocationTrackingRepository;
 import com.example.demo.repository.WorkTypesRepository;
 import com.example.demo.service.AttendanceService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1059,5 +1060,18 @@ public class AttendanceServiceImpl implements AttendanceService {
         return employeeRepository.fetchEmployeesUsernames();
 
     }
+
+    @Override
+    @Transactional
+    public Attendance attendanceDeleteById(Long id) {
+
+        Attendance attendance = attendanceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Attendance not found with id: " + id));
+
+        attendanceRepository.deleteById(id);
+
+        return attendance; // return the deleted record for confirmation
+    }
+
 
 }

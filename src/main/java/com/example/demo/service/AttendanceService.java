@@ -63,5 +63,7 @@ public interface AttendanceService {
 
     List<String> fetchEmployeesUsernames();
 
+    Attendance attendanceDeleteById(Long id);
+
 
 }

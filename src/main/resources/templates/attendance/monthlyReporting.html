@@ -224,42 +224,53 @@
                 </div>
             </div>
 
-            <div class="report-filters mb-4 flex items-center gap-4">
+            <div class="report-filters mb-4 flex items-center gap-4 text-center">
+
                 <!-- Username Dropdown -->
-                <select id="usernameSelect" class="border rounded px-2 py-1">
-                    <th:block th:each="uname : ${empUsernames}">
-                        <option th:value="${uname}" th:text="${uname}"></option>
-                    </th:block>
-                </select>
+                <label for="usernameSelect" class="flex items-center gap-2">
+                    <span class="font-medium">Username:</span>
+                    <select id="usernameSelect" class="border rounded px-2 py-1">
+                        <th:block th:each="uname : ${empUsernames}">
+                            <option th:value="${uname}" th:text="${uname}"></option>
+                        </th:block>
+                    </select>
+                </label>
 
                 <!-- Month Dropdown -->
-                <select id="monthSelect" class="border rounded px-2 py-1">
-                    <option value="1" th:selected="${#dates.format(#dates.createNow(), 'M') == 1}">January</option>
-                    <option value="2" th:selected="${#dates.format(#dates.createNow(), 'M') == 2}">February</option>
-                    <option value="3" th:selected="${#dates.format(#dates.createNow(), 'M') == 3}">March</option>
-                    <option value="4" th:selected="${#dates.format(#dates.createNow(), 'M') == 4}">April</option>
-                    <option value="5" th:selected="${#dates.format(#dates.createNow(), 'M') == 5}">May</option>
-                    <option value="6" th:selected="${#dates.format(#dates.createNow(), 'M') == 6}">June</option>
-                    <option value="7" th:selected="${#dates.format(#dates.createNow(), 'M') == 7}">July</option>
-                    <option value="8" th:selected="${#dates.format(#dates.createNow(), 'M') == 8}">August</option>
-                    <option value="9" th:selected="${#dates.format(#dates.createNow(), 'M') == 9}">September</option>
-                    <option value="10" th:selected="${#dates.format(#dates.createNow(), 'M') == 10}">October</option>
-                    <option value="11" th:selected="${#dates.format(#dates.createNow(), 'M') == 11}">November</option>
-                    <option value="12" th:selected="${#dates.format(#dates.createNow(), 'M') == 12}">December</option>
-                </select>
+                <label for="monthSelect" class="flex items-center gap-2">
+                    <span class="font-medium">Month:</span>
+                    <select id="monthSelect" class="border rounded px-2 py-1">
+                        <option value="1" th:selected="${#dates.format(#dates.createNow(), 'M') == 1}">January</option>
+                        <option value="2" th:selected="${#dates.format(#dates.createNow(), 'M') == 2}">February</option>
+                        <option value="3" th:selected="${#dates.format(#dates.createNow(), 'M') == 3}">March</option>
+                        <option value="4" th:selected="${#dates.format(#dates.createNow(), 'M') == 4}">April</option>
+                        <option value="5" th:selected="${#dates.format(#dates.createNow(), 'M') == 5}">May</option>
+                        <option value="6" th:selected="${#dates.format(#dates.createNow(), 'M') == 6}">June</option>
+                        <option value="7" th:selected="${#dates.format(#dates.createNow(), 'M') == 7}">July</option>
+                        <option value="8" th:selected="${#dates.format(#dates.createNow(), 'M') == 8}">August</option>
+                        <option value="9" th:selected="${#dates.format(#dates.createNow(), 'M') == 9}">September</option>
+                        <option value="10" th:selected="${#dates.format(#dates.createNow(), 'M') == 10}">October</option>
+                        <option value="11" th:selected="${#dates.format(#dates.createNow(), 'M') == 11}">November</option>
+                        <option value="12" th:selected="${#dates.format(#dates.createNow(), 'M') == 12}">December</option>
+                    </select>
+                </label>
 
                 <!-- Year Dropdown -->
-                <select id="yearSelect" class="border rounded px-2 py-1">
-                    <option th:each="y : ${#numbers.sequence(2020, 2030)}"
-                            th:value="${y}"
-                            th:text="${y}"
-                            th:selected="${y == #dates.format(#dates.createNow(), 'yyyy')}">
-                    </option>
-                </select>
+                <label for="yearSelect" class="flex items-center gap-2">
+                    <span class="font-medium">Year:</span>
+                    <select id="yearSelect" class="border rounded px-2 py-1">
+                        <option th:each="y : ${#numbers.sequence(2020, 2030)}"
+                                th:value="${y}"
+                                th:text="${y}"
+                                th:selected="${y == #dates.format(#dates.createNow(), 'yyyy')}">
+                        </option>
+                    </select>
+                </label>
 
                 <!-- Show Report Button -->
                 <button id="showReportBtn" class="bg-primary px-4 py-1 rounded">Show Report</button>
             </div>
+
 
             <!-- Cards section (replaces the Table section) -->
             <div class="dashboard-main">
@@ -413,11 +424,20 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         const username = document.getElementById('usernameSelect').value;
-        const month = document.getElementById('monthSelect').value;
-        const year = document.getElementById('yearSelect').value;
 
-        fetchMonthlyReport(username, month, year);
+        // Get current date on client
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1; // JS months are 0-based
+        const currentYear = now.getFullYear();
+
+        // Set dropdowns to current month/year
+        document.getElementById('monthSelect').value = currentMonth;
+        document.getElementById('yearSelect').value = currentYear;
+
+        // Fetch report with current date
+        fetchMonthlyReport(username, currentMonth, currentYear);
     });
+
 </script>
 
 </body>
