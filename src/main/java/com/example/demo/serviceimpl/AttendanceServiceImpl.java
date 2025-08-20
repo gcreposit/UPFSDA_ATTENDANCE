@@ -438,6 +438,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         if (employee == null) {
             Map<String, Object> response = new HashMap<>();
             response.put("flag", "error");
+            response.put("statusCode", "404");
             response.put("message", "Username not found");
             return response;
         }
@@ -521,6 +522,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         // Step 8: Prepare final response
         Map<String, Object> response = new HashMap<>();
         response.put("flag", "success");
+        response.put("statusCode", "200");
         response.put("message", "Monthly attendance summary retrieved successfully");
         response.put("data", data);
 
