@@ -981,6 +981,7 @@ function showLocationDetail(timestampISO) {
     if (!modalEl || !content) return;
 
     const historyItem = locationHistory.find(h => h.timestamp.toISOString() === timestampISO);
+
     if (!historyItem) return;
 
     const lat = historyItem.location?.lat;
@@ -991,9 +992,9 @@ function showLocationDetail(timestampISO) {
       <h6>Location Details</h6>
       <div class="row">
         <div class="col-md-6">
+          <strong>Username:</strong> ${historyItem.username || 'N/A'}
           <strong>Timestamp:</strong> ${formatDateTime(historyItem.timestamp)}<br>
           <strong>Status:</strong> ${historyItem.isActive ? 'Active' : 'Offline'}<br>
-          <strong>Session ID:</strong> ${historyItem.sessionId || 'N/A'}
         </div>
         <div class="col-md-6">
           <strong>Latitude:</strong> ${typeof lat === 'number' ? lat.toFixed(6) : 'N/A'}<br>

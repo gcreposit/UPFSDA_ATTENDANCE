@@ -2,12 +2,12 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Employee;
+import com.example.demo.entity.WorkTypes;
 import com.example.demo.service.AttendanceService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 
@@ -125,21 +125,79 @@ public class AttendanceController {
     @GetMapping("/monthlyReporting")
     public String monthlyReporting(Model model) {
 
-        // Decide role dynamically (example: fetch from logged-in user's session or authentication)
+        // Decide a role dynamically (example: fetch from logged-in user's session or authentication)
         String username = "MasterAdmin"; // Change to dynamic retrieval later
         String userRole = username.equals("admin") ? "Administrator" : "employee";
 
         Map<String, Object> user = getMockUserData(username);
 
         List<String> employeesUsernames = attendanceService.fetchEmployeesUsernames();
-        model.addAttribute("empUsernames",employeesUsernames);
+        model.addAttribute("empUsernames", employeesUsernames);
 
-        model.addAttribute("pageTitle", "Dashboard");
-        model.addAttribute("currentPage", "dashboard");
+        model.addAttribute("pageTitle", "Monthly Reporting");
+        model.addAttribute("currentPage", "reporting");
         model.addAttribute("user", user);
         model.addAttribute("userRole", userRole);
 
         return "attendance/monthlyReporting";
+    }
+
+    //    Management Section
+    @GetMapping("/management")
+    public String management(Model model) {
+
+        String usernames = "MasterAdmin"; // Change to dynamic retrieval later
+        String userRole = usernames.equals("admin") ? "Administrator" : "employee";
+
+        Map<String, Object> user = getMockUserData(usernames);
+
+        List<WorkTypes> workTypes = attendanceService.fetchWorkTypes();
+        model.addAttribute("workTypes", workTypes);
+
+        model.addAttribute("pageTitle", "Management");
+        model.addAttribute("currentPage", "management");
+        model.addAttribute("user", user);
+        model.addAttribute("userRole", userRole);
+
+        return "management/management"; // Thymeleaf template name
+    }
+
+    //   Create New Work Types
+    @PostMapping("/management/work-types/add")
+    public String createNewWorkTypes(@ModelAttribute WorkTypes workTypes, RedirectAttributes redirectAttributes, Model model) {
+
+        String usernames = "MasterAdmin"; // Change to dynamic retrieval later
+        String userRole = usernames.equals("admin") ? "Administrator" : "employee";
+
+        Map<String, Object> user = getMockUserData(usernames);
+
+        String message = attendanceService.createNewWorkType(workTypes);
+//        redirectAttributes.addFlashAttribute("message",message);
+
+        model.addAttribute("pageTitle", "Management");
+        model.addAttribute("currentPage", "management");
+        model.addAttribute("user", user);
+        model.addAttribute("userRole", userRole);
+
+        return "redirect:/attendance/management"; // Thymeleaf template name
+    }
+
+    // Update Work Type
+    @PostMapping("/management/work-types/edit/{id}")
+    public String updateWorkType(@PathVariable Long id, @ModelAttribute WorkTypes workTypes) {
+
+        attendanceService.updateWorkType(id, workTypes);
+
+        return "redirect:/attendance/management";
+    }
+
+    // Delete Work Type
+    @PostMapping("/management/work-types/delete/{id}")
+    public String deleteWorkType(@PathVariable Long id) {
+
+        attendanceService.deleteWorkType(id);
+
+        return "redirect:/attendance/management"; // Thymeleaf template name
     }
 
     //These pages are Not Currently in Use

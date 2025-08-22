@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}">
+    <title>Work Types Management - UPFSDA Attendance System</title>
+</head>
+
+<body>
+<nav th:replace="~{fragments/layout :: sidebar}"></nav>
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main class="main-content">
+    <div class="dashboard-grid-admin">
+        <div class="dashboard-center">
+
+            <!-- Add Work Type Form -->
+            <div class="card">
+                <h5><i class="fas fa-briefcase mb-2"></i> Manage Work Types</h5>
+                <form th:action="@{/attendance/management/work-types/add}" method="post" class="form-inline">
+                    <input type="text" name="workType" class="form-control" placeholder="Enter new work type" required>
+                    <button type="submit" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                </form>
+            </div>
+
+            <!-- Work Types Table -->
+            <div class="card">
+                <h5><i class="fas fa-list mb-3"></i> Existing Work Types</h5>
+                <table id="workTypesTable" class="table table-bordered display nowrap" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th hidden>ID</th>
+                        <th>Work Type</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="workType : ${workTypes}">
+                        <td hidden th:text="${workType.id}"></td>
+                        <td th:text="${workType.workType}"></td>
+                        <td>
+                            <div style="display:inline-flex; gap:6px; align-items:center;">
+                                <!-- Edit button opens modal -->
+                                <button type="button" class="btn btn-warning btn-sm"
+                                        data-bs-toggle="modal"
+                                        th:attr="data-bs-target='#editModal_' + ${workType.id}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+
+                                <!-- Delete button -->
+                                <form th:action="@{/attendance/management/work-types/delete/{id}(id=${workType.id})}"
+                                      method="post" th:onsubmit="return confirm('Are you sure?')"
+                                      style="margin:0;">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div th:each="workType : ${workTypes}">
+    <div class="modal fade" th:id="'editModal_' + ${workType.id}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/attendance/management/work-types/edit/{id}(id=${workType.id})}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Work Type</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" name="workType" th:value="${workType.workType}" class="form-control"
+                               required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

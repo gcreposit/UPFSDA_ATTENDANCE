@@ -4,6 +4,7 @@ import com.example.demo.dto.ApiResponse;
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Employee;
 import com.example.demo.entity.WffLocationTracking;
+import com.example.demo.entity.WorkTypes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -65,5 +66,12 @@ public interface AttendanceService {
 
     Attendance attendanceDeleteById(Long id);
 
+    List<WorkTypes> fetchWorkTypes();
+
+    String createNewWorkType(WorkTypes workTypes);
+
+    void deleteWorkType(Long id);
+
+    WorkTypes updateWorkType(Long id, WorkTypes workTypes);
 
 }

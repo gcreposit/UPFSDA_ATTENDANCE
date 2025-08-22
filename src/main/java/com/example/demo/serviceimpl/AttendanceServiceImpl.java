@@ -4,6 +4,7 @@ import com.example.demo.dto.ApiResponse;
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Employee;
 import com.example.demo.entity.WffLocationTracking;
+import com.example.demo.entity.WorkTypes;
 import com.example.demo.repository.AttendanceRepository;
 import com.example.demo.repository.EmployeeRepository;
 import com.example.demo.repository.WffLocationTrackingRepository;
@@ -15,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +28,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Service
@@ -1075,5 +1074,46 @@ public class AttendanceServiceImpl implements AttendanceService {
         return attendance; // return the deleted record for confirmation
     }
 
+    @Override
+    public List<WorkTypes> fetchWorkTypes() {
+
+        return workTypesRepository.findAll();
+
+    }
+
+    @Override
+    public String createNewWorkType(WorkTypes workTypes) {
+
+        try {
+            workTypesRepository.save(workTypes);
+            return "Work type created successfully!";
+        } catch (Exception e) {
+            e.printStackTrace(); // log for debugging
+            return "Error while creating work type: " + e.getMessage();
+        }
+    }
+
+    @Override
+    public void deleteWorkType(Long id) {
+
+        if (!workTypesRepository.existsById(id)) {
+            throw new RuntimeException("Work type not found with id: " + id);
+        }
+        workTypesRepository.deleteById(id);
+    }
+
+    @Override
+    public WorkTypes updateWorkType(Long id, WorkTypes updatedWorkType) {
+
+        Optional<WorkTypes> optional = workTypesRepository.findById(id);
+
+        if (optional.isPresent()) {
+            WorkTypes existing = optional.get();
+            existing.setWorkType(updatedWorkType.getWorkType());
+            return workTypesRepository.save(existing);
+        } else {
+            throw new RuntimeException("Work type not found with id: " + id);
+        }
+    }
 
 }
