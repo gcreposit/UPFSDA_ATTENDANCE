@@ -1,20 +1,15 @@
 package com.example.demo.serviceimpl;
 
 import com.example.demo.dto.ApiResponse;
-import com.example.demo.entity.Attendance;
-import com.example.demo.entity.Employee;
-import com.example.demo.entity.WffLocationTracking;
-import com.example.demo.entity.WorkTypes;
-import com.example.demo.repository.AttendanceRepository;
-import com.example.demo.repository.EmployeeRepository;
-import com.example.demo.repository.WffLocationTrackingRepository;
-import com.example.demo.repository.WorkTypesRepository;
+import com.example.demo.entity.*;
+import com.example.demo.repository.*;
 import com.example.demo.service.AttendanceService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +49,8 @@ public class AttendanceServiceImpl implements AttendanceService {
     private WorkTypesRepository workTypesRepository;
 
     @Autowired
-    private AttendanceService attendanceService;
+    private HolidayRepository holidayRepository;
+
 
     private final LocationEventPublisher publisher;
 
@@ -1114,6 +1110,49 @@ public class AttendanceServiceImpl implements AttendanceService {
         } else {
             throw new RuntimeException("Work type not found with id: " + id);
         }
+    }
+
+    @Override
+    public Holidays saveHoliday(Holidays holiday) {
+
+        try {
+            return holidayRepository.save(holiday);
+        } catch (DataIntegrityViolationException ex) {
+            // Example: duplicate holiday_date (unique constraint violated)
+            throw new RuntimeException("Holiday already exists for date: " + holiday.getHolidayDate(), ex);
+        } catch (Exception ex) {
+            // Catch all other exceptions
+            throw new RuntimeException("Failed to save holiday. Please try again.", ex);
+        }
+    }
+
+    @Override
+    public List<Holidays> fetchAllHolidays() {
+
+        return holidayRepository.findAll();
+
+    }
+
+    @Override
+    public Holidays updateHoliday(Long id, Holidays holiday) {
+
+        return holidayRepository.findById(id).map(existing -> {
+            existing.setName(holiday.getName());
+            existing.setDescription(holiday.getDescription());
+            existing.setHolidayDate(holiday.getHolidayDate());
+            return holidayRepository.save(existing);
+        }).orElseThrow(() -> new RuntimeException("Holiday not found with id " + id));
+
+    }
+
+    @Override
+    public void deleteHoliday(Long id) {
+
+        if (!holidayRepository.existsById(id)) {
+            throw new RuntimeException("Holiday not found with id " + id);
+        }
+        holidayRepository.deleteById(id);
+
     }
 
 }

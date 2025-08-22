@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Employee;
+import com.example.demo.entity.Holidays;
 import com.example.demo.entity.WorkTypes;
 import com.example.demo.service.AttendanceService;
 import org.springframework.stereotype.Controller;
@@ -153,6 +154,9 @@ public class AttendanceController {
 
         List<WorkTypes> workTypes = attendanceService.fetchWorkTypes();
         model.addAttribute("workTypes", workTypes);
+
+        List<Holidays> holidays = attendanceService.fetchAllHolidays();
+        model.addAttribute("holidays", holidays);
 
         model.addAttribute("pageTitle", "Management");
         model.addAttribute("currentPage", "management");

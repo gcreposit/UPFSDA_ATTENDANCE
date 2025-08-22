@@ -6,6 +6,7 @@ import com.example.demo.dto.EmployeeResponse;
 import com.example.demo.dto.ErrorResponse;
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Employee;
+import com.example.demo.entity.Holidays;
 import com.example.demo.entity.WffLocationTracking;
 import com.example.demo.service.AttendanceService;
 import com.example.demo.service.EmployeeService;
@@ -960,6 +961,32 @@ public class DataApiController {
                             .build()
             );
         }
+    }
+
+    // CREATE Holiday
+    @PostMapping("/createHolidays")
+    public Holidays saveHoliday(@RequestBody Holidays holiday) {
+
+        return attendanceService.saveHoliday(holiday);
+
+    }
+
+    // UPDATE Holiday
+    @PutMapping("/updateHoliday/{id}")
+    public ResponseEntity<Holidays> updateHoliday(@PathVariable Long id, @RequestBody Holidays holiday) {
+
+        Holidays updated = attendanceService.updateHoliday(id, holiday);
+
+        return ResponseEntity.ok(updated);
+    }
+
+    // DELETE Holiday
+    @DeleteMapping("/deleteHoliday/{id}")
+    public ResponseEntity<Void> deleteHoliday(@PathVariable Long id) {
+
+        attendanceService.deleteHoliday(id);
+
+        return ResponseEntity.noContent().build();
     }
 
 }
