@@ -3,7 +3,6 @@
 <head th:replace="~{fragments/layout :: head}">
     <title>Work Types Management - UPFSDA Attendance System</title>
 </head>
-
 <body>
 <nav th:replace="~{fragments/layout :: sidebar}"></nav>
 <header th:replace="~{fragments/layout :: header}"></header>
@@ -63,6 +62,39 @@
                 </table>
             </div>
 
+            <!--Office Timing Maintenance Table -->
+            <div class="card">
+                <h5><i class="fas fa-list mb-3"></i> Existing Office Timing</h5>
+                <table id="officeTimeTable" class="table table-bordered display nowrap" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th hidden>ID</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="officeTime : ${officeTiming}">
+                        <td hidden th:text="${officeTime.id}"></td>
+                        <td th:text="${officeTime.startTime}"></td>
+                        <td th:text="${officeTime.endTime}"></td>
+                        <td>
+                            <div style="display:inline-flex; gap:6px; align-items:center;">
+                                <!-- Edit button opens modal -->
+                                <button type="button" class="btn btn-warning btn-sm"
+                                        data-bs-toggle="modal"
+                                        th:attr="data-bs-target='#editModal1_' + ${officeTime.id}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!--            Holiday Maintenance-->
             <div class="card">
                 <div class="dashboard-right">
                     <h5 class="mb-3"><i class="fas fa-calendar-alt"></i> Holiday Maintenance</h5>
@@ -81,6 +113,42 @@
         </div>
     </div>
 </main>
+
+<!--Modal For Office Time Update-->
+<div th:each="officeTime : ${officeTiming}">
+    <div class="modal fade" th:id="'editModal1_' + ${officeTime.id}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/attendance/management/office-time/edit/{id}(id=${officeTime.id})}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Office Time</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="startTime" class="form-label">Start Time</label>
+                            <input type="time" id="startTime" name="startTime"
+                                   th:value="${officeTime.startTime}" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="endTime" class="form-label">End Time</label>
+                            <input type="time" id="endTime" name="endTime"
+                                   th:value="${officeTime.endTime}" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 <!--Modal For Work Type Update-->
 <div th:each="workType : ${workTypes}">
@@ -106,41 +174,6 @@
     </div>
 </div>
 
-<!-- Holiday Modal -->
-<!--<div class="modal fade" id="holidayModal" tabindex="-1" aria-hidden="true">-->
-<!--    <div class="modal-dialog">-->
-<!--        <form id="holidayForm" class="modal-content">-->
-<!--            <div class="modal-header">-->
-<!--                <h5 class="modal-title">Add Holiday</h5>-->
-<!--                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>-->
-<!--            </div>-->
-
-<!--            <div class="modal-body">-->
-<!--                <div class="mb-3">-->
-<!--                    <label for="holiday_date" class="form-label">Date</label>-->
-<!--                    <input type="text" class="form-control" id="holiday_date" name="holiday_date" readonly>-->
-<!--                </div>-->
-
-<!--                <div class="mb-3">-->
-<!--                    <label for="name" class="form-label">Holiday Name</label>-->
-<!--                    <input type="text" class="form-control" id="name" name="name" required>-->
-<!--                </div>-->
-
-<!--                <div class="mb-3">-->
-<!--                    <label for="description" class="form-label">Description</label>-->
-<!--                    <textarea class="form-control" id="description" name="description"></textarea>-->
-<!--                </div>-->
-<!--            </div>-->
-
-<!--            <div class="modal-footer">-->
-<!--                <button type="submit" class="btn btn-primary">Save Holiday</button>-->
-<!--                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>-->
-<!--            </div>-->
-<!--        </form>-->
-<!--    </div>-->
-<!--</div>-->
-
-
 <div class="modal fade" id="holidayModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -163,7 +196,6 @@
         </div>
     </div>
 </div>
-
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 <div th:replace="~{fragments/layout :: scripts}"></div>

@@ -1,9 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Attendance;
-import com.example.demo.entity.Employee;
-import com.example.demo.entity.Holidays;
-import com.example.demo.entity.WorkTypes;
+import com.example.demo.entity.*;
 import com.example.demo.service.AttendanceService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -158,6 +155,9 @@ public class AttendanceController {
         List<Holidays> holidays = attendanceService.fetchAllHolidays();
         model.addAttribute("holidays", holidays);
 
+        List<OfficeTime> officeTiming = attendanceService.fetchAllOfficeTiming();
+        model.addAttribute("officeTiming",officeTiming);
+
         model.addAttribute("pageTitle", "Management");
         model.addAttribute("currentPage", "management");
         model.addAttribute("user", user);
@@ -202,6 +202,15 @@ public class AttendanceController {
         attendanceService.deleteWorkType(id);
 
         return "redirect:/attendance/management"; // Thymeleaf template name
+    }
+
+    // Update Office Time
+    @PostMapping("/management/office-time/edit/{id}")
+    public String updateOfficeTime(@PathVariable Long id, @ModelAttribute OfficeTime officeTime) {
+
+        attendanceService.updateOfficeTime(id, officeTime);
+
+        return "redirect:/attendance/management";
     }
 
     //These pages are Not Currently in Use

@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -836,6 +837,7 @@ public class DataApiController {
     public List<Employee> employeesDetails() {
 
         return employeeService.findAllEmployeeDetails();
+
     }
 
     //    Api for Location History
@@ -851,6 +853,7 @@ public class DataApiController {
         final LocalDateTime fromTs = (from != null) ? from : toTs.minusHours(24);
 
         if (userName != null && !userName.isBlank()) {
+
             return attendanceService.getHistoryForUser(userName, fromTs, toTs);
         }
         return attendanceService.getHistory(fromTs, toTs);

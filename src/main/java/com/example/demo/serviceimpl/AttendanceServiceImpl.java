@@ -51,6 +51,8 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Autowired
     private HolidayRepository holidayRepository;
 
+    @Autowired
+    private OfficeTimeRepository officeTimeRepository;
 
     private final LocationEventPublisher publisher;
 
@@ -1153,6 +1155,24 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
         holidayRepository.deleteById(id);
 
+    }
+
+    @Override
+    public List<OfficeTime> fetchAllOfficeTiming() {
+
+        return officeTimeRepository.findAll();
+
+    }
+
+    @Override
+    public void updateOfficeTime(Long id, OfficeTime officeTime) {
+        officeTimeRepository.findById(id)
+                .map(existing -> {
+                    existing.setStartTime(officeTime.getStartTime());
+                    existing.setEndTime(officeTime.getEndTime());
+                    return officeTimeRepository.save(existing);
+                })
+                .orElseThrow(() -> new RuntimeException("Office Time not found with id " + id));
     }
 
 }

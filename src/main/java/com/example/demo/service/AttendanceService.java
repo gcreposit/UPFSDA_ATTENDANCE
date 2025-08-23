@@ -79,5 +79,9 @@ public interface AttendanceService {
 
     void deleteHoliday(Long id);
 
+    List<OfficeTime> fetchAllOfficeTiming();
+
+    void updateOfficeTime(Long id, OfficeTime officeTime);
+
 
 }

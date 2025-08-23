@@ -16,7 +16,6 @@ let watchId = null;
 let mockUsers = [];       // [{ id, username, name, isActive, distanceTraveled, currentLocation, lastSeen, sessionStart }]
 let locationHistory = []; // [{ username, location:{lat,lng}, isActive, timestamp:Date, sessionId }]
 
-
 let stompClient;
 let reconnectTimer = null;
 
@@ -28,7 +27,7 @@ function connectLiveSocket() {
     // quiet logs (optional)
     stompClient.debug = null;
 
-    // IMPORTANT: set heartbeat BEFORE connect
+    // IMPORTANT: set heartbeat BEFORE connecting
     stompClient.heartbeat.outgoing = 10000; // client -> broker
     stompClient.heartbeat.incoming = 10000; // broker -> client
 
@@ -155,7 +154,7 @@ window.initMap = initializeLocationTracking;
 /* ========================
    Utilities (IDs / names / formatting)
 ======================== */
-const DEFAULT_CENTER = {lat: 26.8467, lng: 80.9462}; // Lucknow
+const DEFAULT_CENTER = {lat: 26.8883, lng: 80.9370}; // Lucknow
 
 function userId(u) {
     // A stable key for users across the app
@@ -253,7 +252,7 @@ function initializeMap() {
 
     // Add a static marker for Lucknow
     const lucknowMarker = new google.maps.Marker({
-        position: DEFAULT_CENTER, map, title: 'Lucknow, India', icon: {
+        position: DEFAULT_CENTER, map, title: 'Commissionarate of Food Safety and Drug Administration,Lucknow', icon: {
             url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
         <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
           <circle cx="16" cy="16" r="12" fill="#ff6b35" stroke="#fff" stroke-width="3"/>
@@ -266,10 +265,10 @@ function initializeMap() {
     const infoWindow = new google.maps.InfoWindow({
         content: `
       <div class="marker-info">
-        <h6>Lucknow, India</h6>
-        <p><strong>Default Location</strong></p>
-        <p>Latitude: 26.8467</p>
-        <p>Longitude: 80.9462</p>
+        <h6>Commissionarate of Food Safety and Drug Administration</h6>
+        <p><strong>Office Location</strong></p>
+        <p>Latitude: 26.8883</p>
+        <p>Longitude: 80.9370</p>
       </div>
     `
     });
@@ -318,8 +317,7 @@ async function loadMockData() {
             username: item.userName,
             location: item.location ?? ((item.lat != null && item.lon != null) ? {lat: item.lat, lng: item.lon} : null),
             timestamp: new Date(item.timestamp),
-            isActive: item.isActive ?? false,      // backend may not have this – fine
-            sessionId: item.sessionId ?? undefined // optional
+            isActive: item.isActive ?? false,
         })).filter(h => h.location && !isNaN(h.timestamp?.getTime?.()));
 
         // 3) Latest per user (for “historyMarkers” on first render)
@@ -775,8 +773,13 @@ async function updateLocationHistory() {
     const hours = {'24h': 24, '7d': 7 * 24, '30d': 30 * 24}[key] || 24;
 
     try {
-        const to = new Date();
-        const from = new Date(to.getTime() - hours * 60 * 60 * 1000);
+        const now = new Date();
+
+        // Start of today (00:00:00)
+        const from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        // End of today (23:59:59)
+        const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
         const url = `/api/data/location-history?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`;
         const resp = await fetch(url);
@@ -853,7 +856,7 @@ function centerMap() {
         const me = findUserById(currentUser);
         if (me?.currentLocation) {
             map.setCenter(me.currentLocation);
-            map.setZoom(15);
+            map.setZoom(12);
         }
     } else {
         const bounds = new google.maps.LatLngBounds();
@@ -883,7 +886,7 @@ function focusOnUser(uid) {
     const u = findUserById(uid);
     if (u?.currentLocation) {
         map.setCenter(u.currentLocation);
-        map.setZoom(15);
+        map.setZoom(12);
 
         const marker = userMarkers[uid] || historyMarkers[uid] || markers[uid];
         if (marker) google.maps.event.trigger(marker, 'click');
@@ -905,18 +908,18 @@ function viewUserHistory(uid) {
 }
 
 async function showUserPath(uid) {
+
     // Clear existing paths
     Object.values(userPaths).forEach(p => p.setMap(null));
     userPaths = {};
 
-    // Get current filter window
-    const key = document.getElementById('historyTimeFilter')?.value || '24h';
-    const hours = {'24h': 24, '7d': 7 * 24, '30d': 30 * 24}[key] || 24;
-    const to = new Date();
-    const from = new Date(to.getTime() - hours * 60 * 60 * 1000);
+    const now = new Date();
+    const from = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0); // today 00:00 local
+    const to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);  // today 23:59 local
 
     // Fetch this user's points from backend
     const url = `/api/data/location-history?userName=${encodeURIComponent(uid)}&from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`;
+
     const resp = await fetch(url);
     if (!resp.ok) {
         showNotification('Error', 'Failed to load user path', 'error');
@@ -924,15 +927,17 @@ async function showUserPath(uid) {
     }
     const data = await resp.json();
 
+    // Build a coordinates array
     const coords = data
         .map(p => p.location || (p.lat != null && p.lon != null ? {lat: p.lat, lng: p.lon} : null))
         .filter(Boolean);
 
     if (!coords.length) {
-        showNotification('Info', 'No points in this window', 'info');
+        showNotification('Info', 'No points in the last 24 hours', 'info');
         return;
     }
 
+    // Draw polyline
     const poly = new google.maps.Polyline({
         path: coords,
         geodesic: true,
@@ -943,7 +948,7 @@ async function showUserPath(uid) {
     poly.setMap(map);
     userPaths[uid] = poly;
 
-    // Fit bounds to this path
+    // Fit map bounds to this path
     const bounds = new google.maps.LatLngBounds();
     coords.forEach(c => bounds.extend(c));
     map.fitBounds(bounds);
@@ -956,20 +961,6 @@ window.addEventListener('beforeunload', () => {
     } catch {
     }
 });
-
-function generateMockPath(startLocation) {
-    const base = startLocation || DEFAULT_CENTER;
-    const path = [base];
-    let currentLat = base.lat;
-    let currentLng = base.lng;
-
-    for (let i = 0; i < 20; i++) {
-        currentLat += (Math.random() - 0.5) * 0.01;
-        currentLng += (Math.random() - 0.5) * 0.01;
-        path.push({lat: currentLat, lng: currentLng});
-    }
-    return path;
-}
 
 function setMarkersVisible(collection, visible) {
     Object.values(collection).forEach(m => m && m.setMap(visible ? map : null));
