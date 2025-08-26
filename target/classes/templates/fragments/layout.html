@@ -42,10 +42,11 @@
 <!-- Sidebar Fragment -->
 <nav th:fragment="sidebar" class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <a href="/attendance/dashboard" class="logo text-decoration-none">
-            <i class="fas fa-clock text-warning"></i>
-            <span class="logo-text">UPFSDA</span>
+        <a href="/attendance/dashboard" class="logo text-decoration-none d-flex align-items-center">
+            <img src="/images/fdalogo.png" alt="UPFSDA Logo" style="width:40px; height:40px; object-fit:contain; margin-right:8px;">
+            <span class="logo-text" style="font-weight:bold; font-size:18px;">UPFSDA - AI</span>
         </a>
+
         <button class="sidebar-toggle" id="sidebarToggle">
             <i class="fas fa-bars"></i>
         </button>
@@ -98,6 +99,13 @@
                    th:classappend="${currentPage == 'reporting'} ? 'active' : ''">
                     <i class="fas fa-chart-bar"></i>
                     <span class="nav-text">Monthly Reporting</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/attendance/filterWiseReporting}" class="nav-link"
+                   th:classappend="${currentPage == 'filterReporting'} ? 'active' : ''">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-text">Filter Reporting</span>
                 </a>
             </li>
             <li class="nav-item">

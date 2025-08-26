@@ -1175,4 +1175,29 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .orElseThrow(() -> new RuntimeException("Office Time not found with id " + id));
     }
 
+    @Override
+    public Map<String, Object> getAttendanceByFilters(String officeName, String district,
+                                                      LocalDate startDate, LocalDate endDate) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // Call repository to fetch filtered data
+            List<Attendance> records = attendanceRepository.findAttendanceByFilters(officeName, district, startDate, endDate);
+
+            if (records.isEmpty()) {
+                response.put("flag", "error");
+                response.put("message", "No attendance records found for given filters");
+                response.put("data", null);
+            } else {
+                response.put("flag", "success");
+                response.put("message", "Filtered attendance fetched successfully");
+                response.put("data", records);
+            }
+        } catch (Exception e) {
+            response.put("flag", "error");
+            response.put("message", "Failed to fetch filtered attendance: " + e.getMessage());
+            response.put("data", null);
+        }
+        return response;
+    }
+
 }

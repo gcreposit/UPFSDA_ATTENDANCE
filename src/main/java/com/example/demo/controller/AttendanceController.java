@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.*;
 import com.example.demo.service.AttendanceService;
+import com.example.demo.service.EmployeeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +16,11 @@ public class AttendanceController {
 
     private final AttendanceService attendanceService;
 
-    public AttendanceController(AttendanceService attendanceService) {
+    private final EmployeeService employeeService;
+
+    public AttendanceController(AttendanceService attendanceService, EmployeeService employeeService) {
         this.attendanceService = attendanceService;
+        this.employeeService = employeeService;
     }
 
     //    Dashboard Page
@@ -164,6 +168,28 @@ public class AttendanceController {
         model.addAttribute("userRole", userRole);
 
         return "management/management"; // Thymeleaf template name
+    }
+
+    @GetMapping("/filterWiseReporting")
+    public String filterWiseReporting(Model model) {
+
+        String usernames = "MasterAdmin"; // Change to dynamic retrieval later
+        String userRole = usernames.equals("admin") ? "Administrator" : "employee";
+
+        Map<String, Object> user = getMockUserData(usernames);
+
+        List<String> districts = attendanceService.getDistricts();
+        model.addAttribute("districts",districts);
+
+        List<String> officeNames = employeeService.getOfficeNames();
+        model.addAttribute("officeNames",officeNames);
+
+        model.addAttribute("pageTitle", "Management");
+        model.addAttribute("currentPage", "filterReporting");
+        model.addAttribute("user", user);
+        model.addAttribute("userRole", userRole);
+
+        return "attendance/filterWiseReporting"; // Thymeleaf template name
     }
 
     //   Create New Work Types

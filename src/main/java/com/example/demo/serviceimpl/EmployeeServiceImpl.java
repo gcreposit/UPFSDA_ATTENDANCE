@@ -156,6 +156,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepository.saveAndFlush(existing);
     }
 
+    @Override
+    public List<String> getOfficeNames() {
+
+        return employeeRepository.findAllOfficeNames();
+
+    }
+
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();

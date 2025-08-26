@@ -1,9 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.ApiResponse;
-import com.example.demo.dto.EmployeeRequest;
-import com.example.demo.dto.EmployeeResponse;
-import com.example.demo.dto.ErrorResponse;
+import com.example.demo.dto.*;
 import com.example.demo.entity.Attendance;
 import com.example.demo.entity.Employee;
 import com.example.demo.entity.Holidays;
@@ -29,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -990,6 +988,53 @@ public class DataApiController {
         attendanceService.deleteHoliday(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+//    Filter Wise Attendance Report
+
+    // API for Attendance Filter by Office, District, and Date Range
+    @PostMapping(path = "/attendance/filter")
+    public ResponseEntity<ApiResponse> getAttendanceByFilters(
+            @RequestParam String officeName,
+            @RequestParam String district,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        try {
+            Map<String, Object> details = attendanceService.getAttendanceByFilters(
+                    officeName, district, startDate, endDate
+            );
+
+            if ("error".equals(details.get("flag"))) {
+                return ResponseEntity.badRequest().body(
+                        ApiResponse.builder()
+                                .message((String) details.get("message"))
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .data(null)
+                                .build()
+                );
+            }
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message((String) details.get("message"))
+                            .statusCode(HttpStatus.OK.value())
+                            .data(details.get("data"))
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error fetching filtered attendance")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
     }
 
 }

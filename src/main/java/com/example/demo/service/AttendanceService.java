@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -83,5 +84,6 @@ public interface AttendanceService {
 
     void updateOfficeTime(Long id, OfficeTime officeTime);
 
+    Map<String, Object> getAttendanceByFilters(String officeName, String district, LocalDate startDate, LocalDate endDate);
 
 }

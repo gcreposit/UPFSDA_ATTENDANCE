@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head}">
+    <title>Admin Dashboard - UPFSDA Attendance System</title>
+
+    <!-- Include DataTables CSS -->
+    <link th:href="@{/webjars/datatables/1.13.6/css/jquery.dataTables.min.css}" rel="stylesheet"/>
+    <!-- If you want responsive -->
+    <link th:href="@{/webjars/datatables-responsive/2.5.0/css/responsive.dataTables.min.css}" rel="stylesheet"/>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .stat-card {
+            position: relative;
+            border-radius: 16px;
+            padding: 18px 18px 18px 72px;
+            background: linear-gradient(180deg, #ffffff, #fafafa);
+            box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06), 0 2px 8px rgba(16, 24, 40, 0.04);
+            transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+            cursor: pointer;
+            overflow: hidden;
+            min-height: 96px;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 32px rgba(16, 24, 40, 0.10), 0 4px 12px rgba(16, 24, 40, 0.06);
+            background: linear-gradient(180deg, #ffffff, #f7f7f7);
+        }
+
+        .stat-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #f3f4f6;
+        }
+
+        .stat-title {
+            font-weight: 600;
+            color: #344054;
+            font-size: 14px;
+            letter-spacing: .2px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        /* Category accents */
+        .accent-on_time .stat-icon {
+            background: #e6f9ef;
+        }
+
+        .accent-on_time .stat-icon i {
+            color: #10b981;
+        }
+
+        .accent-late_entry .stat-icon {
+            background: #fff4e5;
+        }
+
+        .accent-late_entry .stat-icon i {
+            color: #f59e0b;
+        }
+
+        .accent-late_and_half .stat-icon {
+            background: #fef3f2;
+        }
+
+        .accent-late_and_half .stat-icon i {
+            color: #f97316;
+        }
+
+        .accent-half_day .stat-icon {
+            background: #fff1f2;
+        }
+
+        .accent-half_day .stat-icon i {
+            color: #ec4899;
+        }
+
+        .accent-absent .stat-icon {
+            background: #fef2f2;
+        }
+
+        .accent-absent .stat-icon i {
+            color: #ef4444;
+        }
+
+        .accent-wfh .stat-icon {
+            background: #eef2ff;
+        }
+
+        .accent-wfh .stat-icon i {
+            color: #6366f1;
+        }
+
+        .accent-wfo .stat-icon {
+            background: #e0f2fe;
+        }
+
+        .accent-wfo .stat-icon i {
+            color: #0ea5e9;
+        }
+
+        .accent-wff .stat-icon {
+            background: #ecfeff;
+        }
+
+        .accent-wff .stat-icon i {
+            color: #06b6d4;
+        }
+
+        .accent-total .stat-icon {
+            background: #f1f5f9;
+        }
+
+        .accent-total .stat-icon i {
+            color: #334155;
+        }
+
+        .stat-footer {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-link {
+            color: #2563eb;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .stat-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Skeletons */
+        .skeleton {
+            background: linear-gradient(90deg, #f4f4f5 25%, #eceef1 37%, #f4f4f5 63%);
+            background-size: 400% 100%;
+            animation: shimmer 1.4s infinite;
+            min-height: 96px;
+            border-radius: 16px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 100% 0;
+            }
+            100% {
+                background-position: -100% 0;
+            }
+        }
+
+        .stats-error {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #fff1f2;
+            color: #b91c1c;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+<nav th:replace="~{fragments/layout :: sidebar}"></nav>
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main class="main-content">
+    <div class="dashboard-grid-admin">
+        <div class="dashboard-center">
+            <div class="welcome-card">
+                <div class="welcome-content">
+                    <h3>Filter Wise Attendance Report</h3>
+                    <p th:text="'Overview for ' + ${#dates.format(#dates.createNow(), 'MMMM yyyy')}"></p>
+                    <small th:text="'Generated on ' + ${#dates.format(#dates.createNow(), 'EEEE, MMMM dd, yyyy')}"></small>
+                </div>
+                <div class="welcome-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+
+            <div class="report-filters mb-4 flex flex-wrap items-center gap-10 text-center">
+
+                <!-- Office Name -->
+                <label for="officeNameSelect" class="flex items-center gap-2 mr-8">
+                    <span class="font-medium">Office Name:</span>
+                    <select id="officeNameSelect" class="border rounded px-3 py-2 min-w-[180px]">
+                        <th:block th:each="officeName : ${officeNames}">
+                            <option th:value="${officeName}" th:text="${officeName}"></option>
+                        </th:block>
+                    </select>
+                </label>
+
+                <!-- District Dropdown -->
+                <label for="districtSelect" class="flex items-center gap-2 mr-8">
+                    <span class="font-medium">District:</span>
+                    <select id="districtSelect" class="border rounded px-3 py-2 min-w-[180px]">
+                        <th:block th:each="district : ${districts}">
+                            <option th:value="${district}" th:text="${district}"></option>
+                        </th:block>
+                    </select>
+                </label>
+
+                <!-- From Date -->
+                <label for="fromDate" class="flex items-center gap-2 mr-8">
+                    <span class="font-medium">From:</span>
+                    <input type="date" id="fromDate" class="border rounded px-3 py-2">
+                </label>
+
+                <!-- To Date -->
+                <label for="toDate" class="flex items-center gap-2 mr-8">
+                    <span class="font-medium">To:</span>
+                    <input type="date" id="toDate" class="border rounded px-3 py-2">
+                </label>
+
+                <!-- Show Report Button -->
+                <button id="showReportBtn" class="bg-primary text-white px-5 py-2 rounded-lg shadow">
+                    Show Report
+                </button>
+
+            </div>
+
+            <div class="dashboard-grid-detail">
+                <div class="dashboard-center">
+
+                    <!-- Detailed Table section -->
+                    <div class="bg-white rounded-xl shadow-lg p-2">
+                        <div class="table-responsive">
+                            <table id="detailTable" class="table table-bordered display nowrap" style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Date</th>
+                                    <th>In Time</th>
+                                    <th>Out Time</th>
+                                    <th>Status</th>
+                                    <th>Attendance Type</th>
+                                    <th>Remarks</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Data will be loaded by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="dashboard-right">
+            <div class="simple-calendar-card">
+                <div class="simple-calendar-header">
+                    <button class="simple-nav" id="simplePrevMonth"><i class="fas fa-chevron-left"></i></button>
+                    <span class="simple-month-year" id="simpleCurrentMonth">August 2025</span>
+                    <button class="simple-nav" id="simpleNextMonth"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="simple-calendar-grid" id="simpleCalendarGrid"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+<script>
+    $(document).ready(function () {
+        // Initialize DataTable
+        let detailTable = $('#detailTable').DataTable({
+            responsive: true,
+            searching: false,
+            paging: true,
+            ordering: true,
+            info: true,
+            columns: [
+                { data: "userName" },
+                { data: "date" },
+                { data: "morningTime" },
+                { data: "eveningTime" },
+                { data: "status" },
+                { data: "attendanceType" },
+                { data: "reason" }
+            ]
+        });
+
+        // Show Report Button Click
+        $("#showReportBtn").on("click", function () {
+            let officeName = $("#officeNameSelect").val();
+            let district = $("#districtSelect").val();
+            let startDate = $("#fromDate").val();
+            let endDate = $("#toDate").val();
+
+            if (!officeName || !district || !startDate || !endDate) {
+                alert("Please select all filters (Office, District, From Date, To Date)");
+                return;
+            }
+
+            $.ajax({
+                url: "/api/data/attendance/filter",
+                method: "POST",
+                data: {
+                    officeName: officeName,
+                    district: district,
+                    startDate: startDate,
+                    endDate: endDate
+                },
+                success: function (response) {
+                    if (response.statusCode === 200) {
+                        // Update subtitle
+                        $("#reportSubTitle").text(`Report for ${officeName}, ${district} (${startDate} → ${endDate})`);
+
+                        // Clear and reload table
+                        detailTable.clear();
+                        detailTable.rows.add(response.data); // assumes API returns list of objects
+                        detailTable.draw();
+                    } else {
+                        alert(response.message || "No data found");
+                    }
+                },
+                error: function (xhr) {
+                    alert("Error loading report: " + xhr.responseText);
+                }
+            });
+        });
+
+        // Download PDF Button Click
+        $("#downloadPdfBtn").on("click", function () {
+            let officeName = $("#officeNameSelect").val();
+            let district = $("#districtSelect").val();
+            let startDate = $("#fromDate").val();
+            let endDate = $("#toDate").val();
+
+            if (!officeName || !district || !startDate || !endDate) {
+                alert("Please select all filters first!");
+                return;
+            }
+
+            // Redirect to PDF download endpoint
+            window.location.href = `/attendance/download-pdf?officeName=${officeName}&district=${district}&startDate=${startDate}&endDate=${endDate}`;
+        });
+    });
+</script>
+
+</body>
+</html>

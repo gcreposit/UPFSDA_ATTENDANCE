@@ -61,4 +61,20 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query(value = "SELECT * FROM attendance WHERE user_name = ?1", nativeQuery = true)
     Attendance findByUsername(String employeeId);
 
+
+    @Query(value = "SELECT a.* " +
+            "FROM attendance a " +
+            "JOIN employee e ON a.user_name = e.username " +
+            "WHERE (:officeName IS NULL OR e.office_name = :officeName) " +
+            "AND (:district IS NULL OR e.district = :district) " +
+            "AND (:startDate IS NULL OR a.attendance_date >= :startDate) " +
+            "AND (:endDate IS NULL OR a.attendance_date <= :endDate)",
+            nativeQuery = true)
+    List<Attendance> findAttendanceByFilters(
+            @Param("officeName") String officeName,
+            @Param("district") String district,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
 }
