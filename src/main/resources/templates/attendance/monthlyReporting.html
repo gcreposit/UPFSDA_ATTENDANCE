@@ -223,10 +223,10 @@
                 </div>
             </div>
 
-            <div class="report-filters mb-4 flex items-center gap-4 text-center">
+            <div class="report-filters mb-4 flex flex-wrap items-center gap-10 text-center">
 
                 <!-- Username Dropdown -->
-                <label for="usernameSelect" class="flex items-center gap-2">
+                <label for="usernameSelect" class="flex items-center gap-2 mr-8">
                     <span class="font-medium">Username:</span>
                     <select id="usernameSelect" class="border rounded px-2 py-1">
                         <th:block th:each="uname : ${empUsernames}">
@@ -236,7 +236,7 @@
                 </label>
 
                 <!-- Month Dropdown -->
-                <label for="monthSelect" class="flex items-center gap-2">
+                <label for="monthSelect" class="flex items-center gap-2 mr-8">
                     <span class="font-medium">Month:</span>
                     <select id="monthSelect" class="border rounded px-2 py-1">
                         <option value="1" th:selected="${#dates.format(#dates.createNow(), 'M') == 1}">January</option>
@@ -255,7 +255,7 @@
                 </label>
 
                 <!-- Year Dropdown -->
-                <label for="yearSelect" class="flex items-center gap-2">
+                <label for="yearSelect" class="flex items-center gap-2 mr-8">
                     <span class="font-medium">Year:</span>
                     <select id="yearSelect" class="border rounded px-2 py-1">
                         <option th:each="y : ${#numbers.sequence(2020, 2030)}"
