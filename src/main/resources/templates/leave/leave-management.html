@@ -9,122 +9,19 @@
     
     <!-- Header -->
     <header th:replace="~{fragments/layout :: header}"></header>
-    
-    <!-- Main Content -->
+
+    <!-- Main Content (Admin Only) -->
     <main class="main-content">
         <!-- Page Header -->
         <div class="page-header mb-4">
             <div class="row align-items-center">
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <h2 class="page-title">
-                        <i class="fas fa-calendar-alt me-2"></i>Leave Management
+                        <i class="fas fa-calendar-alt me-2"></i>Leave Management (Admin)
                     </h2>
                     <p class="page-subtitle text-muted">
-                        Manage leave requests and track your leave balance
+                        Manage and review all employee leave requests
                     </p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#requestLeaveModal">
-                        <i class="fas fa-plus me-2"></i>Request Leave
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Leave Balance Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <div class="stat-value" th:text="${user?.leaveBalance?.remaining} ?: '0'">16</div>
-                    <div class="stat-label">Days Remaining</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-calendar-times"></i>
-                    </div>
-                    <div class="stat-value" th:text="${user?.leaveBalance?.used} ?: '0'">4</div>
-                    <div class="stat-label">Days Used</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-calendar"></i>
-                    </div>
-                    <div class="stat-value" th:text="${user?.leaveBalance?.total} ?: '0'">20</div>
-                    <div class="stat-label">Total Allocation</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-hourglass-half"></i>
-                    </div>
-                    <div class="stat-value" id="pendingRequests">0</div>
-                    <div class="stat-label">Pending Requests</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Leave Balance Breakdown -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-chart-pie me-2"></i>Leave Balance Breakdown
-                </h5>
-            </div>
-            <div class="card-content">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="leave-type-card">
-                            <div class="leave-type-header">
-                                <i class="fas fa-sun text-warning"></i>
-                                <span>Annual Leave</span>
-                            </div>
-                            <div class="leave-type-balance">
-                                <span class="balance-used" th:text="${user?.leaveBalance?.annual} ?: '0'">12</span>
-                                <span class="balance-total">/ 15 days</span>
-                            </div>
-                            <div class="progress mt-2">
-                                <div class="progress-bar bg-warning" style="width: 80%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="leave-type-card">
-                            <div class="leave-type-header">
-                                <i class="fas fa-thermometer-half text-danger"></i>
-                                <span>Sick Leave</span>
-                            </div>
-                            <div class="leave-type-balance">
-                                <span class="balance-used" th:text="${user?.leaveBalance?.sick} ?: '0'">6</span>
-                                <span class="balance-total">/ 10 days</span>
-                            </div>
-                            <div class="progress mt-2">
-                                <div class="progress-bar bg-danger" style="width: 60%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="leave-type-card">
-                            <div class="leave-type-header">
-                                <i class="fas fa-user text-info"></i>
-                                <span>Personal Leave</span>
-                            </div>
-                            <div class="leave-type-balance">
-                                <span class="balance-used" th:text="${user?.leaveBalance?.personal} ?: '0'">2</span>
-                                <span class="balance-total">/ 5 days</span>
-                            </div>
-                            <div class="progress mt-2">
-                                <div class="progress-bar bg-info" style="width: 40%"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -152,10 +49,11 @@
                             <option value="Emergency Leave">Emergency Leave</option>
                         </select>
                     </div>
-                    <div class="col-md-3" th:if="${userRole == 'admin'}">
+                    <div class="col-md-3">
                         <label for="employeeFilter" class="form-label">Filter by Employee</label>
                         <select id="employeeFilter" class="form-control">
                             <option value="">All Employees</option>
+                            <!-- dynamically load employees -->
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -174,302 +72,74 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-list me-2"></i>Leave Requests
+                    <i class="fas fa-list me-2"></i>All Leave Requests
                 </h5>
             </div>
             <div class="card-content">
-                <div id="leaveRequestsList" class="leave-requests-container">
-                    <!-- Leave requests will be loaded here via JavaScript -->
+                <div id="leaveRequestsList" class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Dates</th>
+                            <th>Duration</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Approved By</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="leave : ${leaveList}">
+                            <td th:text="${leave.username}">john.doe</td>
+                            <td>
+                                <span th:text="${leave.startDate}"></span> -
+                                <span th:text="${leave.endDate}"></span>
+                            </td>
+                            <td th:text="${leave.durationType}">FULL_DAY</td>
+                            <td th:text="${leave.reason}">Personal work</td>
+                            <td>
+                <span class="badge"
+                      th:classappend="${leave.status} == 'PENDING' ? 'bg-warning' :
+                                      (${leave.status} == 'APPROVED' ? 'bg-success' : 'bg-danger')"
+                      th:text="${leave.status}">
+                    PENDING
+                </span>
+                            </td>
+                            <td th:text="${leave.approvedBy != null ? leave.approvedBy : '-'}">-</td>
+                            <td class="text-center">
+                                <div th:if="${leave.status == 'PENDING'}">
+                                    <form th:action="@{/admin/leave/approve/{id}(id=${leave.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form th:action="@{/admin/leave/deny/{id}(id=${leave.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <span th:if="${leave.status != 'PENDING'}" class="text-muted">—</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+
+                    <!-- If no requests -->
+                    <p class="text-muted mt-3" th:if="${#lists.isEmpty(leaveRequests)}">No leave requests found.</p>
                 </div>
             </div>
+
         </div>
     </main>
-
-    <!-- Request Leave Modal -->
-    <div class="modal fade" id="requestLeaveModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content bg-dark">
-                <div class="modal-header">
-                    <h5 class="modal-title">Request Leave</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="requestLeaveForm">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="leaveType" class="form-label">Leave Type</label>
-                                    <select id="leaveType" class="form-control" required>
-                                        <option value="">Select Leave Type</option>
-                                        <option value="Annual Leave">Annual Leave</option>
-                                        <option value="Sick Leave">Sick Leave</option>
-                                        <option value="Personal Leave">Personal Leave</option>
-                                        <option value="Emergency Leave">Emergency Leave</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="leaveDays" class="form-label">Number of Days</label>
-                                    <input type="number" id="leaveDays" class="form-control" min="1" max="30" required readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="startDate" class="form-label">Start Date</label>
-                                    <input type="date" id="startDate" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="endDate" class="form-label">End Date</label>
-                                    <input type="date" id="endDate" class="form-control" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="leaveReason" class="form-label">Reason</label>
-                            <textarea id="leaveReason" class="form-control" rows="3" required placeholder="Please provide a reason for your leave request..."></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="submitLeaveRequest()">Submit Request</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Footer -->
     <footer th:replace="~{fragments/layout :: footer}"></footer>
 
     <!-- Scripts -->
     <div th:replace="~{fragments/layout :: scripts}"></div>
-    
-    <script>
-        let allLeaveRequests = [];
-        let filteredLeaveRequests = [];
-
-        document.addEventListener('DOMContentLoaded', function() {
-            loadLeaveRequests();
-            loadEmployees();
-            setupEventListeners();
-            setupDateCalculation();
-        });
-
-        async function loadLeaveRequests() {
-            try {
-                const userRole = /*[[${userRole}]]*/ 'employee';
-                const userId = /*[[${user?.id}]]*/ 1;
-                
-                const result = await mockAPI.getLeaveRequests(userRole === 'employee' ? userId : null);
-                if (result.success) {
-                    allLeaveRequests = result.data;
-                    filteredLeaveRequests = [...allLeaveRequests];
-                    displayLeaveRequests(filteredLeaveRequests);
-                    updatePendingCount(allLeaveRequests);
-                }
-            } catch (error) {
-                console.error('Error loading leave requests:', error);
-                attendanceUtils.showNotification('Error', 'Failed to load leave requests', 'error');
-            }
-        }
-
-        async function loadEmployees() {
-            try {
-                const result = await mockAPI.getEmployees();
-                if (result.success) {
-                    populateEmployeeFilter(result.data);
-                }
-            } catch (error) {
-                console.error('Error loading employees:', error);
-            }
-        }
-
-        function populateEmployeeFilter(employees) {
-            const employeeFilter = document.getElementById('employeeFilter');
-            if (employeeFilter) {
-                employees.forEach(employee => {
-                    const option = document.createElement('option');
-                    option.value = employee.id;
-                    option.textContent = employee.name;
-                    employeeFilter.appendChild(option);
-                });
-            }
-        }
-
-        function displayLeaveRequests(requests) {
-            const container = document.getElementById('leaveRequestsList');
-            
-            if (!requests || requests.length === 0) {
-                container.innerHTML = '<p class="text-muted text-center py-4">No leave requests found.</p>';
-                return;
-            }
-
-            const requestsHtml = requests.map(request => `
-                <div class="leave-card card mb-3 ${request.status.toLowerCase()}">
-                    <div class="card-content">
-                        <div class="leave-header">
-                            <div class="leave-info">
-                                <div class="leave-title">${request.type}</div>
-                                <div class="leave-employee">${request.employeeName}</div>
-                                <div class="leave-dates">
-                                    ${attendanceUtils.formatDate(request.startDate)} - ${attendanceUtils.formatDate(request.endDate)}
-                                    <span class="leave-duration">(${request.days} day${request.days > 1 ? 's' : ''})</span>
-                                </div>
-                            </div>
-                            <div class="leave-status">
-                                <span class="badge ${attendanceUtils.getStatusBadgeClass(request.status)}">${request.status}</span>
-                                <div class="leave-actions mt-2">
-                                    ${request.status === 'Pending' && /*[[${userRole}]]*/ 'employee' === 'admin' ? `
-                                        <button class="btn btn-sm btn-success me-1" onclick="approveLeave(${request.id})">
-                                            <i class="fas fa-check"></i> Approve
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="denyLeave(${request.id})">
-                                            <i class="fas fa-times"></i> Deny
-                                        </button>
-                                    ` : ''}
-                                    ${request.status === 'Pending' && /*[[${userRole}]]*/ 'employee' === 'employee' ? `
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="cancelLeave(${request.id})">
-                                            <i class="fas fa-times"></i> Cancel
-                                        </button>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="leave-reason">
-                            <strong>Reason:</strong> ${request.reason}
-                        </div>
-                        
-                        <div class="leave-meta">
-                            <div class="meta-item">
-                                <i class="fas fa-calendar me-1"></i>
-                                <span>Applied: ${attendanceUtils.formatDate(request.appliedDate)}</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-user-tie me-1"></i>
-                                <span>Approver: ${request.approver}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            container.innerHTML = requestsHtml;
-        }
-
-        function updatePendingCount(requests) {
-            const pendingCount = requests.filter(r => r.status === 'Pending').length;
-            document.getElementById('pendingRequests').textContent = pendingCount;
-        }
-
-        function setupEventListeners() {
-            document.getElementById('statusFilter').addEventListener('change', applyFilters);
-            document.getElementById('typeFilter').addEventListener('change', applyFilters);
-            const employeeFilter = document.getElementById('employeeFilter');
-            if (employeeFilter) {
-                employeeFilter.addEventListener('change', applyFilters);
-            }
-        }
-
-        function setupDateCalculation() {
-            const startDateInput = document.getElementById('startDate');
-            const endDateInput = document.getElementById('endDate');
-            const leaveDaysInput = document.getElementById('leaveDays');
-
-            function calculateDays() {
-                const startDate = new Date(startDateInput.value);
-                const endDate = new Date(endDateInput.value);
-                
-                if (startDate && endDate && endDate >= startDate) {
-                    const timeDiff = endDate.getTime() - startDate.getTime();
-                    const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
-                    leaveDaysInput.value = dayDiff;
-                } else {
-                    leaveDaysInput.value = '';
-                }
-            }
-
-            startDateInput.addEventListener('change', calculateDays);
-            endDateInput.addEventListener('change', calculateDays);
-        }
-
-        function applyFilters() {
-            const statusFilter = document.getElementById('statusFilter').value;
-            const typeFilter = document.getElementById('typeFilter').value;
-            const employeeFilter = document.getElementById('employeeFilter')?.value || '';
-            
-            filteredLeaveRequests = allLeaveRequests.filter(request => {
-                const matchesStatus = !statusFilter || request.status === statusFilter;
-                const matchesType = !typeFilter || request.type === typeFilter;
-                const matchesEmployee = !employeeFilter || request.employeeId == employeeFilter;
-                
-                return matchesStatus && matchesType && matchesEmployee;
-            });
-            
-            displayLeaveRequests(filteredLeaveRequests);
-        }
-
-        function clearFilters() {
-            document.getElementById('statusFilter').value = '';
-            document.getElementById('typeFilter').value = '';
-            const employeeFilter = document.getElementById('employeeFilter');
-            if (employeeFilter) employeeFilter.value = '';
-            
-            filteredLeaveRequests = [...allLeaveRequests];
-            displayLeaveRequests(filteredLeaveRequests);
-        }
-
-        function submitLeaveRequest() {
-            const form = document.getElementById('requestLeaveForm');
-            const formData = new FormData(form);
-            
-            // Validate form
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-            
-            // Simulate API call
-            attendanceUtils.showNotification('Success', 'Leave request submitted successfully!', 'success');
-            
-            const modal = bootstrap.Modal.getInstance(document.getElementById('requestLeaveModal'));
-            modal.hide();
-            
-            // Reset form
-            form.reset();
-            
-            // Reload requests
-            setTimeout(() => {
-                loadLeaveRequests();
-            }, 1000);
-        }
-
-        function approveLeave(requestId) {
-            if (confirm('Are you sure you want to approve this leave request?')) {
-                attendanceUtils.showNotification('Success', 'Leave request approved!', 'success');
-                loadLeaveRequests();
-            }
-        }
-
-        function denyLeave(requestId) {
-            if (confirm('Are you sure you want to deny this leave request?')) {
-                attendanceUtils.showNotification('Success', 'Leave request denied!', 'success');
-                loadLeaveRequests();
-            }
-        }
-
-        function cancelLeave(requestId) {
-            if (confirm('Are you sure you want to cancel this leave request?')) {
-                attendanceUtils.showNotification('Success', 'Leave request cancelled!', 'success');
-                loadLeaveRequests();
-            }
-        }
-    </script>
     
     <style>
         .leave-type-card {

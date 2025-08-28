@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.LeaveRequestDto;
 import com.example.demo.entity.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -85,5 +86,10 @@ public interface AttendanceService {
     void updateOfficeTime(Long id, OfficeTime officeTime);
 
     Map<String, Object> getAttendanceByFilters(String officeName, String district, LocalDate startDate, LocalDate endDate);
+
+    Leave applyLeaveRequest(LeaveRequestDto leaveRequest);
+
+    List<Leave> fetchAllLeaves();
+
 
 }

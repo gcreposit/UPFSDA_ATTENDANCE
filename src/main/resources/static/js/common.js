@@ -434,7 +434,7 @@ async function validateAuthToken(token) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({token: token})
+            body: JSON.stringify({ token: token })
         });
 
         console.log('Token validation response status:', response.status);
@@ -453,35 +453,94 @@ async function validateAuthToken(token) {
             localStorage.removeItem('username');
             sessionStorage.clear();
 
-            // Use replacement to prevent back button access
+            // Redirect to login
             window.location.replace('/login?error=Session expired. Please login again.');
             return;
         }
 
         console.log('Token is valid, checking role-based access');
-        // Token is valid, check role-based access
         const username = localStorage.getItem('username');
         const currentPath = window.location.pathname;
 
         console.log('Current user:', username, 'Current path:', currentPath);
 
-// Always redirect to dashboard unless already there
-        if (currentPath !== '/attendance/dashboard') {
-            console.log('Redirecting to dashboard page only');
-            window.location.replace('/attendance/dashboard');
+        // ✅ Instead of forcing dashboard, just stay on current page
+        // Optionally, check role-based restrictions here
+        const protectedPaths = ['/attendance/dashboard', '/attendance/projects', '/attendance/leave', '/attendance/team'];
+        if (protectedPaths.some(path => currentPath.startsWith(path))) {
+            console.log('User is on a protected path, access granted');
         } else {
-            console.log('Already on dashboard — access granted');
+            console.log('User is on an unprotected path — no redirect needed');
         }
 
     } catch (error) {
         console.error('Token validation error:', error);
-        // On error, clear auth data and redirect to login for safety
+        // On error, clear auth data and redirect to login
         localStorage.removeItem('authToken');
         localStorage.removeItem('username');
         sessionStorage.clear();
         window.location.replace('/login?error=Authentication error. Please login again.');
     }
 }
+
+
+// async function validateAuthToken(token) {
+//     try {
+//         console.log('Validating token:', token.substring(0, 20) + '...');
+//
+//         const response = await fetch('/api/web/validate-token', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({token: token})
+//         });
+//
+//         console.log('Token validation response status:', response.status);
+//
+//         if (!response.ok) {
+//             throw new Error('Token validation request failed');
+//         }
+//
+//         const data = await response.json();
+//         console.log('Token validation response:', data);
+//
+//         if (!data.valid) {
+//             console.log('Token is invalid, clearing auth data and redirecting');
+//             // Token is invalid, clear all auth data and redirect
+//             localStorage.removeItem('authToken');
+//             localStorage.removeItem('username');
+//             sessionStorage.clear();
+//
+//             // Use replacement to prevent back button access
+//             window.location.replace('/login?error=Session expired. Please login again.');
+//             return;
+//         }
+//
+//         console.log('Token is valid, checking role-based access');
+//         // Token is valid, check role-based access
+//         const username = localStorage.getItem('username');
+//         const currentPath = window.location.pathname;
+//
+//         console.log('Current user:', username, 'Current path:', currentPath);
+//
+// // Always redirect to dashboard unless already there
+//         if (currentPath !== '/attendance/dashboard') {
+//             console.log('Redirecting to dashboard page only');
+//             window.location.replace('/attendance/dashboard');
+//         } else {
+//             console.log('Already on dashboard — access granted');
+//         }
+//
+//     } catch (error) {
+//         console.error('Token validation error:', error);
+//         // On error, clear auth data and redirect to login for safety
+//         localStorage.removeItem('authToken');
+//         localStorage.removeItem('username');
+//         sessionStorage.clear();
+//         window.location.replace('/login?error=Authentication error. Please login again.');
+//     }
+// }
 
 // Logout functionality
 function handleLogout() {

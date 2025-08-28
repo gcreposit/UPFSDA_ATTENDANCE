@@ -160,7 +160,7 @@ public class AttendanceController {
         model.addAttribute("holidays", holidays);
 
         List<OfficeTime> officeTiming = attendanceService.fetchAllOfficeTiming();
-        model.addAttribute("officeTiming",officeTiming);
+        model.addAttribute("officeTiming", officeTiming);
 
         model.addAttribute("pageTitle", "Management");
         model.addAttribute("currentPage", "management");
@@ -179,10 +179,10 @@ public class AttendanceController {
         Map<String, Object> user = getMockUserData(usernames);
 
         List<String> districts = attendanceService.getDistricts();
-        model.addAttribute("districts",districts);
+        model.addAttribute("districts", districts);
 
         List<String> officeNames = employeeService.getOfficeNames();
-        model.addAttribute("officeNames",officeNames);
+        model.addAttribute("officeNames", officeNames);
 
         model.addAttribute("pageTitle", "Management");
         model.addAttribute("currentPage", "filterReporting");
@@ -239,6 +239,26 @@ public class AttendanceController {
         return "redirect:/attendance/management";
     }
 
+    //    Leave Requests Section
+    @GetMapping("/leaveRequests")
+    public String leaveManagement(Model model) {
+
+        String usernames = "MasterAdmin"; // Change to dynamic retrieval later
+        String userRole = usernames.equals("admin") ? "Administrator" : "employee";
+
+        Map<String, Object> user = getMockUserData(usernames);
+
+        List<Leave> leaveList = attendanceService.fetchAllLeaves();
+        model.addAttribute("leaveList",leaveList);
+
+        model.addAttribute("pageTitle", "Leave Requests");
+        model.addAttribute("currentPage", "leaveRequests");
+        model.addAttribute("user", user);
+        model.addAttribute("userRole", userRole);
+
+        return "leave/leave-management";
+    }
+
     //These pages are Not Currently in Use
     @GetMapping("/projects")
     public String projects(Model model) {
@@ -255,24 +275,6 @@ public class AttendanceController {
         ));
 
         return "projects/projects";
-    }
-
-
-    @GetMapping("/leave")
-    public String leaveManagement(Model model) {
-        Map<String, Object> user = getMockUserData("user");
-        String userRole = "employee";
-
-        model.addAttribute("pageTitle", "Leave Management");
-        model.addAttribute("currentPage", "leave");
-        model.addAttribute("user", user);
-        model.addAttribute("userRole", userRole);
-        model.addAttribute("breadcrumbs", Arrays.asList(
-                Map.of("name", "Home", "url", "/attendance/dashboard"),
-                Map.of("name", "Leave Management", "url", "")
-        ));
-
-        return "leave/leave-management";
     }
 
     @GetMapping("/team")

@@ -1,10 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.*;
-import com.example.demo.entity.Attendance;
-import com.example.demo.entity.Employee;
-import com.example.demo.entity.Holidays;
-import com.example.demo.entity.WffLocationTracking;
+import com.example.demo.entity.*;
 import com.example.demo.service.AttendanceService;
 import com.example.demo.service.EmployeeService;
 import com.example.demo.service.FileStorageService;
@@ -1005,6 +1002,7 @@ public class DataApiController {
                     officeName, district, startDate, endDate
             );
 
+            // Case 1: Service returned "error" flag
             if ("error".equals(details.get("flag"))) {
                 return ResponseEntity.badRequest().body(
                         ApiResponse.builder()
@@ -1015,6 +1013,18 @@ public class DataApiController {
                 );
             }
 
+            // Case 2: No data found
+            if ("not_found".equals(details.get("flag"))) {
+                return ResponseEntity.ok(
+                        ApiResponse.builder()
+                                .message((String) details.get("message")) // "No attendance records found..."
+                                .statusCode(HttpStatus.OK.value()) // still 200
+                                .data(Collections.emptyList()) // always return empty list
+                                .build()
+                );
+            }
+
+            // Case 3: Success
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .message((String) details.get("message"))
@@ -1030,6 +1040,45 @@ public class DataApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                     ApiResponse.builder()
                             .message("Error fetching filtered attendance")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
+    //    API For Applying Leave
+    @PostMapping("/applyLeave")
+    public ResponseEntity<ApiResponse> applyLeave(@ModelAttribute LeaveRequestDto leaveRequestDto) {
+
+        try {
+            Leave savedLeave = attendanceService.applyLeaveRequest(leaveRequestDto);
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .username(savedLeave.getUsername())
+                            .message("Leave applied successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(savedLeave)
+                            .build()
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error while applying for leave")
                             .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                             .data(errorData)
                             .build()
