@@ -1185,7 +1185,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 //    }
 //
 
-
     @Override
     public List<WffLocationTracking> getHistory(LocalDateTime from, LocalDateTime to) {
         return locationTrackingRepository.findByTimestampBetweenOrderByTimestampDesc(from, to);
@@ -1238,6 +1237,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     }
 
+    @Transactional
     @Override
     public String createNewWorkType(WorkTypes workTypes) {
 
@@ -1259,6 +1259,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         workTypesRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public WorkTypes updateWorkType(Long id, WorkTypes updatedWorkType) {
 
@@ -1273,6 +1274,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
     }
 
+    @Transactional
     @Override
     public Holidays saveHoliday(Holidays holiday) {
 
@@ -1294,6 +1296,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     }
 
+    @Transactional
     @Override
     public Holidays updateHoliday(Long id, Holidays holiday) {
 
@@ -1323,6 +1326,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     }
 
+    @Transactional
     @Override
     public void updateOfficeTime(Long id, OfficeTime officeTime) {
         officeTimeRepository.findById(id)
@@ -1361,6 +1365,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         return response;
     }
 
+    @Transactional
     @Override
     public Leave applyLeaveRequest(LeaveRequestDto dto) {
 
