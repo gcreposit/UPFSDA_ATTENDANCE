@@ -4,276 +4,128 @@
     <title>Leave Management - UPFSDA Attendance System</title>
 </head>
 <body>
-    <!-- Sidebar -->
-    <nav th:replace="~{fragments/layout :: sidebar}"></nav>
-    
-    <!-- Header -->
-    <header th:replace="~{fragments/layout :: header}"></header>
+<!-- Sidebar -->
+<nav th:replace="~{fragments/layout :: sidebar}"></nav>
 
-    <!-- Main Content (Admin Only) -->
-    <main class="main-content">
-        <!-- Page Header -->
-        <div class="page-header mb-4">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <h2 class="page-title">
-                        <i class="fas fa-calendar-alt me-2"></i>Leave Management (Admin)
-                    </h2>
-                    <p class="page-subtitle text-muted">
-                        Manage and review all employee leave requests
-                    </p>
-                </div>
+<!-- Header -->
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<!-- Main Content (Admin Only) -->
+<main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <h2 class="page-title">
+                    <i class="fas fa-calendar-alt me-2"></i>Leave Management (Admin)
+                </h2>
+                <p class="page-subtitle text-muted">
+                    Manage and review all employee leave requests
+                </p>
             </div>
         </div>
+    </div>
 
-        <!-- Filters -->
-        <div class="card mb-4">
-            <div class="card-content">
-                <div class="row align-items-center">
-                    <div class="col-md-3">
-                        <label for="statusFilter" class="form-label">Filter by Status</label>
-                        <select id="statusFilter" class="form-control">
-                            <option value="">All Status</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Approved">Approved</option>
-                            <option value="Denied">Denied</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="typeFilter" class="form-label">Filter by Type</label>
-                        <select id="typeFilter" class="form-control">
-                            <option value="">All Types</option>
-                            <option value="Annual Leave">Annual Leave</option>
-                            <option value="Sick Leave">Sick Leave</option>
-                            <option value="Personal Leave">Personal Leave</option>
-                            <option value="Emergency Leave">Emergency Leave</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="employeeFilter" class="form-label">Filter by Employee</label>
-                        <select id="employeeFilter" class="form-control">
-                            <option value="">All Employees</option>
-                            <!-- dynamically load employees -->
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">&nbsp;</label>
-                        <div>
-                            <button class="btn btn-secondary" onclick="clearFilters()">
-                                <i class="fas fa-times me-2"></i>Clear Filters
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Filters -->
+    <!--        <div class="card mb-4">-->
+    <!--            <div class="card-content">-->
+    <!--                <div class="row align-items-center">-->
+    <!--                    <div class="col-md-3">-->
+    <!--                        <label for="statusFilter" class="form-label">Filter by Status</label>-->
+    <!--                        <select id="statusFilter" class="form-control">-->
+    <!--                            <option value="">All Status</option>-->
+    <!--                            <option value="Pending">Pending</option>-->
+    <!--                            <option value="Approved">Approved</option>-->
+    <!--                            <option value="Denied">Denied</option>-->
+    <!--                        </select>-->
+    <!--                    </div>-->
+    <!--                    <div class="col-md-3">-->
+    <!--                        <label for="employeeFilter" class="form-label">Filter by Employee</label>-->
+    <!--                        <select id="employeeFilter" class="form-control">-->
+    <!--                            <option value="">All Employees</option>-->
+    <!--                            &lt;!&ndash; dynamically load employees &ndash;&gt;-->
+    <!--                        </select>-->
+    <!--                    </div>-->
+    <!--                    <div class="col-md-3">-->
+    <!--                        <label class="form-label">&nbsp;</label>-->
+    <!--                        <div>-->
+    <!--                            <button class="btn btn-secondary" onclick="clearFilters()">-->
+    <!--                                <i class="fas fa-times me-2"></i>Clear Filters-->
+    <!--                            </button>-->
+    <!--                        </div>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+
+    <!-- Leave Requests -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list me-2"></i>All Leave Requests
+            </h5>
         </div>
-
-        <!-- Leave Requests -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-list me-2"></i>All Leave Requests
-                </h5>
-            </div>
-            <div class="card-content">
-                <div id="leaveRequestsList" class="table-responsive">
-                    <table class="table table-striped table-hover align-middle">
-                        <thead>
-                        <tr>
-                            <th>Employee</th>
-                            <th>Dates</th>
-                            <th>Duration</th>
-                            <th>Reason</th>
-                            <th>Status</th>
-                            <th>Approved By</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="leave : ${leaveList}">
-                            <td th:text="${leave.username}">john.doe</td>
-                            <td>
-                                <span th:text="${leave.startDate}"></span> -
-                                <span th:text="${leave.endDate}"></span>
-                            </td>
-                            <td th:text="${leave.durationType}">FULL_DAY</td>
-                            <td th:text="${leave.reason}">Personal work</td>
-                            <td>
+        <div class="card-content">
+            <div id="leaveRequestsList" class="table-responsive">
+                <table class="table table-striped table-hover align-middle" id="leaveRequests">
+                    <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>From Date</th>
+                        <th>To Date</th>
+                        <th>Duration</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th hidden>Approved By</th>
+                        <th hidden class="text-center">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="leave : ${leaveList}">
+                        <td th:text="${leave.username}">john.doe</td>
+                        <td th:text="${leave.startDate}">john.doe</td>
+                        <td th:text="${leave.endDate}">john.doe</td>
+                        <td th:text="${leave.durationType}">FULL_DAY</td>
+                        <td th:text="${leave.reason}">Personal work</td>
+                        <td>
                 <span class="badge"
                       th:classappend="${leave.status} == 'PENDING' ? 'bg-warning' :
                                       (${leave.status} == 'APPROVED' ? 'bg-success' : 'bg-danger')"
                       th:text="${leave.status}">
                     PENDING
                 </span>
-                            </td>
-                            <td th:text="${leave.approvedBy != null ? leave.approvedBy : '-'}">-</td>
-                            <td class="text-center">
-                                <div th:if="${leave.status == 'PENDING'}">
-                                    <form th:action="@{/admin/leave/approve/{id}(id=${leave.id})}" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-success btn-sm">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </form>
-                                    <form th:action="@{/admin/leave/deny/{id}(id=${leave.id})}" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-danger btn-sm">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                                <span th:if="${leave.status != 'PENDING'}" class="text-muted">—</span>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-
-
-                    <!-- If no requests -->
-                    <p class="text-muted mt-3" th:if="${#lists.isEmpty(leaveRequests)}">No leave requests found.</p>
-                </div>
+                        </td>
+                        <td hidden th:text="${leave.approvedBy != null ? leave.approvedBy : '-'}">-</td>
+                        <td hidden class="text-center">
+                            <div th:if="${leave.status == 'PENDING'}">
+                                <form th:action="@{/admin/leave/approve/{id}(id=${leave.id})}" method="post"
+                                      class="d-inline">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form th:action="@{/admin/leave/deny/{id}(id=${leave.id})}" method="post"
+                                      class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <span th:if="${leave.status != 'PENDING'}" class="text-muted">—</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
-
         </div>
-    </main>
+    </div>
+</main>
 
-    <!-- Footer -->
-    <footer th:replace="~{fragments/layout :: footer}"></footer>
+<!-- Footer -->
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
-    <!-- Scripts -->
-    <div th:replace="~{fragments/layout :: scripts}"></div>
-    
-    <style>
-        .leave-type-card {
-            background-color: var(--tertiary-black);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.5rem;
-            text-align: center;
-        }
-        
-        .leave-type-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-        
-        .leave-type-balance {
-            margin-bottom: 0.5rem;
-        }
-        
-        .balance-used {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-        
-        .balance-total {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-        }
-        
-        .leave-requests-container {
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        
-        .leave-card {
-            background-color: var(--tertiary-black);
-            border: 1px solid var(--border-color);
-            border-left-width: 4px;
-        }
-        
-        .leave-card.pending {
-            border-left-color: var(--warning-color);
-        }
-        
-        .leave-card.approved {
-            border-left-color: var(--success-color);
-        }
-        
-        .leave-card.denied {
-            border-left-color: var(--error-color);
-        }
-        
-        .leave-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-        
-        .leave-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-        
-        .leave-employee {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.25rem;
-        }
-        
-        .leave-dates {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-        }
-        
-        .leave-duration {
-            font-weight: 500;
-            color: var(--primary-orange);
-        }
-        
-        .leave-status {
-            text-align: right;
-        }
-        
-        .leave-reason {
-            background-color: var(--secondary-black);
-            border-radius: 6px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-        
-        .leave-meta {
-            display: flex;
-            gap: 1.5rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-        
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .leave-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        @media (max-width: 768px) {
-            .leave-header {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .leave-status {
-                text-align: left;
-            }
-            
-            .leave-meta {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-        }
-    </style>
+<!-- Scripts -->
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
 </body>
 </html>

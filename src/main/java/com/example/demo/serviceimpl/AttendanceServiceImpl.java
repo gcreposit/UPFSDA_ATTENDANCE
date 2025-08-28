@@ -317,7 +317,6 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
     }
 
-
     @Override
     @Transactional
     public String uploadFieldImages(String username, MultipartFile fieldImage, MultipartFile fieldImage1) throws IOException {
@@ -370,11 +369,11 @@ public class AttendanceServiceImpl implements AttendanceService {
         return "Field images uploaded successfully";
     }
 
+
     @Override
     public Map<String, Object> getMonthlyAttendanceCount(String employeeId, int year, int month) {
 
         Employee employee = employeeRepository.findByUsername(employeeId);
-
         if (employee == null) {
             Map<String, Object> response = new HashMap<>();
             response.put("flag", "error");
@@ -383,66 +382,75 @@ public class AttendanceServiceImpl implements AttendanceService {
             return response;
         }
 
-        // Fetch records for the given month/year
+        // Fetch attendance records for the given month/year
         List<Attendance> records = attendanceRepository.findByUserNameAndMonthAndYear(employeeId, year, month);
 
-        // Step 1: Generate working days list (exclude Sundays initially)
         YearMonth ym = YearMonth.of(year, month);
-        LocalDate today = LocalDate.now();
-        LocalDate endDate = (year == today.getYear() && month == today.getMonthValue())
-                ? today
-                : ym.atEndOfMonth();
+        LocalDate endDate = ym.atEndOfMonth(); // <-- Always end of month
 
         List<LocalDate> workingDays = new ArrayList<>();
         List<LocalDate> holidays = new ArrayList<>();
 
+        // Build working days and holidays (Sundays)
         for (int day = 1; day <= endDate.getDayOfMonth(); day++) {
             LocalDate date = LocalDate.of(year, month, day);
             if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                holidays.add(date); // Sundays
+                holidays.add(date);
             } else {
                 workingDays.add(date);
             }
         }
 
-        // Step 2: Fetch holidays from DB within the month
-        List<Holidays> dbHolidays = holidayRepository.findByHolidayDateBetween(
-                ym.atDay(1), endDate
-        );
-
+        // Fetch holidays from DB
+        List<Holidays> dbHolidays = holidayRepository.findByHolidayDateBetween(ym.atDay(1), endDate);
         for (Holidays h : dbHolidays) {
             LocalDate holidayDate = h.getHolidayDate();
             if (workingDays.contains(holidayDate)) {
-                workingDays.remove(holidayDate); // remove from working days
-                holidays.add(holidayDate);      // add to holidays
+                workingDays.remove(holidayDate);
+                holidays.add(holidayDate);
             }
         }
 
-        // Step 3: Get attended days from records
+        // Get attended days
         Set<LocalDate> attendedDays = records.stream()
                 .map(Attendance::getDate)
                 .collect(Collectors.toSet());
 
-        // Step 4: Calculate absent days (working days without attendance)
+        // Fetch pending leaves for the month
+        List<Leave> pendingLeaves = leaveRepository.findByUsernameAndStatusAndDateRange(employeeId, "PENDING", ym.atDay(1), endDate);
+
+        // Collect all leave dates excluding holidays
+        Set<LocalDate> leaveDays = new HashSet<>();
+        for (Leave leave : pendingLeaves) {
+            LocalDate start = leave.getStartDate().isBefore(ym.atDay(1)) ? ym.atDay(1) : leave.getStartDate();
+            LocalDate end = leave.getEndDate().isAfter(endDate) ? endDate : leave.getEndDate();
+
+            for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+                if (!holidays.contains(date)) { // exclude holidays
+                    leaveDays.add(date);
+                }
+            }
+        }
+
+        // Calculate absent days (working days without attendance or leave)
         long absent = workingDays.stream()
-                .filter(day -> !attendedDays.contains(day))
+                .filter(day -> !attendedDays.contains(day) && !leaveDays.contains(day))
                 .count();
 
-        // Step 5: Calculate present days (distinct attendance records)
         long present = attendedDays.size();
 
-        // Step 6: Count attendance by status
+        // Count attendance by status
         long onTime = records.stream().filter(r -> "On Time".equalsIgnoreCase(r.getStatus())).count();
         long lateEntry = records.stream().filter(r -> "Late Entry".equalsIgnoreCase(r.getStatus())).count();
         long halfDay = records.stream().filter(r -> "Half Day".equalsIgnoreCase(r.getStatus())).count();
         long lateAndHalf = records.stream().filter(r -> "Late & Half".equalsIgnoreCase(r.getStatus())).count();
 
-        // Step 7: Count by attendance type
+        // Count by attendance type
         long wfh = records.stream().filter(r -> "WFH".equalsIgnoreCase(r.getAttendanceType())).count();
         long wfo = records.stream().filter(r -> "WFO".equalsIgnoreCase(r.getAttendanceType())).count();
         long wff = records.stream().filter(r -> "WFF".equalsIgnoreCase(r.getAttendanceType())).count();
 
-        // Step 8: Prepare detailed data
+        // Prepare detailed data
         Map<String, Object> data = new HashMap<>();
         data.put("on_time", onTime);
         data.put("late_entry", lateEntry);
@@ -456,9 +464,13 @@ public class AttendanceServiceImpl implements AttendanceService {
         data.put("total_days_in_month", ym.lengthOfMonth());
         data.put("working_days_in_month", workingDays.size());
         data.put("holidays", holidays.size());
-        data.put("holiday_dates", holidays); // now includes Sundays + DB holidays
+        data.put("holiday_dates", holidays);
 
-        // Step 9: Final response
+        // Add leave info
+        data.put("leave_days_count", leaveDays.size());
+        data.put("leave_dates", leaveDays);
+
+        // Final response
         Map<String, Object> response = new HashMap<>();
         response.put("flag", "success");
         response.put("statusCode", "200");
@@ -467,6 +479,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         return response;
     }
+
+
 
 //    @Override
 //    public Map<String, Object> getMonthlyAttendanceCount(String employeeId, int year, int month) {
@@ -484,12 +498,12 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        // Fetch records for the given month/year
 //        List<Attendance> records = attendanceRepository.findByUserNameAndMonthAndYear(employeeId, year, month);
 //
-//        // Step 1: Generate working days list (exclude Sundays) + track holidays (Sundays)
+//        // Step 1: Generate working days list (exclude Sundays initially)
 //        YearMonth ym = YearMonth.of(year, month);
 //        LocalDate today = LocalDate.now();
 //        LocalDate endDate = (year == today.getYear() && month == today.getMonthValue())
-//                ? today  // if current month, only consider days up to today
-//                : ym.atEndOfMonth(); // for past months, consider full month
+//                ? today
+//                : ym.atEndOfMonth();
 //
 //        List<LocalDate> workingDays = new ArrayList<>();
 //        List<LocalDate> holidays = new ArrayList<>();
@@ -497,51 +511,50 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        for (int day = 1; day <= endDate.getDayOfMonth(); day++) {
 //            LocalDate date = LocalDate.of(year, month, day);
 //            if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
-//                holidays.add(date); // mark Sundays as holidays
+//                holidays.add(date); // Sundays
 //            } else {
 //                workingDays.add(date);
 //            }
 //        }
 //
-//        // Step 2: Get attended days from records
+//        // Step 2: Fetch holidays from DB within the month
+//        List<Holidays> dbHolidays = holidayRepository.findByHolidayDateBetween(
+//                ym.atDay(1), endDate
+//        );
+//
+//        for (Holidays h : dbHolidays) {
+//            LocalDate holidayDate = h.getHolidayDate();
+//            if (workingDays.contains(holidayDate)) {
+//                workingDays.remove(holidayDate); // remove from working days
+//                holidays.add(holidayDate);      // add to holidays
+//            }
+//        }
+//
+//        // Step 3: Get attended days from records
 //        Set<LocalDate> attendedDays = records.stream()
 //                .map(Attendance::getDate)
 //                .collect(Collectors.toSet());
 //
-//        // Step 3: Calculate absent days (working days without attendance)
+//        // Step 4: Calculate absent days (working days without attendance)
 //        long absent = workingDays.stream()
 //                .filter(day -> !attendedDays.contains(day))
 //                .count();
 //
-//        // Step 4: Calculate present days (distinct attendance records)
+//        // Step 5: Calculate present days (distinct attendance records)
 //        long present = attendedDays.size();
 //
-//        // Step 5: Count attendance by status
-//        long onTime = records.stream()
-//                .filter(r -> "On Time".equalsIgnoreCase(r.getStatus()))
-//                .count();
-//        long lateEntry = records.stream()
-//                .filter(r -> "Late Entry".equalsIgnoreCase(r.getStatus()))
-//                .count();
-//        long halfDay = records.stream()
-//                .filter(r -> "Half Day".equalsIgnoreCase(r.getStatus()))
-//                .count();
-//        long lateAndHalf = records.stream()
-//                .filter(r -> "Late & Half".equalsIgnoreCase(r.getStatus()))
-//                .count();
+//        // Step 6: Count attendance by status
+//        long onTime = records.stream().filter(r -> "On Time".equalsIgnoreCase(r.getStatus())).count();
+//        long lateEntry = records.stream().filter(r -> "Late Entry".equalsIgnoreCase(r.getStatus())).count();
+//        long halfDay = records.stream().filter(r -> "Half Day".equalsIgnoreCase(r.getStatus())).count();
+//        long lateAndHalf = records.stream().filter(r -> "Late & Half".equalsIgnoreCase(r.getStatus())).count();
 //
-//        // Step 6: Count by attendance type
-//        long wfh = records.stream()
-//                .filter(r -> "WFH".equalsIgnoreCase(r.getAttendanceType()))
-//                .count();
-//        long wfo = records.stream()
-//                .filter(r -> "WFO".equalsIgnoreCase(r.getAttendanceType()))
-//                .count();
-//        long wff = records.stream()
-//                .filter(r -> "WFF".equalsIgnoreCase(r.getAttendanceType()))
-//                .count();
+//        // Step 7: Count by attendance type
+//        long wfh = records.stream().filter(r -> "WFH".equalsIgnoreCase(r.getAttendanceType())).count();
+//        long wfo = records.stream().filter(r -> "WFO".equalsIgnoreCase(r.getAttendanceType())).count();
+//        long wff = records.stream().filter(r -> "WFF".equalsIgnoreCase(r.getAttendanceType())).count();
 //
-//        // Step 7: Prepare the detailed data
+//        // Step 8: Prepare detailed data
 //        Map<String, Object> data = new HashMap<>();
 //        data.put("on_time", onTime);
 //        data.put("late_entry", lateEntry);
@@ -553,11 +566,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        data.put("total_work_from_office", wfo);
 //        data.put("total_work_from_field", wff);
 //        data.put("total_days_in_month", ym.lengthOfMonth());
-//        data.put("working_days_in_month", workingDays.size()); // Mon-Sat
-//        data.put("holidays", holidays.size()); // total Sundays
-//        data.put("holiday_dates", holidays);   // list of actual Sunday dates
+//        data.put("working_days_in_month", workingDays.size());
+//        data.put("holidays", holidays.size());
+//        data.put("holiday_dates", holidays); // now includes Sundays + DB holidays
 //
-//        // Step 8: Prepare final response
+//        // Step 9: Final response
 //        Map<String, Object> response = new HashMap<>();
 //        response.put("flag", "success");
 //        response.put("statusCode", "200");
@@ -566,6 +579,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 //
 //        return response;
 //    }
+
 
     @Override
     public Optional<Map<String, Object>> getDashboardDataForAdmin() {
@@ -789,6 +803,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public Map<String, Object> getMonthlyCategoryDetails(String employeeId, int year, int month, String category) {
+
         Map<String, Object> response = new HashMap<>();
 
         // Step 1: Check if employee exists
@@ -799,14 +814,11 @@ public class AttendanceServiceImpl implements AttendanceService {
             return response;
         }
 
-        // Step 2: Fetch all records for the month
+        // Step 2: Fetch all attendance records for the month
         List<Attendance> records = attendanceRepository.findByUserNameAndMonthAndYear(employeeId, year, month);
 
         YearMonth ym = YearMonth.of(year, month);
-        LocalDate today = LocalDate.now();
-        LocalDate endDate = (year == today.getYear() && month == today.getMonthValue())
-                ? today
-                : ym.atEndOfMonth();
+        LocalDate endDate = ym.atEndOfMonth(); // Use end of month instead of today
 
         // Step 3: Build working days and holidays (Sundays + DB holidays)
         List<LocalDate> workingDays = new ArrayList<>();
@@ -822,10 +834,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
         // Fetch holidays from DB
-        List<Holidays> dbHolidays = holidayRepository.findByHolidayDateBetween(
-                ym.atDay(1), endDate
-        );
-
+        List<Holidays> dbHolidays = holidayRepository.findByHolidayDateBetween(ym.atDay(1), endDate);
         for (Holidays h : dbHolidays) {
             LocalDate holidayDate = h.getHolidayDate();
             if (workingDays.contains(holidayDate)) {
@@ -834,14 +843,26 @@ public class AttendanceServiceImpl implements AttendanceService {
             }
         }
 
+        // Get attended days
         Set<LocalDate> attendedDays = records.stream()
                 .map(Attendance::getDate)
                 .collect(Collectors.toSet());
 
-        // Count values
-        long present = attendedDays.size();
-        long totalWorkingDays = workingDays.size();
-        long holidayCount = holidays.size();
+        // Step 3.5: Fetch pending leaves and exclude holidays
+        List<Leave> pendingLeaves = leaveRepository.findByUsernameAndStatusAndDateRange(
+                employeeId, "PENDING", ym.atDay(1), endDate
+        );
+
+        Set<LocalDate> leaveDays = new HashSet<>();
+        for (Leave leave : pendingLeaves) {
+            LocalDate start = leave.getStartDate().isBefore(ym.atDay(1)) ? ym.atDay(1) : leave.getStartDate();
+            LocalDate end = leave.getEndDate().isAfter(endDate) ? endDate : leave.getEndDate();
+            for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+                if (!holidays.contains(date)) { // Exclude holidays from leave
+                    leaveDays.add(date);
+                }
+            }
+        }
 
         // Step 4: Filter based on category
         List<Attendance> filtered;
@@ -873,7 +894,7 @@ public class AttendanceServiceImpl implements AttendanceService {
             case "absent":
                 List<Attendance> absentList = new ArrayList<>();
                 for (LocalDate day : workingDays) {
-                    if (!attendedDays.contains(day)) {
+                    if (!attendedDays.contains(day) && !leaveDays.contains(day)) {
                         Attendance absentRecord = new Attendance();
                         absentRecord.setDate(day);
                         absentRecord.setStatus("Absent");
@@ -882,6 +903,28 @@ public class AttendanceServiceImpl implements AttendanceService {
                     }
                 }
                 filtered = absentList;
+                break;
+
+            case "leave":
+                // Use DB leave data for proper details
+                filtered = pendingLeaves.stream()
+                        .flatMap(leave -> {
+                            LocalDate start = leave.getStartDate().isBefore(ym.atDay(1)) ? ym.atDay(1) : leave.getStartDate();
+                            LocalDate end = leave.getEndDate().isAfter(endDate) ? endDate : leave.getEndDate();
+                            List<Attendance> leaveRecords = new ArrayList<>();
+                            for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+                                if (!holidays.contains(date)) {
+                                    Attendance leaveRecord = new Attendance();
+                                    leaveRecord.setDate(date);
+                                    leaveRecord.setStatus("Leave");
+                                    leaveRecord.setAttendanceType("-");
+                                    leaveRecord.setReason(leave.getReason() != null ? leave.getReason() : "-");
+                                    leaveRecords.add(leaveRecord);
+                                }
+                            }
+                            return leaveRecords.stream();
+                        })
+                        .collect(Collectors.toList());
                 break;
 
             case "wfh":
@@ -903,20 +946,16 @@ public class AttendanceServiceImpl implements AttendanceService {
                 break;
 
             case "present":
-                filtered = records; // all attended records count as present
+                filtered = records;
                 break;
 
             case "holiday":
-                // Sundays + DB Holidays
                 filtered = holidays.stream().map(date -> {
                     Attendance holidayRecord = new Attendance();
                     holidayRecord.setDate(date);
-
-                    // If from DB holiday, use its name, else just "Holiday"
                     Optional<Holidays> dbHoliday = dbHolidays.stream()
                             .filter(h -> h.getHolidayDate().equals(date))
                             .findFirst();
-
                     holidayRecord.setStatus(dbHoliday.map(Holidays::getName).orElse("Holiday"));
                     holidayRecord.setAttendanceType("-");
                     holidayRecord.setReason(dbHoliday.map(Holidays::getDescription).orElse(""));
@@ -958,13 +997,14 @@ public class AttendanceServiceImpl implements AttendanceService {
         response.put("data", details);
 
         // Extra summary info
-        response.put("present_days", present);
-        response.put("working_days_in_month", totalWorkingDays);
-        response.put("holidays", holidayCount);
+        response.put("present_days", attendedDays.size());
+        response.put("working_days_in_month", workingDays.size());
+        response.put("holidays", holidays.size());
+        response.put("leave_days_count", leaveDays.size());
+        response.put("leave_dates", leaveDays);
 
         return response;
     }
-
 
 //    @Override
 //    public Map<String, Object> getMonthlyCategoryDetails(String employeeId, int year, int month, String category) {
@@ -987,15 +1027,29 @@ public class AttendanceServiceImpl implements AttendanceService {
 //                ? today
 //                : ym.atEndOfMonth();
 //
-//        // Build working days and holidays (Sundays)
+//        // Step 3: Build working days and holidays (Sundays + DB holidays)
 //        List<LocalDate> workingDays = new ArrayList<>();
 //        List<LocalDate> holidays = new ArrayList<>();
+//
 //        for (int day = 1; day <= endDate.getDayOfMonth(); day++) {
 //            LocalDate date = LocalDate.of(year, month, day);
 //            if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
 //                holidays.add(date);
 //            } else {
 //                workingDays.add(date);
+//            }
+//        }
+//
+//        // Fetch holidays from DB
+//        List<Holidays> dbHolidays = holidayRepository.findByHolidayDateBetween(
+//                ym.atDay(1), endDate
+//        );
+//
+//        for (Holidays h : dbHolidays) {
+//            LocalDate holidayDate = h.getHolidayDate();
+//            if (workingDays.contains(holidayDate)) {
+//                workingDays.remove(holidayDate);
+//                holidays.add(holidayDate);
 //            }
 //        }
 //
@@ -1008,7 +1062,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        long totalWorkingDays = workingDays.size();
 //        long holidayCount = holidays.size();
 //
-//        // Step 3: Filter based on category
+//        // Step 4: Filter based on category
 //        List<Attendance> filtered;
 //        switch (category.toLowerCase()) {
 //            case "on_time":
@@ -1072,11 +1126,19 @@ public class AttendanceServiceImpl implements AttendanceService {
 //                break;
 //
 //            case "holiday":
+//                // Sundays + DB Holidays
 //                filtered = holidays.stream().map(date -> {
 //                    Attendance holidayRecord = new Attendance();
 //                    holidayRecord.setDate(date);
-//                    holidayRecord.setStatus("Holiday");
+//
+//                    // If from DB holiday, use its name, else just "Holiday"
+//                    Optional<Holidays> dbHoliday = dbHolidays.stream()
+//                            .filter(h -> h.getHolidayDate().equals(date))
+//                            .findFirst();
+//
+//                    holidayRecord.setStatus(dbHoliday.map(Holidays::getName).orElse("Holiday"));
 //                    holidayRecord.setAttendanceType("-");
+//                    holidayRecord.setReason(dbHoliday.map(Holidays::getDescription).orElse(""));
 //                    return holidayRecord;
 //                }).collect(Collectors.toList());
 //                break;
@@ -1097,7 +1159,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 //                return response;
 //        }
 //
-//        // Step 4: Build details
+//        // Step 5: Build details
 //        List<Map<String, Object>> details = filtered.stream().map(r -> {
 //            Map<String, Object> map = new HashMap<>();
 //            map.put("date", r.getDate());
@@ -1109,7 +1171,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 //            return map;
 //        }).collect(Collectors.toList());
 //
-//        // Step 5: Prepare final response
+//        // Step 6: Prepare final response
 //        response.put("flag", "success");
 //        response.put("message", "Details retrieved successfully");
 //        response.put("data", details);
@@ -1121,6 +1183,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 //
 //        return response;
 //    }
+//
 
 
     @Override
@@ -1307,18 +1370,33 @@ public class AttendanceServiceImpl implements AttendanceService {
         if (dto.getStartDate() == null || dto.getEndDate() == null) {
             throw new IllegalArgumentException("Leave start and end dates are required");
         }
+        if (dto.getEndDate().isBefore(dto.getStartDate())) {
+            throw new IllegalArgumentException("End date cannot be before start date");
+        }
 
-        // Convert DTO → Entity
+        // Step 1: Fetch all pending leaves for this user
+        List<Leave> existingLeaves = leaveRepository.findByUsernameAndStatus(dto.getUsername(), "PENDING");
+
+        // Step 2: Check for overlapping leaves
+        for (Leave leave : existingLeaves) {
+            if (!dto.getEndDate().isBefore(leave.getStartDate()) && !dto.getStartDate().isAfter(leave.getEndDate())) {
+                // Overlap detected
+                throw new IllegalArgumentException("You already have a leave request overlapping with the selected dates");
+            }
+        }
+
+        // Step 3: Convert DTO → Entity
         Leave leave = new Leave();
         leave.setUsername(dto.getUsername());
         leave.setStartDate(dto.getStartDate());
         leave.setEndDate(dto.getEndDate());
-        leave.setDurationType(dto.getDurationType() != null ? dto.getDurationType() : "FULL DAY");
+        leave.setDurationType(dto.getDurationType() != null ? dto.getDurationType() : "FULL_DAY");
         leave.setReason(dto.getReason());
         leave.setStatus("PENDING");
         leave.setAppliedOn(LocalDateTime.now());
         leave.setUpdatedOn(LocalDateTime.now());
 
+        // Step 4: Save leave
         return leaveRepository.save(leave);
     }
 

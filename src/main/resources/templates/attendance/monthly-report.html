@@ -14,72 +14,194 @@
             grid-template-columns: repeat(1, minmax(0, 1fr));
             gap: 16px;
         }
-        @media (min-width: 640px){ .stats-grid{ grid-template-columns: repeat(2, 1fr);} }
-        @media (min-width: 1024px){ .stats-grid{ grid-template-columns: repeat(3, 1fr);} }
 
-        .stat-card{
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .stat-card {
             position: relative;
             border-radius: 16px;
             padding: 18px 18px 18px 72px;
             background: linear-gradient(180deg, #ffffff, #fafafa);
-            box-shadow: 0 8px 24px rgba(16,24,40,0.06), 0 2px 8px rgba(16,24,40,0.04);
+            box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06), 0 2px 8px rgba(16, 24, 40, 0.04);
             transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
             cursor: pointer;
             overflow: hidden;
             min-height: 96px;
         }
-        .stat-card:hover{
+
+        .stat-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 16px 32px rgba(16,24,40,0.10), 0 4px 12px rgba(16,24,40,0.06);
+            box-shadow: 0 16px 32px rgba(16, 24, 40, 0.10), 0 4px 12px rgba(16, 24, 40, 0.06);
             background: linear-gradient(180deg, #ffffff, #f7f7f7);
         }
-        .stat-icon{
-            position: absolute;
-            left: 16px; top: 50%; transform: translateY(-50%);
-            width: 44px; height: 44px; display:flex; align-items:center; justify-content:center;
-            border-radius: 12px; background: #f3f4f6;
-        }
-        .stat-title{
-            font-weight: 600; color: #344054; font-size: 14px; letter-spacing: .2px;
-        }
-        .stat-value{
-            font-size: 28px; font-weight: 700; color: #0f172a; line-height: 1.2;
-        }
-        .stat-chip{
-            display:inline-flex; align-items:center; gap:6px;
-            font-size: 12px; padding: 4px 8px; border-radius: 9999px; background: #f1f5f9; color:#334155;
-        }
-        /* Category accents */
-        .accent-on_time .stat-icon{ background:#e6f9ef; }
-        .accent-on_time .stat-icon i{ color:#10b981; }
-        .accent-late_entry .stat-icon{ background:#fff4e5; }
-        .accent-late_entry .stat-icon i{ color:#f59e0b; }
-        .accent-late_and_half .stat-icon{ background:#fef3f2; }
-        .accent-late_and_half .stat-icon i{ color:#f97316; }
-        .accent-half_day .stat-icon{ background:#fff1f2; }
-        .accent-half_day .stat-icon i{ color:#ec4899; }
-        .accent-absent .stat-icon{ background:#fef2f2; }
-        .accent-absent .stat-icon i{ color:#ef4444; }
-        .accent-wfh .stat-icon{ background:#eef2ff; }
-        .accent-wfh .stat-icon i{ color:#6366f1; }
-        .accent-wfo .stat-icon{ background:#e0f2fe; }
-        .accent-wfo .stat-icon i{ color:#0ea5e9; }
-        .accent-wff .stat-icon{ background:#ecfeff; }
-        .accent-wff .stat-icon i{ color:#06b6d4; }
-        .accent-total .stat-icon{ background:#f1f5f9; }
-        .accent-total .stat-icon i{ color:#334155; }
 
-        .stat-footer{
-            margin-top: 8px; display:flex; align-items:center; justify-content:space-between;
+        .stat-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #f3f4f6;
         }
-        .stat-link{ color:#2563eb; font-size:13px; text-decoration:none; }
-        .stat-link:hover{ text-decoration: underline; }
+
+        .stat-title {
+            font-weight: 600;
+            color: #344054;
+            font-size: 14px;
+            letter-spacing: .2px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        /* Category accents */
+        .accent-on_time .stat-icon {
+            background: #e6f9ef;
+        }
+
+        .accent-on_time .stat-icon i {
+            color: #10b981;
+        }
+
+        .accent-late_entry .stat-icon {
+            background: #fff4e5;
+        }
+
+        .accent-late_entry .stat-icon i {
+            color: #f59e0b;
+        }
+
+        .accent-late_and_half .stat-icon {
+            background: #fef3f2;
+        }
+
+        .accent-late_and_half .stat-icon i {
+            color: #f97316;
+        }
+
+        .accent-half_day .stat-icon {
+            background: #fff1f2;
+        }
+
+        .accent-half_day .stat-icon i {
+            color: #ec4899;
+        }
+
+        .accent-absent .stat-icon {
+            background: #fef2f2;
+        }
+
+        .accent-absent .stat-icon i {
+            color: #ef4444;
+        }
+
+        .accent-wfh .stat-icon {
+            background: #eef2ff;
+        }
+
+        .accent-wfh .stat-icon i {
+            color: #6366f1;
+        }
+
+        .accent-wfo .stat-icon {
+            background: #e0f2fe;
+        }
+
+        .accent-wfo .stat-icon i {
+            color: #0ea5e9;
+        }
+
+        .accent-wff .stat-icon {
+            background: #ecfeff;
+        }
+
+        .accent-wff .stat-icon i {
+            color: #06b6d4;
+        }
+
+        .accent-total .stat-icon {
+            background: #f1f5f9;
+        }
+
+        .accent-total .stat-icon i {
+            color: #334155;
+        }
+
+        .stat-footer {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-link {
+            color: #2563eb;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .stat-link:hover {
+            text-decoration: underline;
+        }
 
         /* Skeletons */
-        .skeleton{ background: linear-gradient(90deg, #f4f4f5 25%, #eceef1 37%, #f4f4f5 63%); background-size: 400% 100%; animation: shimmer 1.4s infinite; min-height: 96px; border-radius:16px; }
-        @keyframes shimmer{ 0%{ background-position: 100% 0; } 100%{ background-position: -100% 0; } }
+        .skeleton {
+            background: linear-gradient(90deg, #f4f4f5 25%, #eceef1 37%, #f4f4f5 63%);
+            background-size: 400% 100%;
+            animation: shimmer 1.4s infinite;
+            min-height: 96px;
+            border-radius: 16px;
+        }
 
-        .stats-error{ display:flex; align-items:center; gap:8px; padding:12px 14px; border-radius:12px; background:#fff1f2; color:#b91c1c; margin-top:12px; }
+        @keyframes shimmer {
+            0% {
+                background-position: 100% 0;
+            }
+            100% {
+                background-position: -100% 0;
+            }
+        }
+
+        .stats-error {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #fff1f2;
+            color: #b91c1c;
+            margin-top: 12px;
+        }
     </style>
 
 </head>
@@ -107,6 +229,7 @@
                 <div class="bg-white rounded-xl shadow-lg p-4">
                     <div id="statsGrid" class="stats-grid">
                         <!-- Skeletons while loading -->
+                        <div class="stat-card skeleton"></div>
                         <div class="stat-card skeleton"></div>
                         <div class="stat-card skeleton"></div>
                         <div class="stat-card skeleton"></div>
@@ -157,23 +280,115 @@
         function cardConfig(d) {
             // map data keys to pretty labels, icons, and category slugs for linking
             return [
-                { key: 'total_days_in_month',    label: 'Total Days',        icon: 'fa-solid fa-calendar-days',  slug: null,           accent: 'total',     hint: 'Calendar days in month' },
-                { key: 'working_days_in_month',  label: 'Working Days',      icon: 'fa-solid fa-briefcase',      slug: null,           accent: 'working',   hint: 'Excludes Sundays/holidays' },
-                { key: 'holidays',               label: 'Holidays',          icon: 'fa-solid fa-umbrella-beach', slug: 'holiday',      accent: 'holiday',   hint: 'Weekly offs (Sundays) / holidays' },
-                { key: 'present',                label: 'Present Days',      icon: 'fa-solid fa-user-check',     slug: 'present',      accent: 'present',   hint: 'Days employee was present' },
-                { key: 'on_time',                label: 'On Time',           icon: 'fa-regular fa-clock',        slug: 'on_time',      accent: 'on_time',   hint: 'Arrived on or before start time' },
-                { key: 'late_entry',             label: 'Late Entry',        icon: 'fa-solid fa-person-walking', slug: 'late_entry',   accent: 'late_entry',hint: 'Late arrivals without half day' },
-                { key: 'late_and_half',          label: 'Late & Half',       icon: 'fa-solid fa-person-running', slug: 'late_and_half',accent: 'late_and_half',hint: 'Late arrivals counted as half day' },
-                { key: 'half_day',               label: 'Half Day',          icon: 'fa-solid fa-hourglass-half', slug: 'half_day',     accent: 'half_day',  hint: 'Approved or computed half days' },
-                { key: 'absent',                 label: 'Absent',            icon: 'fa-solid fa-user-xmark',     slug: 'absent',       accent: 'absent',    hint: 'Unapproved or marked absences' },
-                { key: 'total_work_from_home',   label: 'Work From Home',    icon: 'fa-solid fa-house-laptop',   slug: 'wfh',          accent: 'wfh',       hint: 'WFH days logged' },
-                { key: 'total_work_from_office', label: 'Work From Office',  icon: 'fa-solid fa-building',       slug: 'wfo',          accent: 'wfo',       hint: 'Office presence days' },
-                { key: 'total_work_from_field',  label: 'Work From Field',   icon: 'fa-solid fa-map-location',   slug: 'wff',          accent: 'wff',       hint: 'On-field work days' }
+                {
+                    key: 'total_days_in_month',
+                    label: 'Total Days',
+                    icon: 'fa-solid fa-calendar-days',
+                    slug: null,
+                    accent: 'total',
+                    hint: 'Calendar days in month'
+                },
+                {
+                    key: 'working_days_in_month',
+                    label: 'Working Days',
+                    icon: 'fa-solid fa-briefcase',
+                    slug: null,
+                    accent: 'working',
+                    hint: 'Excludes Sundays/holidays'
+                },
+                {
+                    key: 'holidays',
+                    label: 'Holidays',
+                    icon: 'fa-solid fa-umbrella-beach',
+                    slug: 'holiday',
+                    accent: 'holiday',
+                    hint: 'Weekly offs (Sundays) / holidays'
+                },
+                {
+                    key: 'present',
+                    label: 'Present Days',
+                    icon: 'fa-solid fa-user-check',
+                    slug: 'present',
+                    accent: 'present',
+                    hint: 'Days employee was present'
+                },
+                {
+                    key: 'leave_days_count',
+                    label: 'Leaves',
+                    icon: 'fa-solid fa-hand-holding-medical',
+                    slug: 'leave',
+                    accent: 'leave',
+                    hint: 'Days employee was on leave'
+                },
+                {
+                    key: 'on_time',
+                    label: 'On Time',
+                    icon: 'fa-regular fa-clock',
+                    slug: 'on_time',
+                    accent: 'on_time',
+                    hint: 'Arrived on or before start time'
+                },
+                {
+                    key: 'late_entry',
+                    label: 'Late Entry',
+                    icon: 'fa-solid fa-person-walking',
+                    slug: 'late_entry',
+                    accent: 'late_entry',
+                    hint: 'Late arrivals without half day'
+                },
+                {
+                    key: 'late_and_half',
+                    label: 'Late & Half',
+                    icon: 'fa-solid fa-person-running',
+                    slug: 'late_and_half',
+                    accent: 'late_and_half',
+                    hint: 'Late arrivals counted as half day'
+                },
+                {
+                    key: 'half_day',
+                    label: 'Half Day',
+                    icon: 'fa-solid fa-hourglass-half',
+                    slug: 'half_day',
+                    accent: 'half_day',
+                    hint: 'Approved or computed half days'
+                },
+                {
+                    key: 'absent',
+                    label: 'Absent',
+                    icon: 'fa-solid fa-user-xmark',
+                    slug: 'absent',
+                    accent: 'absent',
+                    hint: 'Unapproved or marked absences'
+                },
+                {
+                    key: 'total_work_from_home',
+                    label: 'Work From Home',
+                    icon: 'fa-solid fa-house-laptop',
+                    slug: 'wfh',
+                    accent: 'wfh',
+                    hint: 'WFH days logged'
+                },
+                {
+                    key: 'total_work_from_office',
+                    label: 'Work From Office',
+                    icon: 'fa-solid fa-building',
+                    slug: 'wfo',
+                    accent: 'wfo',
+                    hint: 'Office presence days'
+                },
+                {
+                    key: 'total_work_from_field',
+                    label: 'Work From Field',
+                    icon: 'fa-solid fa-map-location',
+                    slug: 'wff',
+                    accent: 'wff',
+                    hint: 'On-field work days'
+                }
             ];
         }
 
-        function linkFor(slug){
-            if(!slug) return null;
+        function linkFor(slug) {
+            if (!slug) return null;
             const params = new URLSearchParams({
                 username: username || '',
                 year, month, category: slug
@@ -181,10 +396,13 @@
             return `/attendance/monthly/details?${params.toString()}`;
         }
 
-        function createCard({label, value, icon, slug, accent, hint}){
+        function createCard({label, value, icon, slug, accent, hint}) {
             const aHref = linkFor(slug);
             const wrapper = document.createElement(aHref ? 'a' : 'div');
-            if (aHref) { wrapper.href = aHref; wrapper.className = 'stat-link-wrap'; }
+            if (aHref) {
+                wrapper.href = aHref;
+                wrapper.className = 'stat-link-wrap';
+            }
             const card = document.createElement('div');
             card.className = `stat-card accent-${accent}`;
             card.setAttribute('title', hint || label);
@@ -206,17 +424,6 @@
             const footer = document.createElement('div');
             footer.className = 'stat-footer';
 
-            // const chip = document.createElement('div');
-            // chip.className = 'stat-chip';
-            // chip.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square"></i> Details';
-            //
-            // const link = document.createElement('span');
-            // link.className = 'stat-link';
-            // link.textContent = aHref ? 'View details' : '—';
-            //
-            // footer.appendChild(chip);
-            // footer.appendChild(link);
-
             card.appendChild(iconBox);
             card.appendChild(title);
             card.appendChild(valueEl);
@@ -226,11 +433,11 @@
             return wrapper;
         }
 
-        function renderCards(d){
+        function renderCards(d) {
             grid.innerHTML = '';
             const items = cardConfig(d).map(cfg => {
                 const value = d[cfg.key];
-                return createCard({ ...cfg, value });
+                return createCard({...cfg, value});
             });
             items.forEach(el => grid.appendChild(el));
         }
