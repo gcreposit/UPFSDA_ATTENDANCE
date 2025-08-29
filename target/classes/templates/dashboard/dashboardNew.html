@@ -14,100 +14,65 @@
     <div class="dashboard-grid-admin">
 
         <div class="dashboard-center">
-            <div class="welcome-card">
-                <div class="welcome-content">
-                    <h3>Admin Dashboard</h3>
-                    <p>Here's the attendance overview for today.</p>
-                    <small th:text="'Today is ' + ${#dates.format(#dates.createNow(), 'EEEE, MMMM dd, yyyy')}"></small>
+            <div class="welcome-card" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-radius: 8px; background-color: #f8f9fa; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+                <!-- Left side: Admin Dashboard -->
+                <div class="welcome-content" style="display: flex; flex-direction: column;">
+                    <h2 style="font-size: 36px; margin: 0;">Admin Dashboard</h2>
                 </div>
-                <div class="welcome-icon">
-                    <i class="fas fa-chart-line"></i>
+
+                <!-- Right side: Date and Icon -->
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+                    <small style="font-size: 14px; color: #555;" th:text="'' + ${#dates.format(#dates.createNow(), 'EEEE, MMMM dd, yyyy')}"></small>
+                    <div class="welcome-icon" style="font-size: 36px; color: #007bff;">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
                 </div>
+
             </div>
 
-            <div class="dashboard-main">
-<!--                &lt;!&ndash; Summary Cards Section &ndash;&gt;-->
-<!--                <div class="stats-section">-->
 
-<!--                    &lt;!&ndash; Total Employees &ndash;&gt;-->
-<!--                    <div class="stat-card-small" onclick="goToDetails('total_employees')">-->
-<!--                        <div class="stat-icon" style="background:#007bff"><i class="fas fa-users"></i></div>-->
+            <div class="dashboard-main">
+
+                <!-- Summary Cards Section -->
+                <div class="stats-section">
+
+                    <!-- Total Employees -->
+<!--                    <div class="stat-card-small" onclick="goToDetails('total_employees')" style="background: linear-gradient(145deg, #00b3b3, #009999)">-->
+<!--                        <div class="stat-icon"><i class="fas fa-users"></i></div>-->
 <!--                        <div class="stat-content">-->
 <!--                            <div class="stat-title">Total Employees</div>-->
 <!--                            <div class="stat-value" id="totalEmployeesCount">0</div>-->
 <!--                        </div>-->
 <!--                    </div>-->
 
-<!--                    &lt;!&ndash; Present Card with Breakdown Inside &ndash;&gt;-->
-<!--                    <div class="stat-card-small" style="flex: 1;">-->
-<!--                        <div class="stat-icon" style="background:#28a745"><i class="fas fa-user-check"></i></div>-->
-<!--                        <div class="stat-content" style="width: 100%;">-->
-<!--                            <div class="stat-title" onclick="goToDetails('today_present')" style="cursor: pointer;">Present</div>-->
-<!--                            <div class="stat-value" id="presentCount" onclick="goToDetails('today_present')" style="cursor: pointer;">0</div>-->
-
-<!--                            &lt;!&ndash; Attendance Type Breakdown &ndash;&gt;-->
-<!--                            <div style="margin-top: 8px; font-size: 0.85rem; color: #555;">-->
-<!--                                <strong>Attendance Type</strong>-->
-<!--                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('on_time')">-->
-<!--                                    <span>On Time:</span> <span id="onTimeCount">0</span>-->
-<!--                                </div>-->
-<!--                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('late_entry')">-->
-<!--                                    <span>Late Entry:</span> <span id="lateEntryCount">0</span>-->
-<!--                                </div>-->
-<!--                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('late_and_half')">-->
-<!--                                    <span>Late & Half Day:</span> <span id="lateAndHalfCount">0</span>-->
-<!--                                </div>-->
-<!--                            </div>-->
-
-<!--                            &lt;!&ndash; Work Mode Breakdown &ndash;&gt;-->
-<!--                            <div style="margin-top: 8px; font-size: 0.85rem; color: #555;">-->
-<!--                                <strong>Work Mode</strong>-->
-<!--                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('wfo')">-->
-<!--                                    <span>Work From Office:</span> <span id="wfoCount">0</span>-->
-<!--                                </div>-->
-<!--                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('wfh')">-->
-<!--                                    <span>Work From Home:</span> <span id="wfhCount">0</span>-->
-<!--                                </div>-->
-<!--                                <div style="display: flex; justify-content: space-between; cursor: pointer;" onclick="goToDetails('wff')">-->
-<!--                                    <span>Work From Field:</span> <span id="wffCount">0</span>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    &lt;!&ndash; Absent &ndash;&gt;-->
-<!--                    <div class="stat-card-small" onclick="goToDetails('absent')">-->
-<!--                        <div class="stat-icon" style="background:#dc3545"><i class="fas fa-user-times"></i></div>-->
-<!--                        <div class="stat-content">-->
-<!--                            <div class="stat-title">Absent</div>-->
-<!--                            <div class="stat-value" id="absentCount">0</div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    &lt;!&ndash; Half Day &ndash;&gt;-->
-<!--                    <div class="stat-card-small" onclick="goToDetails('half_day')">-->
-<!--                        <div class="stat-icon" style="background-color: #ff9800;">-->
-<!--                            <i class="fas fa-user-slash"></i>-->
-<!--                        </div>-->
-<!--                        <div class="stat-content">-->
-<!--                            <div class="stat-title">Half Day</div>-->
-<!--                            <div class="stat-value" id="halfDayCount">0</div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-
-
-                <!-- Summary Cards Section -->
-                <div class="stats-section">
-
-                    <!-- Total Employees -->
-                    <div class="stat-card-small" onclick="goToDetails('total_employees')" style="background: linear-gradient(145deg, #00b3b3, #009999)">
+                    <!-- Total Employees Card with Breakdown -->
+                    <div class="stat-card-large" style="background: linear-gradient(145deg, #00b3b3, #009999);" onclick="goToDetails('total_employees')">
                         <div class="stat-icon"><i class="fas fa-users"></i></div>
                         <div class="stat-content">
                             <div class="stat-title">Total Employees</div>
-                            <div class="stat-value" id="totalEmployeesCount">0</div>
+                            <div class="stat-value" id="totalEmployeesCount">120</div>
+
+                            <!-- Breakdown Section -->
+                            <div class="stat-breakdown">
+                                <strong>Office Breakdown</strong>
+                                <div class="breakdown-item">
+                                    <span>Total Office:</span> <span>2</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span>Headquarters:</span> <span>1</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span>Division:</span> <span>18</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span>District:</span> <span>75</span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
+
 
                     <!-- Present Card with Breakdown Inside -->
                     <div class="stat-card-large" style="background: linear-gradient(145deg, #28a745, #218838);" onclick="goToDetails('today_present')">
@@ -163,11 +128,19 @@
                     </div>
 
                     <!-- Half-Day -->
-                    <div class="stat-card-small" onclick="goToDetails('half_day')" style="background: linear-gradient(145deg, #ff9800, #e68900)">
+<!--                    <div class="stat-card-small" onclick="goToDetails('half_day')" style="background: linear-gradient(145deg, #ff9800, #e68900)">-->
+<!--                        <div class="stat-icon"><i class="fas fa-user-slash"></i></div>-->
+<!--                        <div class="stat-content">-->
+<!--                            <div class="stat-title">Half Day</div>-->
+<!--                            <div class="stat-value" id="halfDayCount">0</div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+                    <div class="stat-card-small" onclick="goToDetails('leave')" style="background: linear-gradient(145deg, #ff9800, #e68900)">
                         <div class="stat-icon"><i class="fas fa-user-slash"></i></div>
                         <div class="stat-content">
-                            <div class="stat-title">Half Day</div>
-                            <div class="stat-value" id="halfDayCount">0</div>
+                            <div class="stat-title">Leave</div>
+                            <div class="stat-value" id="leaveCount">0</div>
                         </div>
                     </div>
 
@@ -339,6 +312,7 @@
         document.getElementById('lateEntryCount').textContent = data.late_entry || 0;
         document.getElementById('absentCount').textContent = data.absent_today || 0;
         document.getElementById('halfDayCount').textContent = data.half_day || 0;
+        document.getElementById('leaveCount').textContent = data.on_leave_today || 0;
         document.getElementById('lateAndHalfCount').textContent = data.late_and_half || 0;
         document.getElementById('wfoCount').textContent = data.total_work_from_office || 0;
         document.getElementById('wfhCount').textContent = data.total_work_from_home || 0;

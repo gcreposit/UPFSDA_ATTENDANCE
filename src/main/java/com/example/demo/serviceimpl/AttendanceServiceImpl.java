@@ -647,7 +647,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        return response;
 //    }
 
-
     @Override
     public Optional<Map<String, Object>> getDashboardDataForAdmin() {
 
@@ -673,19 +672,14 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .filter(r -> "Late & Half".equalsIgnoreCase(r.getStatus()))
                 .count();
 
-        // Calculate count for employees who are marked as "On Leave".
-        long onLeaveToday = todaysAttendances.stream()
-                .filter(r -> "On Leave".equalsIgnoreCase(r.getStatus()))
-                .count();
-
         // Calculate present today (excluding those on leave).
         long presentToday = onTime + lateEntry + halfDay + lateAndHalf;
 
-        // Calculate the total number of employees who are accounted for (present or on leave).
-        long accountedForToday = presentToday + onLeaveToday;
+        // === Corrected leave calculation ===
+        long onLeaveToday = leaveRepository.countApprovedLeavesForToday(LocalDate.now());
 
         // The number of absent employees is the total number of employees minus those accounted for.
-        long absentToday = totalEmployees - accountedForToday;
+        long absentToday = totalEmployees - (presentToday + onLeaveToday);
 
         // Calculate counts based on work type.
         long wfh = todaysAttendances.stream()
@@ -701,7 +695,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         // Prepare the dashboard data map.
         Map<String, Object> data = new HashMap<>();
         data.put("total_employees", totalEmployees);
-        data.put("present_today", presentToday); // explicitly present today count
+        data.put("present_today", presentToday);
         data.put("on_time", onTime);
         data.put("late_entry", lateEntry);
         data.put("half_day", halfDay);
@@ -719,6 +713,78 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         return Optional.of(data);
     }
+
+//    @Override
+//    public Optional<Map<String, Object>> getDashboardDataForAdmin() {
+//
+//        LocalDate today = LocalDate.now();
+//
+//        // Fetch today's attendance records.
+//        List<Attendance> todaysAttendances = attendanceRepository.findAttendanceByDate(today);
+//
+//        // Get total employee count from the repository.
+//        long totalEmployees = employeeRepository.count();
+//
+//        // Calculate counts based on attendance status.
+//        long onTime = todaysAttendances.stream()
+//                .filter(r -> "On Time".equalsIgnoreCase(r.getStatus()))
+//                .count();
+//        long lateEntry = todaysAttendances.stream()
+//                .filter(r -> "Late Entry".equalsIgnoreCase(r.getStatus()))
+//                .count();
+//        long halfDay = todaysAttendances.stream()
+//                .filter(r -> "Half Day".equalsIgnoreCase(r.getStatus()))
+//                .count();
+//        long lateAndHalf = todaysAttendances.stream()
+//                .filter(r -> "Late & Half".equalsIgnoreCase(r.getStatus()))
+//                .count();
+//
+//        // Calculate count for employees who are marked as "On Leave".
+//        long onLeaveToday = todaysAttendances.stream()
+//                .filter(r -> "On Leave".equalsIgnoreCase(r.getStatus()))
+//                .count();
+//
+//        // Calculate present today (excluding those on leave).
+//        long presentToday = onTime + lateEntry + halfDay + lateAndHalf;
+//
+//        // Calculate the total number of employees who are accounted for (present or on leave).
+//        long accountedForToday = presentToday + onLeaveToday;
+//
+//        // The number of absent employees is the total number of employees minus those accounted for.
+//        long absentToday = totalEmployees - accountedForToday;
+//
+//        // Calculate counts based on work type.
+//        long wfh = todaysAttendances.stream()
+//                .filter(r -> "WFH".equalsIgnoreCase(r.getAttendanceType()))
+//                .count();
+//        long wfo = todaysAttendances.stream()
+//                .filter(r -> "WFO".equalsIgnoreCase(r.getAttendanceType()))
+//                .count();
+//        long wff = todaysAttendances.stream()
+//                .filter(r -> "WFF".equalsIgnoreCase(r.getAttendanceType()))
+//                .count();
+//
+//        // Prepare the dashboard data map.
+//        Map<String, Object> data = new HashMap<>();
+//        data.put("total_employees", totalEmployees);
+//        data.put("present_today", presentToday); // explicitly present today count
+//        data.put("on_time", onTime);
+//        data.put("late_entry", lateEntry);
+//        data.put("half_day", halfDay);
+//        data.put("late_and_half", lateAndHalf);
+//        data.put("absent_today", absentToday);
+//        data.put("on_leave_today", onLeaveToday);
+//        data.put("total_work_from_home", wfh);
+//        data.put("total_work_from_office", wfo);
+//        data.put("total_work_from_field", wff);
+//        data.put("todays_date", today);
+//
+//        if (totalEmployees == 0) {
+//            return Optional.empty();
+//        }
+//
+//        return Optional.of(data);
+//    }
 
     @Override
     public List<Attendance> getAttendanceByType(String type) {
