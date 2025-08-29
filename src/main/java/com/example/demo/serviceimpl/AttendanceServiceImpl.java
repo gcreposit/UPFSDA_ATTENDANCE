@@ -1470,6 +1470,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         leave.setOfficeName(employee.getOfficeName()); // ✅ set office name from employee
         leave.setStartDate(dto.getStartDate());
         leave.setEndDate(dto.getEndDate());
+        leave.setLeaveType(dto.getLeaveType());
         leave.setDurationType(dto.getDurationType() != null ? dto.getDurationType() : "FULL DAY");
         leave.setReason(dto.getReason());
         leave.setStatus("Approved"); // 👈 better default (then Admin/Manager can approve)

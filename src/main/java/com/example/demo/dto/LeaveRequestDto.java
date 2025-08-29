@@ -18,6 +18,8 @@ public class LeaveRequestDto {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 
+    private String leaveType;
+
     private String durationType; // FULL_DAY, HALF_DAY
     private String reason;
 

@@ -35,6 +35,8 @@ public class Leave {
     @Column(name = "duration_type", nullable = false)
     private String durationType; // e.g., FULL_DAY / HALF_DAY
 
+    private String leaveType;
+
     // Reason for applying
     @Column(name = "reason", length = 500)
     private String reason;
