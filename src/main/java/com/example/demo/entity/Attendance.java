@@ -20,6 +20,8 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String officeName;
+
     @Column(name = "attendance_type", nullable = false)
     private String attendanceType;
 

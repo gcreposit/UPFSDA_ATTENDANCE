@@ -1,10 +1,11 @@
 package com.example.demo.serviceimpl;
 
-import com.example.demo.dto.EmployeeRequest;
-import com.example.demo.dto.EmployeeResponse;
+import com.example.demo.dto.*;
 import com.example.demo.entity.Employee;
-import com.example.demo.repository.EmployeeRepository;
-import com.example.demo.repository.WorkTypesRepository;
+import com.example.demo.entity.LeaveType;
+import com.example.demo.entity.OfficeName;
+import com.example.demo.entity.OfficeType;
+import com.example.demo.repository.*;
 import com.example.demo.service.EmployeeService;
 import com.example.demo.service.FileStorageService;
 import com.example.demo.service.FaceRecognitionService;
@@ -28,6 +29,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final FaceRecognitionService faceRecognitionService;
     private final LocationService locationService;
     private final WorkTypesRepository workTypesRepository;
+    private final OfficeTypeRepository officeTypeRepository;
+    private final OfficeNameRepository officeNameRepository;
+    private final LeaveTypeRepository leaveTypeRepository;
 
     @Override
     @Transactional
@@ -56,6 +60,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
             String username = idCardNo + '_' + name;
             employee.setUsername(username);
+
+            employee.setProductType(request.getProductType());
+            employee.setOfficeType(request.getOfficeType());
 
             Employee savedEmployee = employeeRepository.save(employee);
 
@@ -272,6 +279,72 @@ public class EmployeeServiceImpl implements EmployeeService {
         public EmployeeNotFoundException(String message) {
             super(message);
         }
+    }
+
+
+    @Override
+    @Transactional
+    public OfficeType saveOfficeType(OfficeTypeDto officeTypeDto) {
+
+        if (officeTypeDto.getOfficeType() == null || officeTypeDto.getOfficeType().isEmpty()) {
+            throw new IllegalArgumentException("Office type cannot be empty");
+        }
+
+        OfficeType officeType = new OfficeType();
+        officeType.setOfficeType(officeTypeDto.getOfficeType());
+        return officeTypeRepository.save(officeType);
+
+    }
+
+    @Override
+    public List<OfficeType> getAllOfficeTypes() {
+
+        return officeTypeRepository.findAll();
+
+    }
+
+    @Override
+    @Transactional
+    public OfficeName saveOfficeName(OfficeNameDto dto) {
+
+        if (dto.getOfficeName() == null || dto.getOfficeName().isEmpty()) {
+            throw new IllegalArgumentException("Office name cannot be empty");
+        }
+
+        OfficeName officeName = new OfficeName();
+        officeName.setOfficeName(dto.getOfficeName());
+
+        return officeNameRepository.save(officeName);
+
+    }
+
+    @Override
+    public List<OfficeName> getAllOfficeNames() {
+
+        return officeNameRepository.findAll();
+
+    }
+
+    @Override
+    @Transactional
+    public LeaveType saveLeaveType(LeaveTypeDto dto) {
+
+        if (dto.getLeaveType() == null || dto.getLeaveType().isEmpty()) {
+            throw new IllegalArgumentException("Leave Type cannot be empty");
+        }
+
+        LeaveType leaveType = new LeaveType();
+        leaveType.setLeaveType(dto.getLeaveType());
+
+        return leaveTypeRepository.save(leaveType);
+
+    }
+
+    @Override
+    public List<LeaveType> getAllLeaveTypes() {
+
+        return leaveTypeRepository.findAll();
+
     }
 
 }

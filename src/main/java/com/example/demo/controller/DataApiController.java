@@ -1086,4 +1086,186 @@ public class DataApiController {
         }
     }
 
+//    Crud of Office Type Started
+
+    // Create Office Type
+    @PostMapping("/saveOfficeType")
+    public ResponseEntity<ApiResponse> createOfficeType(@ModelAttribute OfficeTypeDto officeType) {
+
+        try {
+
+            OfficeType saved = employeeService.saveOfficeType(officeType);
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("Office type created successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(saved)
+                            .build()
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error while creating office type")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
+    // Get All Office Details
+    @GetMapping("/fetchOfficeDetails")
+    public ResponseEntity<ApiResponse> getAllOfficeDetails() {
+        try {
+            List<OfficeType> officeTypes = employeeService.getAllOfficeTypes();
+            List<OfficeName> officeNames = employeeService.getAllOfficeNames();
+
+            Map<String, Object> officeDetails = new HashMap<>();
+            officeDetails.put("officeTypes", officeTypes);
+            officeDetails.put("officeNames", officeNames);
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("Office Details fetched successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(officeDetails)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error while fetching office details")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
+    // Create Office Name
+    @PostMapping("/saveOfficeName")
+    public ResponseEntity<ApiResponse> createOfficeName(@ModelAttribute OfficeNameDto dto) {
+
+        try {
+
+            OfficeName saved = employeeService.saveOfficeName(dto);
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("Office name created successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(saved)
+                            .build()
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error while creating office name")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
+    // Create Leave Type
+    @PostMapping("/saveLeaveType")
+    public ResponseEntity<ApiResponse> createLeaveType(@ModelAttribute LeaveTypeDto dto) {
+
+        try {
+
+            LeaveType saved = employeeService.saveLeaveType(dto);
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("Leave Type created successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(saved)
+                            .build()
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error while creating leave type")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
+    //    Fetch All Leave Types
+    @GetMapping("/fetchLeaveTypes")
+    public ResponseEntity<ApiResponse> getAllLeaveTypes() {
+
+        try {
+
+            List<LeaveType> leaveTypes = employeeService.getAllLeaveTypes();
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("Leave Types fetched successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(leaveTypes)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error while fetching leave types")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
 }

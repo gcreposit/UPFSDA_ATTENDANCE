@@ -1393,11 +1393,12 @@ public class AttendanceServiceImpl implements AttendanceService {
         // Step 3: Convert DTO → Entity
         Leave leave = new Leave();
         leave.setUsername(dto.getUsername());
+        leave.setOfficeName(dto.getOfficeName());
         leave.setStartDate(dto.getStartDate());
         leave.setEndDate(dto.getEndDate());
-        leave.setDurationType(dto.getDurationType() != null ? dto.getDurationType() : "FULL_DAY");
+        leave.setDurationType(dto.getDurationType() != null ? dto.getDurationType() : "FULL DAY");
         leave.setReason(dto.getReason());
-        leave.setStatus("PENDING");
+        leave.setStatus("APPROVED");
         leave.setAppliedOn(LocalDateTime.now());
         leave.setUpdatedOn(LocalDateTime.now());
 

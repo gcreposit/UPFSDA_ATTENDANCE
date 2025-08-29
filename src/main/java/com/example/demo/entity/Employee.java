@@ -29,6 +29,10 @@ public class Employee {
 
     private String username;
 
+    private String productType;
+
+    private String officeType;
+
     private String designation;
 
     //    @NotBlank

@@ -11,6 +11,12 @@ public class EmployeeRequest {
     @NotBlank(message = "Employee name is required")
     private String name;
 
+    @NotBlank(message = "Product type is required")
+    private String productType;
+
+    @NotBlank(message = "Office type is required")
+    private String officeType;
+
     //    @NotBlank(message = "Date of birth is required")
     private String dateOfBirth;
 

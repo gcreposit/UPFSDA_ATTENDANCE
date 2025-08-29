@@ -37,12 +37,6 @@ public class WffLocationTracking {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // Ensures ISO string
     private LocalDateTime timestamp;
 
-    // Virtual property: sends { lat: ..., lng: ... } in JSON
-//    @JsonProperty("location")
-//    public Map<String, Double> getLocation() {
-//        return Map.of("lat", lat, "lng", lon);
-//    }
-
     @JsonProperty("location")
     public Map<String, Double> getLocation() {
         if (lat == null || lon == null) {

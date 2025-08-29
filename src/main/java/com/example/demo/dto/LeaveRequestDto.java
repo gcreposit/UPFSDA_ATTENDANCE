@@ -10,6 +10,8 @@ public class LeaveRequestDto {
 
     private String username;
 
+    private String officeName;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
 
@@ -18,4 +20,5 @@ public class LeaveRequestDto {
 
     private String durationType; // FULL_DAY, HALF_DAY
     private String reason;
+
 }

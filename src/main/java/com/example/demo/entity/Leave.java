@@ -22,6 +22,8 @@ public class Leave {
     @Column(name = "username", nullable = false)
     private String username;
 
+    private String officeName;
+
     // Leave start and end dates
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -39,7 +41,7 @@ public class Leave {
 
     // Status of leave (Pending, Approved, Rejected, Cancelled)
     @Column(name = "status", nullable = false)
-    private String status = "PENDING";
+    private String status = "APPROVED";
 
     // Approver's username (manager/admin)
     @Column(name = "approved_by")
