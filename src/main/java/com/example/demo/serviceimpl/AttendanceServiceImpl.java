@@ -181,23 +181,41 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public Attendance getDashboardData(String userName, String date) {
 
-        // Validate if employee exists
+        // 1. Validate employee exists
         Employee employee = employeeRepository.findByUsername(userName);
         if (employee == null) {
             throw new IllegalArgumentException("Employee not found for username: " + userName);
         }
 
-        // Parse date string to LocalDate
+        // 2. Parse date
         LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        // 1. Try to fetch attendance record
-        Attendance attendance = attendanceRepository.findByUserNameAndDate(userName, parsedDate);
+        // 3. Check if Sunday
+        if (parsedDate.getDayOfWeek().getValue() == 7) { // 7 = Sunday
+            Attendance holidayAttendance = new Attendance();
+            holidayAttendance.setUserName(userName);
+            holidayAttendance.setDate(parsedDate);
+            holidayAttendance.setStatus("Holiday");
+            holidayAttendance.setReason("Weekend (Sunday)");
+            holidayAttendance.setOfficeName(employee.getOfficeName());
+            return holidayAttendance;
+        }
 
-        // 2. Check if user has leave for this date
+        // 4. Check if holiday exists in DB
+        Holidays holiday = holidayRepository.findByHolidayDate(parsedDate);
+        if (holiday != null) {
+            Attendance holidayAttendance = new Attendance();
+            holidayAttendance.setUserName(userName);
+            holidayAttendance.setDate(parsedDate);
+            holidayAttendance.setStatus("Holiday");
+            holidayAttendance.setReason(holiday.getName() != null ? holiday.getName() : holiday.getDescription());
+            holidayAttendance.setOfficeName(employee.getOfficeName());
+            return holidayAttendance;
+        }
+
+        // 5. Try to fetch leave for this date
         Leave leave = leaveRepository.findByUsernameAndDateRange(userName, parsedDate);
-
         if (leave != null) {
-            // If leave exists, override response with ON_LEAVE
             Attendance leaveAttendance = new Attendance();
             leaveAttendance.setUserName(userName);
             leaveAttendance.setDate(parsedDate);
@@ -205,20 +223,21 @@ public class AttendanceServiceImpl implements AttendanceService {
             leaveAttendance.setReason(leave.getReason());
             leaveAttendance.setOfficeName(leave.getOfficeName());
             return leaveAttendance;
-
         }
 
-        // 3. If no leave, but attendance exists → return attendance
+        // 6. Try to fetch attendance
+        Attendance attendance = attendanceRepository.findByUserNameAndDate(userName, parsedDate);
         if (attendance != null) {
             return attendance;
         }
 
-        // 4. If neither attendance nor leave → mark absent
+        // 7. If nothing found → Absent
         Attendance absent = new Attendance();
         absent.setUserName(userName);
         absent.setDate(parsedDate);
         absent.setStatus("Absent");
         absent.setReason("No attendance or leave record found");
+        absent.setOfficeName(employee.getOfficeName());
         return absent;
     }
 

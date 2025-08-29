@@ -10,7 +10,9 @@ import java.util.List;
 @Repository
 public interface HolidayRepository extends JpaRepository<Holidays,Long> {
 
-
     List<Holidays> findByHolidayDateBetween(LocalDate startDate, LocalDate endDate);
+
+    Holidays findByHolidayDate(LocalDate parsedDate);
+
 
 }
