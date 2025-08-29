@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/fragment::head}">
+
+</head>
+<body>
+<!-- Navbar -->
+<th:block th:replace="~{fragment/fragment :: header}"></th:block>
+
+
+<!-- Breadcrumb -->
+<div class="container mt-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="#">Security Monitoring</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Lab Details</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Lab Details Content -->
+<div class="container mt-2">
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="mb-2">Agra Lab <span class="status-dot status-active"></span><span class="text-success">Active</span></h4>
+            <div class="mb-2 text-muted">District Laboratory</div>
+            <div class="row mb-2">
+                <div class="col-md-4"><strong>Cameras Online:</strong> 12/12</div>
+                <div class="col-md-4"><strong>Last Activity:</strong> 2 min ago</div>
+                <div class="col-md-4"><strong>Location:</strong> Agra, Uttar Pradesh</div>
+            </div>
+            <div class="mb-2"><strong>Lab Manager:</strong> Dr. A. Kumar</div>
+            <div class="mb-2"><strong>Contact:</strong> +91-1234567890</div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3">Camera Feeds</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card p-2">
+                        <div class="mb-2"><strong>Camera 1</strong></div>
+                        <div class="bg-secondary" style="height:120px; border-radius:8px;"></div>
+                        <div class="mt-2 text-muted" style="font-size:0.95rem;">Status: Online</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-2">
+                        <div class="mb-2"><strong>Camera 2</strong></div>
+                        <div class="bg-secondary" style="height:120px; border-radius:8px;"></div>
+                        <div class="mt-2 text-muted" style="font-size:0.95rem;">Status: Online</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-2">
+                        <div class="mb-2"><strong>Camera 3</strong></div>
+                        <div class="bg-secondary" style="height:120px; border-radius:8px;"></div>
+                        <div class="mt-2 text-muted" style="font-size:0.95rem;">Status: Online</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<th:block th:replace="~{fragment/fragment :: scripts}"></th:block>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

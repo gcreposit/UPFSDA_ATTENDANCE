@@ -1,0 +1,1076 @@
+<th:block th:fragment="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UPFSDA Security Monitoring</title>
+
+
+    <link href="/css/common.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            background: #fff;
+            border-radius: 10px;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .card-img-top {
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .confidence-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: #e9ecef;
+        }
+
+        .pagination .page-link.active, .pagination .active > .page-link {
+            background: #198754;
+            color: #fff;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+        }
+
+        .profile-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .status-btn-group .btn {
+            border-radius: 8px;
+        }
+
+        body {
+            background: #f7f8fa;
+        }
+
+        .card {
+            border-radius: 16px;
+        }
+
+        .lab-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .dot-green {
+            background: #27c46b;
+        }
+
+        .dot-yellow {
+            background: #ffd600;
+        }
+
+        .dot-red {
+            background: #ff4d4f;
+        }
+
+        .btn-green {
+            background: #27c46b;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-green:hover {
+            background: #219e57;
+        }
+
+        .card-warning {
+            border: 1px solid #ffd600;
+        }
+
+        .active-btn {
+            background: #27c46b !important;
+            color: #fff !important;
+        }
+
+        .timeline-box {
+            background: #fff;
+            border-radius: 10px;
+            padding: 24px;
+        }
+
+        .timeline-row {
+            border-left: 4px solid #e9ecef;
+            padding-left: 16px;
+            margin-bottom: 8px;
+        }
+
+        .timeline-selected {
+            border: 2px solid #20c997;
+            border-radius: 8px;
+            background: #e6f9f3;
+        }
+
+        .frame-card img {
+            height: 110px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .badge-status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+
+        .badge-time {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .frame-card {
+            position: relative;
+        }
+
+        .card-section {
+            background: #fff;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .alert-table th, .alert-table td {
+            vertical-align: middle;
+        }
+
+        .icon-fire {
+            color: #ff5252;
+        }
+
+        .icon-crowd {
+            color: #ff9800;
+        }
+
+        .dropdown-menu {
+            min-width: 200px;
+        }
+
+        .chart-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .alert-cards-row {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+        }
+
+        .alert-card {
+            min-width: 220px;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background: #e9ecef;
+        }
+
+        /* --- Alert Sider Styles --- */
+        #alertSider {
+            display: none;
+            position: fixed;
+            top: 70px; /* Adjust if navbar height changes */
+            left: 0;
+            right: 0;
+            z-index: 1050;
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid #eee;
+            padding: 0.5rem 2rem;
+            transition: all 0.3s;
+        }
+
+        #alertSider.active {
+            display: block;
+        }
+
+        .alert-bell-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #dc3545;
+            position: relative;
+        }
+
+        .alert-bell-btn .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 0.7rem;
+        }
+
+        .navbar {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(60, 60, 60, 0.06);
+        }
+
+        .profile-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .notif-success {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(60, 60, 60, 0.10);
+            border-left: 5px solid #27c46b;
+            padding: 14px 24px;
+            position: absolute;
+            top: 85px;
+            right: 32px;
+            z-index: 10;
+            min-width: 300px;
+        }
+
+        .notif-success .bi {
+            color: #27c46b;
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .card {
+            border-radius: 16px;
+        }
+
+        .person-img {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #27c46b;
+        }
+
+        .person-img.unauth {
+            border-color: #e74c3c;
+        }
+
+        .person-img.add {
+            border: 2px dashed #ccc;
+            background: #f3f4f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 2rem;
+        }
+
+        .detected-badge {
+            background: #eafaf1;
+            color: #27c46b;
+            font-weight: 500;
+            border-radius: 12px;
+            padding: 2px 12px;
+            font-size: 0.95rem;
+        }
+
+        .alert-badge {
+            background: #fdeaea;
+            color: #e74c3c;
+            font-weight: 500;
+            border-radius: 12px;
+            padding: 2px 12px;
+            font-size: 0.95rem;
+        }
+
+        .objects-badge {
+            background: #eaf1fa;
+            color: #2176ff;
+            font-weight: 500;
+            border-radius: 12px;
+            padding: 2px 12px;
+            font-size: 0.95rem;
+        }
+
+        .missing-badge {
+            background: #fff7e6;
+            color: #f7c948;
+            font-weight: 500;
+            border-radius: 12px;
+            padding: 2px 12px;
+            font-size: 0.95rem;
+        }
+
+        .object-icon {
+            font-size: 1.5rem;
+            color: #2176ff;
+        }
+
+        .object-box {
+            border: 2px solid #2176ff;
+            border-radius: 10px;
+            padding: 10px 8px;
+            text-align: center;
+            margin: 4px;
+            min-width: 80px;
+        }
+
+        .object-label {
+            font-size: 0.95rem;
+            color: #2176ff;
+        }
+
+        .summary-card {
+            border-radius: 12px;
+            background: #fff;
+            padding: 18px 18px;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-card .icon {
+            font-size: 2rem;
+            margin-right: 16px;
+        }
+
+        .summary-card .icon-blue {
+            color: #2176ff;
+        }
+
+        .summary-card .icon-green {
+            color: #27c46b;
+        }
+
+        .summary-card .icon-red {
+            color: #e74c3c;
+        }
+
+        .summary-card .summary-title {
+            font-weight: 600;
+        }
+
+        .summary-card .summary-desc {
+            color: #888;
+            font-size: 0.98rem;
+        }
+
+        .summary-card:hover {
+            background: #f3f4f8;
+            cursor: pointer;
+        }
+
+        @media (max-width: 991px) {
+            .notif-success {
+                position: static;
+                margin-bottom: 16px;
+            }
+        }
+
+        .navbar {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(60, 60, 60, 0.06);
+        }
+
+        .dashboard-header {
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .dashboard-subheader {
+            font-size: 1rem;
+            color: #888;
+        }
+
+        .profile-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .breadcrumb {
+            background: none;
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+
+        .card {
+            border-radius: 12px;
+        }
+
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .status-active {
+            background: #27c46b;
+        }
+
+        .status-warning {
+            background: #f7c948;
+        }
+
+        .status-alert {
+            background: #e74c3c;
+        }
+        .summary-card .summary-title {
+            font-weight: 600;
+        }
+        .summary-card .summary-desc {
+            color: #888;
+            font-size: 0.98rem;
+        }
+        .summary-card .icon-green {
+            color: #27c46b;
+            font-size: 2rem;
+            margin-right: 16px;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .lab-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            background: #27c46b;
+        }
+        /* Timeline Detection System Styles */
+
+        .timeline-box {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .timeline-row {
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .timeline-row:hover {
+            background-color: #e3f2fd !important;
+            transform: translateX(2px);
+        }
+
+        .timeline-selected {
+            background-color: #e8f5e8 !important;
+            border-left: 4px solid #28a745;
+            font-weight: bold;
+        }
+
+        .timeline-row span:first-child {
+            min-width: 30px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Frame Cards */
+        .frame-card {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .frame-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .frame-card img {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .badge-time {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 0.75rem;
+            z-index: 2;
+        }
+
+        .badge-status {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            font-size: 0.7rem;
+            z-index: 2;
+            max-width: calc(100% - 16px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Loading States */
+        .person-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .person-img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Detected Frames Badge */
+        .detected-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Play Controls */
+        .btn-success {
+            min-width: 100px;
+        }
+
+        .form-range {
+            accent-color: #28a745;
+        }
+
+        /* Timeline Container */
+        .timeline-box [style*="background:#f8f9fa"] {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .timeline-box [style*="background:#f8f9fa"]::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .timeline-box [style*="background:#f8f9fa"]::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .timeline-box [style*="background:#f8f9fa"]::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .timeline-box [style*="background:#f8f9fa"]::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Empty States */
+        .text-center i.fs-1 {
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
+
+        /* Animation for timeline updates */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timeline-row {
+            animation: slideIn 0.3s ease;
+        }
+
+        /* Frame loading animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .frame-card {
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .timeline-row {
+                padding: 6px 8px;
+                font-size: 0.9rem;
+            }
+
+            .frame-card img {
+                height: 150px;
+            }
+
+            .badge-time, .badge-status {
+                font-size: 0.65rem;
+            }
+
+            .person-img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* Status-specific colors */
+        .timeline-row .text-success {
+            color: #28a745 !important;
+        }
+
+        .timeline-row .text-warning {
+            color: #ffc107 !important;
+        }
+
+        .timeline-row .text-danger {
+            color: #dc3545 !important;
+        }
+
+        /* Cursor utilities */
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        /* Enhanced modal styles */
+        #imageModal .modal-dialog {
+            max-width: 800px;
+        }
+
+        #imageModal .modal-body img {
+            max-height: 70vh;
+            width: auto;
+            height: auto;
+        }
+        .alertSummary-card {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        /* Scrollable Alert Container - Parent wrapper */
+        .alerts-wrapper {
+            max-height: 500px; /* Adjust based on your needs */
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        #alert-container {
+            /* Remove previous height constraints */
+            height: auto;
+        }
+
+        /* Custom scrollbar styling for alerts wrapper */
+        .alerts-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .alerts-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .alerts-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .alerts-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Alert card layout improvements */
+        .alert-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .alert-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .time-badge {
+            font-family: 'Courier New', monospace;
+            border-radius: 4px !important;
+            white-space: nowrap;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .time-badge {
+                min-width: 70px;
+                font-size: 11px;
+            }
+
+            .alert-card {
+                padding: 0.75rem !important;
+            }
+
+            .alert-card .fs-5 {
+                font-size: 1rem !important;
+            }
+        }
+
+
+    </style>
+    <!-- Bootstrap Icons for bell -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/commonJs.js"></script>
+
+
+</th:block>
+
+
+<th:block th:fragment="header">
+    <!-- Alert Sider (hidden by default) -->
+    <div id="alertSider">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="fw-bold">Recent Alerts</div>
+            <button class="btn btn-sm btn-outline-secondary" id="closeAlertSider">&times;</button>
+        </div>
+        <div class="alert-cards-row" id="alertCardsRow"></div>
+    </div>
+    <!-- Header -->
+
+
+    <nav class="navbar navbar-light bg-white shadow-sm px-4 py-3">
+        <div class="container-fluid">
+            <a href="/upfsdaMonitoring/labDashboard" class="text-decoration-none">
+
+            <div class="d-flex align-items-center">
+                <span class="me-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#27c46b" class="bi bi-shield-fill-check"
+                           viewBox="0 0 16 16">
+                        <path d="M8 0c-.69 0-1.37.07-2 .21C3.07.58 1.5 2.2 1.5 4.09c0 5.52 4.5 9.91 6.5 11.91 2-2 6.5-6.39 6.5-11.91 0-1.89-1.57-3.51-4.5-3.88A8.12 8.12 0 0 0 8 0zm3.354 5.354a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L8 7.293l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                      </svg>
+                    </span>
+                            <div>
+                                <div class="fw-bold fs-5">UPFSDA Security Monitoring</div>
+                                <div class="text-muted small">Monitoring System</div>
+                            </div>
+            </div>
+            </a>
+
+            <div class="d-flex align-items-center">
+                <button class="alert-bell-btn me-4" id="alertBellBtn" title="Show Alerts">
+                    <i class="bi bi-bell-fill"></i>
+                    <span class="badge bg-danger" id="alertCountBadge"></span>
+                </button>
+
+                <!-- "All Alerts" Button -->
+<!--           t-->
+                <span class="me-4 text-muted"><i class="bi bi-clock"></i> 06:00 PM</span>
+                <div class="dropdown me-3">
+                    <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        <img src="/assets/DeafaultImg.jpg" class="profile-img me-2"
+                             alt="Admin User">
+                        User
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                    </ul>
+                </div>
+                <button id="logOutButton" class="btn btn-danger px-4">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+
+</th:block>
+
+<th:block th:fragment="scripts">
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+
+
+        });
+        document.getElementById('logOutButton').addEventListener('click', function () {
+
+
+            window.location.href = "/upfsdaMonitoring/login";
+
+        });
+
+
+         //     COMMON FETCH FUNCTION
+        //  Pass the EndPoint and formData
+        async function fetchData(endpoint, inputData = null) {
+
+            try {
+                // Determine request method and body
+                const options = inputData
+                    ? {method: 'POST', body: inputData}
+                    : {method: 'GET'};
+
+                const response = await fetch(endpoint, options);
+
+                // Check for successful response
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} - ${response.statusText}`);
+                }
+
+                // Handle JSON or text response
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+
+                    return await response.json();
+
+
+                } else {
+                    return await response.text();
+
+
+                }
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null; // Return null on failure
+            }
+        }
+
+
+    </script>
+
+
+    <script>
+        const labs = [
+            {
+                name: "Agra Lab",
+                status: "alert",
+                personnel: "10/12 Present",
+                unauthorized: "3 Today",
+                objects: "1 Suspicious",
+                lastActivity: "14 min ago",
+                alerts: [
+                    {
+                        type: "Critical",
+                        message: "Unauthorized entry detected",
+                        time: "10 min ago",
+                        alertType: "Personnel"
+                    },
+                    {type: "Warning", message: "Suspicious object found", time: "12 min ago", alertType: "Objects"},
+                    {
+                        type: "Info",
+                        message: "Personnel count below threshold",
+                        time: "14 min ago",
+                        alertType: "Personnel"
+                    }
+                ]
+            },
+            {
+                name: "Lucknow Lab",
+                status: "active",
+                personnel: "8/8 Present",
+                unauthorized: "Resolved",
+                objects: "Normal",
+                lastActivity: "2 hrs ago",
+                alerts: [
+                    {type: "Critical", message: "Fire alarm triggered", time: "1 hr ago", alertType: "Fire"}
+                ]
+            },
+            {
+                name: "Meerut Lab",
+                status: "warning",
+                personnel: "6/6 Present",
+                unauthorized: "Overcrowding",
+                objects: "Normal",
+                lastActivity: "45 min ago",
+                alerts: [
+                    {type: "Warning", message: "Overcrowding detected", time: "30 min ago", alertType: "Crowd"}
+                ]
+            },
+            {
+                name: "Jhansi Lab",
+                status: "active",
+                personnel: "9/9 Present",
+                unauthorized: "None",
+                objects: "Normal",
+                lastActivity: "3 min ago",
+                alerts: []
+            },
+            {
+                name: "Varanasi Lab",
+                status: "active",
+                personnel: "11/11 Present",
+                unauthorized: "None",
+                objects: "Normal",
+                lastActivity: "1 min ago",
+                alerts: []
+            },
+            {
+                name: "Gorakhpur Lab",
+                status: "active",
+                personnel: "7/7 Present",
+                unauthorized: "None",
+                objects: "Normal",
+                lastActivity: "4 min ago",
+                alerts: []
+            }
+        ];
+
+        // Status color mapping
+        const statusMap = {
+            active: "status-active",
+            warning: "status-warning",
+            alert: "status-alert"
+        };
+
+        // Dropdown state
+        let currentLabFilter = "All Labs";
+        let currentAlertType = "All Alert Types";
+        let currentSeverity = "All Severity";
+        let currentTime = "Last 24 Hours";
+
+        // --- ALERT SIDER LOGIC ---
+        function getAllAlerts() {
+            // Flatten all alerts from all labs, with lab name
+            let allAlerts = [];
+            labs.forEach(lab => {
+                lab.alerts.forEach(alert => {
+                    // Filter by dropdowns
+                    if (
+                        (currentLabFilter === "All Labs" || lab.name === currentLabFilter) &&
+                        (currentAlertType === "All Alert Types" || alert.alertType === currentAlertType) &&
+                        (currentSeverity === "All Severity" || alert.type === currentSeverity)
+                    ) {
+                        allAlerts.push({...alert, lab: lab.name});
+                    }
+                });
+            });
+            return allAlerts;
+        }
+
+        function renderAlertSider() {
+            const alertSider = document.getElementById('alertSider');
+            const alertCardsRow = document.getElementById('alertCardsRow');
+            const alerts = getAllAlerts();
+            alertCardsRow.innerHTML = alerts.length === 0
+                ? '<div class="text-muted">No alerts to display.</div>'
+                : alerts.map(alert => `
+                <div class="card alert-card shadow-sm border-${alert.type.toLowerCase()}">
+                    <div class="card-body">
+                        <h6 class="card-title text-${alert.type === 'Critical' ? 'danger' : alert.type === 'Warning' ? 'warning' : 'info'}">${alert.type}</h6>
+                        <div class="fw-bold">${alert.lab}</div>
+                        <p class="card-text mb-1">${alert.message}</p>
+                        <small class="text-muted">${alert.time}</small>
+                    </div>
+                </div>
+            `).join('');
+            // Update badge count
+            document.getElementById('alertCountBadge').textContent = alerts.length > 0 ? alerts.length : '';
+        }
+
+        // Bell icon click
+        document.getElementById('alertBellBtn').addEventListener('click', function () {
+            const alertSider = document.getElementById('alertSider');
+            alertSider.classList.toggle('active');
+            if (alertSider.classList.contains('active')) {
+                window.location.href="/upfsdaMonitoring/labDashboard";
+                renderAlertSider();
+
+            }
+        });
+        // Close button
+        document.getElementById('closeAlertSider').addEventListener('click', function () {
+            document.getElementById('alertSider').classList.remove('active');
+        });
+        window.addEventListener("DOMContentLoaded", () => {
+            renderAlertSider();
+        });
+
+
+    </script>
+
+<!----------------------------This is the Inline Js for Populating on the Page-->
+    <script th:inline="javascript">
+
+
+
+   let allRtspUrlData,allLabDetectionData;
+   allRtspUrlData=[[${allLabRtspUrlData}]]
+   allLabDetectionData=[[${allLabDetectionData}]]
+
+    </script>
+</th:block>
+
+
+<body>
+<div class="container-fluid m-0 p-0 d-flex justify-content-center align-items-center">
+
+    <th:block th:fragment="left_sidebar">
+
+
+    </th:block>
+
+
+</div>
+
+</body>
+</html>

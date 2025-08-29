@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/fragment::head}">
+
+</head>
+<body>
+
+<!-- Header -->
+<th:block th:replace="~{fragment/fragment :: header}"></th:block>
+
+
+<!-- Breadcrumb -->
+<div class="container mt-3">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="#">Agra Lab</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Detection Timeline</li>
+        </ol>
+    </nav>
+</div>
+
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row">
+        <div class="col-12">
+
+
+            <div class="mb-2 text-muted" style="font-size:1.15rem;">Real-time security monitoring and person detection
+            </div>
+            <div class="row g-3 mb-3">
+
+                <!----------------------------DETECTED FRAMES-------------------------->
+                <div class="col-lg-3">
+                    <div class="card p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-semibold">Detected Frames</span>
+                            <span class="detected-badge" id="frameCount">0 Frames</span>
+                        </div>
+                        <div class="d-flex flex-wrap mb-2" id="identifiedFrames">
+                            <!-- Frames images will be populated here -->
+                        </div>
+
+                        <div class="text-info mt-1" id="frameStatus">
+                            <i class="bi bi-box"></i> No frames detected
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="bg-white rounded shadow-sm p-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <h5 class="mb-0">Detection Timeline - Agra Lab</h5>
+                    <div class="text-muted">Real-time detection analysis and frame review</div>
+                </div>
+                <div>
+                    <input type="date" class="form-control d-inline-block" value="2024-01-15" style="width: 150px;">
+                    <button class="btn btn-success ms-2">Export</button>
+                </div>
+            </div>
+            <!-- Timeline Navigation -->
+            <div class="timeline-box mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <button class="btn btn-outline-secondary btn-sm">&lt;</button>
+                        <span class="mx-2">00:00 - 23:59</span>
+                        <button class="btn btn-outline-secondary btn-sm">&gt;</button>
+                    </div>
+                    <div class="text-muted">Total Detections: <b>247</b></div>
+                </div>
+                <div style="background:#f8f9fa; border-radius:8px; padding:16px;">
+                    <div class="timeline-row mb-2">
+                        <span class="text-muted">00</span>
+                    </div>
+                    <div class="timeline-row mb-2">
+                        <span class="text-muted">01</span>
+                    </div>
+                    <div class="timeline-row timeline-selected mb-2">
+                        <span class="text-success fw-bold">02</span>
+                        <span class="ms-2 text-muted">15</span>
+                    </div>
+                    <div class="timeline-row mb-2">
+                        <span class="text-muted">03</span>
+                    </div>
+                    <div class="timeline-row mb-2">
+                        <span class="text-muted">04</span>
+                        <span class="ms-2 text-warning">12</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Play Controls -->
+            <div hidden class="d-flex align-items-center mb-3">
+                <button hidden id="playButton" class="btn btn-success me-3"><i class="bi bi-play-fill"></i> Play</button>
+                <label hidden  class="me-2">Speed:</label>
+                <input hidden type="range" class="form-range" min="1" max="5" value="1" id="speedRange"
+                       style="width:120px;">
+                <span hidden id="speedValue">1x</span>
+                <div hidden class="ms-auto text-muted">Showing: <b>02:00 - 02:59</b></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Person Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Person Image" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<th:block th:replace="~{fragment/fragment :: scripts}"></th:block>
+<script src="/js/labDetectionPage.js"></script>
+
+
+<script>
+    // Update speed value display
+    document.getElementById('speedRange').addEventListener('input', function () {
+        document.getElementById('speedValue').textContent = this.value + 'x';
+    });
+</script>
+</body>
+</html>

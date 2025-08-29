@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/fragment::head}">
+    <style>
+
+    </style>
+</head>
+<body>
+
+<th:block th:replace="~{fragment/fragment :: header}"></th:block>
+
+
+<!-- Breadcrumb -->
+<div class="container mt-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-white px-3 py-2 rounded">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Security Monitoring</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div class="container mt-2">
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card summary-card">
+                <span class="bi bi-building icon-green"></span>
+                <div>
+                    <div class="summary-title" id="total-labs-monitored">Total Labs Monitored: 0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card summary-card">
+                <span class="bi bi-check-circle icon-green"></span>
+                <div>
+                    <div class="summary-title" id="total-labs-active">Total Labs Active: 0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h5 class="fw-bold mb-3">District Laboratory Centers</h5>
+    <!-- Monitoring Cards-->
+    <div class="row g-4 mb-4" id="lab-cards-container">
+        <!-- Dynamic Cards will be injected here -->
+    </div>
+
+
+
+    <!-- Alert Section -->
+    <!-- Security Alerts Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h5 class="mb-3">Security Alerts</h5>
+            <!-- Scrollable wrapper for all alerts -->
+            <div class="alerts-wrapper" style="max-height: 400px; overflow-y: auto;">
+                <div id="alert-container" class="row">
+                    <!-- Alerts will be dynamically added here -->
+                    <!-- You can remove existing static alerts and let them be generated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<th:block th:replace="~{fragment/fragment :: scripts}"></th:block>
+<script src="/js/labDashboard.js"></script>
+<script>
+    // const ctx = document.getElementById('labStatusChart').getContext('2d');
+    // const labStatusChart = new Chart(ctx, {
+    //     type: 'bar',
+    //     data: {
+    //         labels: ['Agra', 'Lucknow', 'Meerut', 'Jhansi', 'Varanasi', 'Gorakhpur'],
+    //         datasets: [
+    //             {
+    //                 label: 'Authorized Persons',
+    //                 data: [12, 15, 8, 9, 11, 7],
+    //                 backgroundColor: '#27c46b'
+    //             },
+    //             {
+    //                 label: 'Unauthorized Persons',
+    //                 data: [0, 0, 2, 0, 1, 0],
+    //                 backgroundColor: '#ff4d4f'
+    //             },
+    //             {
+    //                 label: 'Detected Objects',
+    //                 data: [0, 1, 1, 0, 0, 1],
+    //                 backgroundColor: '#ffd600'
+    //             }
+    //         ]
+    //     },
+    //     options: {
+    //         responsive: true,
+    //         plugins: {
+    //             legend: {display: false}
+    //         },
+    //         scales: {
+    //             x: {stacked: true},
+    //             y: {stacked: true, beginAtZero: true}
+    //         }
+    //     }
+    // });
+</script>
+</body>
+</html>

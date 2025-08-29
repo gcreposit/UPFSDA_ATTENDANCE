@@ -91,6 +91,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/web/**", "/api/data/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/Js/**", "/images/**", "/fonts/**","/assets/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)
@@ -113,31 +114,30 @@ public class SecurityConfig {
                         .contentSecurityPolicy(csp -> csp
                                 .policyDirectives("default-src 'self'; " +
                                         "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
-                                        "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://maps.googleapis.com " +
-                                        "https://cdn.datatables.net https://code.jquery.com; " +
+                                        "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.datatables.net https://maps.googleapis.com; " +
                                         "style-src 'self' 'unsafe-inline' " +
                                         "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://cdn.datatables.net; " +
                                         "style-src-elem 'self' 'unsafe-inline' " +
                                         "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://cdn.datatables.net; " +
-                                        "font-src 'self' https://fonts.gstatic.com data:; " +
-                                        "img-src 'self' data: https://cdn.datatables.net; " +
-                                        // ✅ allow ajax/json calls to CDNs + APIs
-                                        "connect-src 'self' https://cdn.datatables.net https://code.jquery.com https://cdnjs.cloudflare.com https://maps.googleapis.com; " +
+                                        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; " +
+                                        "img-src 'self' data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.datatables.net; " +
+                                        "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.datatables.net https://maps.googleapis.com; " +
                                         "frame-ancestors 'self';")
                         )
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/login", "/api/web/**", "/attendance/**","/error/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/Js/**", "/images/**", "/fonts/**", "/assets/**").permitAll()
+                        .requestMatchers("/ws-alerts/**", "/api/data/alert").permitAll()
+                        .requestMatchers("/login", "/api/web/**", "/attendance/**","/error/**","/upfsdaMonitoring/**","/monitoring/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/sockjs-node/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)
                 .formLogin(form -> form
-                        .loginPage("/login") .permitAll()
+                        .loginPage("/login").permitAll()
                         .failureUrl("/error/unauthenticated")
                 )
                 .exceptionHandling(exception -> exception
@@ -151,5 +151,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
 }

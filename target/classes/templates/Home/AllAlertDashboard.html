@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/fragment::head}">
+</head>
+<body>
+
+<!-- Header -->
+<th:block th:replace="~{fragment/fragment :: header}"></th:block>
+
+
+<!-- Alert Sider (hidden by default) -->
+<div id="alertSider">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="fw-bold">Recent Alerts</div>
+        <button class="btn btn-sm btn-outline-secondary" id="closeAlertSider">&times;</button>
+    </div>
+    <div class="alert-cards-row" id="alertCardsRow"></div>
+</div>
+
+<!-- Breadcrumb -->
+<div class="container mt-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-white px-3 py-2 rounded">
+            <li class="breadcrumb-item"><a href="#">Alert</a></li>
+            <li class="breadcrumb-item active" aria-current="page">All Alerts Dashboards</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="container py-2">
+
+    <!-- Dropdown Filters -->
+    <div class="row g-3 mb-4">
+        <h2>All Alert Dashboard</h2>
+        <div class="col-md-3">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="labDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    All Labs
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="labDropdown" id="labDropdownMenu">
+                    <li><a class="dropdown-item active" href="#" data-lab="All Labs">All Labs</a></li>
+                    <li><a class="dropdown-item" href="#" data-lab="Agra Lab">Agra Lab</a></li>
+                    <li><a class="dropdown-item" href="#" data-lab="Lucknow Lab">Lucknow Lab</a></li>
+                    <li><a class="dropdown-item" href="#" data-lab="Meerut Lab">Meerut Lab</a></li>
+                    <li><a class="dropdown-item" href="#" data-lab="Jhansi Lab">Jhansi Lab</a></li>
+                    <li><a class="dropdown-item" href="#" data-lab="Varanasi Lab">Varanasi Lab</a></li>
+                    <li><a class="dropdown-item" href="#" data-lab="Gorakhpur Lab">Gorakhpur Lab</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="alertTypeDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    All Alert Types
+                </button>
+                <ul class="dropdown-menu" id="alertTypeDropdownMenu">
+                    <li><a class="dropdown-item active" href="#" data-type="All Alert Types">All Alert Types</a></li>
+                    <li><a class="dropdown-item" href="#" data-type="Personnel">Personnel</a></li>
+                    <li><a class="dropdown-item" href="#" data-type="Fire">Fire</a></li>
+                    <li><a class="dropdown-item" href="#" data-type="Crowd">Crowd</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="severityDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    All Severity
+                </button>
+                <ul class="dropdown-menu" id="severityDropdownMenu">
+                    <li><a class="dropdown-item active" href="#" data-severity="All Severity">All Severity</a></li>
+                    <li><a class="dropdown-item" href="#" data-severity="Critical">Critical</a></li>
+                    <li><a class="dropdown-item" href="#" data-severity="Warning">Warning</a></li>
+                    <li><a class="dropdown-item" href="#" data-severity="Info">Info</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="timeDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    Last 24 Hours
+                </button>
+                <ul class="dropdown-menu" id="timeDropdownMenu">
+                    <li><a class="dropdown-item active" href="#" data-time="Last 24 Hours">Last 24 Hours</a></li>
+                    <li><a class="dropdown-item" href="#" data-time="Last 7 Days">Last 7 Days</a></li>
+                    <li><a class="dropdown-item" href="#" data-time="Last 30 Days">Last 30 Days</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accordion Labs -->
+    <div class="accordion" id="labsAccordion">
+        <!-- JS will inject labs here -->
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="chart-container">
+        <h5 class="mb-4">Alert Statistics Summary - Lab Wise Breakdown</h5>
+        <canvas id="labBarChart" height="100"></canvas>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!--<th:block th:replace="~{fragment/fragment :: scripts}"></th:block>-->
+
+<script>
+    // Sample data for labs
+    const labs = [
+        {
+            name: "Agra Lab",
+            status: "alert",
+            personnel: "10/12 Present",
+            unauthorized: "3 Today",
+            objects: "1 Suspicious",
+            lastActivity: "14 min ago",
+            alerts: [
+                {type: "Critical", message: "Unauthorized entry detected", time: "10 min ago", alertType: "Personnel"},
+                {type: "Warning", message: "Suspicious object found", time: "12 min ago", alertType: "Objects"},
+                {type: "Info", message: "Personnel count below threshold", time: "14 min ago", alertType: "Personnel"}
+            ]
+        },
+        {
+            name: "Lucknow Lab",
+            status: "active",
+            personnel: "8/8 Present",
+            unauthorized: "Resolved",
+            objects: "Normal",
+            lastActivity: "2 hrs ago",
+            alerts: [
+                {type: "Critical", message: "Fire alarm triggered", time: "1 hr ago", alertType: "Fire"}
+            ]
+        },
+        {
+            name: "Meerut Lab",
+            status: "warning",
+            personnel: "6/6 Present",
+            unauthorized: "Overcrowding",
+            objects: "Normal",
+            lastActivity: "45 min ago",
+            alerts: [
+                {type: "Warning", message: "Overcrowding detected", time: "30 min ago", alertType: "Crowd"}
+            ]
+        },
+        {
+            name: "Jhansi Lab",
+            status: "active",
+            personnel: "9/9 Present",
+            unauthorized: "None",
+            objects: "Normal",
+            lastActivity: "3 min ago",
+            alerts: []
+        },
+        {
+            name: "Varanasi Lab",
+            status: "active",
+            personnel: "11/11 Present",
+            unauthorized: "None",
+            objects: "Normal",
+            lastActivity: "1 min ago",
+            alerts: []
+        },
+        {
+            name: "Gorakhpur Lab",
+            status: "active",
+            personnel: "7/7 Present",
+            unauthorized: "None",
+            objects: "Normal",
+            lastActivity: "4 min ago",
+            alerts: []
+        }
+    ];
+
+    // Status color mapping
+    const statusMap = {
+        active: "status-active",
+        warning: "status-warning",
+        alert: "status-alert"
+    };
+
+    // Dropdown state
+    let currentLabFilter = "All Labs";
+    let currentAlertType = "All Alert Types";
+    let currentSeverity = "All Severity";
+    let currentTime = "Last 24 Hours";
+
+    // Render labs as accordion stripes
+    // Function to render labs content based on the selected lab
+    function renderLabsAccordion(selectedLab) {
+        const container = document.getElementById('labsAccordion');
+        container.innerHTML = '';  // Clear the previous content
+
+        // Filter the labs to show only the selected lab or show all labs if "All Labs" is selected
+        const filteredLabs = labs.filter(lab => selectedLab === "All Labs" || lab.name === selectedLab);
+
+        filteredLabs.forEach((lab, idx) => {
+            container.innerHTML += `
+            <div class="accordion-item mb-2">
+                <h2 class="accordion-header" id="heading${idx}">
+                    <button class="accordion-button collapsed d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${idx}" aria-expanded="false" aria-controls="collapse${idx}">
+                        <span class="status-dot ${statusMap[lab.status]} me-2"></span>
+                        <span class="fw-bold me-3">${lab.name}</span>
+                        <span class="me-3"><strong>Personnel:</strong> ${lab.personnel}</span>
+                        <span class="me-3"><strong>Unauthorized:</strong> ${lab.unauthorized}</span>
+                        <span class="me-3"><strong>Objects:</strong> ${lab.objects}</span>
+                        <span class="me-3"><strong>Last Activity:</strong> ${lab.lastActivity}</span>
+                    </button>
+                </h2>
+                <div id="collapse${idx}" class="accordion-collapse collapse" aria-labelledby="heading${idx}" data-bs-parent="#labsAccordion">
+                    <div class="accordion-body">
+                        ${lab.alerts.length === 0 ? '<div class="text-muted">No alerts for this lab.</div>' : `
+                            <div class="alert-cards-row">
+                                ${lab.alerts.map(alert => `
+                                    <div class="card alert-card shadow-sm border-${alert.type.toLowerCase()}">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-${alert.type === 'Critical' ? 'danger' : alert.type === 'Warning' ? 'warning' : 'info'}">${alert.type}</h6>
+                                            <p class="card-text mb-1">${alert.message}</p>
+                                            <small class="text-muted">${alert.time}</small>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                    </div>
+                </div>
+            </div>
+        `;
+        });
+    }
+
+    // Setup dropdown event listeners
+    document.querySelectorAll('.dropdown-item[data-lab]').forEach(item => {
+        item.addEventListener('click', function (e) {
+            // Get the selected lab from the data-lab attribute
+            const selectedLab = e.target.getAttribute('data-lab');
+
+            // Set the dropdown label to the selected lab name
+            document.getElementById('labDropdown').textContent = selectedLab;
+
+            // Call the function to filter the labs based on the selection
+            renderLabsAccordion(selectedLab);
+            updateChart();
+        });
+    });
+
+    // Chart.js Bar Chart
+    let chart;
+
+    function updateChart() {
+        let chartLabels = [];
+        let chartCritical = [];
+        let chartWarning = [];
+        let chartInfo = [];
+        let filteredLabs = labs.filter(lab => currentLabFilter === "All Labs" || lab.name === currentLabFilter);
+        filteredLabs.forEach(lab => {
+            chartLabels.push(lab.name);
+            // Count alerts by type
+            let critical = lab.alerts.filter(a => a.type === "Critical").length;
+            let warning = lab.alerts.filter(a => a.type === "Warning").length;
+            let info = lab.alerts.filter(a => a.type === "Info").length;
+            chartCritical.push(critical);
+            chartWarning.push(warning);
+            chartInfo.push(info);
+        });
+
+        const data = {
+            labels: chartLabels,
+            datasets: [
+                {
+                    label: 'Critical',
+                    data: chartCritical,
+                    backgroundColor: '#dc3545'
+                },
+                {
+                    label: 'Warning',
+                    data: chartWarning,
+                    backgroundColor: '#ffc107'
+                },
+                {
+                    label: 'Info',
+                    data: chartInfo,
+                    backgroundColor: '#0d6efd'
+                }
+            ]
+        };
+
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {position: 'top'},
+                    title: {display: false}
+                },
+                scales: {
+                    y: {beginAtZero: true}
+                }
+            }
+        };
+
+        if (chart) {
+            chart.destroy();
+        }
+        const ctx = document.getElementById('labBarChart').getContext('2d');
+        chart = new Chart(ctx, config);
+    }
+
+    // --- ALERT SIDER LOGIC ---
+    function getAllAlerts() {
+        // Flatten all alerts from all labs, with lab name
+        let allAlerts = [];
+        labs.forEach(lab => {
+            lab.alerts.forEach(alert => {
+                // Filter by dropdowns
+                if (
+                    (currentLabFilter === "All Labs" || lab.name === currentLabFilter) &&
+                    (currentAlertType === "All Alert Types" || alert.alertType === currentAlertType) &&
+                    (currentSeverity === "All Severity" || alert.type === currentSeverity)
+                ) {
+                    allAlerts.push({...alert, lab: lab.name});
+                }
+            });
+        });
+        return allAlerts;
+    }
+
+    function renderAlertSider() {
+        const alertSider = document.getElementById('alertSider');
+        const alertCardsRow = document.getElementById('alertCardsRow');
+        const alerts = getAllAlerts();
+        alertCardsRow.innerHTML = alerts.length === 0
+            ? '<div class="text-muted">No alerts to display.</div>'
+            : alerts.map(alert => `
+                <div class="card alert-card shadow-sm border-${alert.type.toLowerCase()}">
+                    <div class="card-body">
+                        <h6 class="card-title text-${alert.type === 'Critical' ? 'danger' : alert.type === 'Warning' ? 'warning' : 'info'}">${alert.type}</h6>
+                        <div class="fw-bold">${alert.lab}</div>
+                        <p class="card-text mb-1">${alert.message}</p>
+                        <small class="text-muted">${alert.time}</small>
+                    </div>
+                </div>
+            `).join('');
+        // Update badge count
+        document.getElementById('alertCountBadge').textContent = alerts.length > 0 ? alerts.length : '';
+    }
+
+    // Bell icon click
+    document.getElementById('alertBellBtn').addEventListener('click', function () {
+        const alertSider = document.getElementById('alertSider');
+        alertSider.classList.toggle('active');
+        if (alertSider.classList.contains('active')) {
+            renderAlertSider();
+        }
+    });
+    // Close button
+    document.getElementById('closeAlertSider').addEventListener('click', function () {
+        document.getElementById('alertSider').classList.remove('active');
+    });
+
+    // Initial render
+    renderLabsAccordion('All Labs');
+    updateChart();
+    renderAlertSider();
+
+</script>
+</body>
+</html>

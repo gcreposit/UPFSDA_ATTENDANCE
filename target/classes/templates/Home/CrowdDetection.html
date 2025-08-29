@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragment/fragment::head}">
+</head>
+<body>
+<!-- Header -->
+<th:block th:replace="~{fragment/fragment :: header}"></th:block>
+
+
+<!-- Breadcrumb -->
+<div class="container mt-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-white px-3 py-2 rounded">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="#">Agra Lab</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Fire & Crowd Detection</li>
+        </ol>
+    </nav>
+</div>
+
+
+<div class="container-fluid">
+
+    <!-- Main Content -->
+    <div class="row">
+        <div class="col-12">
+            <div class="bg-white rounded shadow-sm p-4 mb-3">
+                <h5>Fire & Crowd Detection Summary - Agra Lab</h5>
+                <div class="text-muted mb-3">Real-time monitoring of fire hazards and crowd density</div>
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-success btn-sm me-2">Today</button>
+                    <button class="btn btn-outline-secondary btn-sm me-2">Last 7 Days</button>
+                    <button class="btn btn-outline-secondary btn-sm me-2">Last 1 Month</button>
+                    <input type="text" class="form-control form-control-sm ms-auto me-2" placeholder="mm/dd/yyyy"
+                           style="width: 140px;">
+                    <span class="mx-1">to</span>
+                    <input type="text" class="form-control form-control-sm me-2" placeholder="mm/dd/yyyy"
+                           style="width: 140px;">
+                </div>
+                <!-- Chart Section -->
+                <div class="card-section mb-4">
+                    <h6 class="mb-3">Alerts Overview (Last 7 Days)</h6>
+                    <canvas id="alertsChart" height="80"></canvas>
+                </div>
+                <!-- Fire Detection -->
+                <div class="card-section mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-danger me-2"><i class="bi bi-fire"></i> Fire Detection</span>
+                            <span class="fw-bold">Fire Detection</span>
+                            <div class="text-muted small">Real-time fire monitoring system</div>
+                        </div>
+                        <div class="text-success fw-bold">
+                            <span class="me-1">&#9679;</span>No Alerts
+                            <div class="text-muted small">Last detection: None in last 30 days</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Crowd Detection -->
+                <div class="card-section mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-warning text-dark me-2"><i
+                                    class="bi bi-people"></i> Crowd Detection</span>
+                            <span class="fw-bold">Crowd Detection</span>
+                            <div class="text-muted small">Occupancy and density monitoring</div>
+                        </div>
+                        <div class="text-success fw-bold">
+                            <span class="me-1">&#9679;</span>Normal
+                            <div class="text-muted small">Current occupancy: 8 persons</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Alert History Table -->
+                <div class="card-section">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Alert History</h6>
+                        <div>
+                            <select class="form-select form-select-sm d-inline-block" style="width: 120px;">
+                                <option>All Types</option>
+                                <option>Fire</option>
+                                <option>Crowd</option>
+                            </select>
+                            <button class="btn btn-success btn-sm ms-2">Export</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered alert-table mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Type</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>2024-01-15 14:30:22</td>
+                                <td><span class="badge bg-warning text-dark"><i class="bi bi-people"></i> Crowd</span>
+                                </td>
+                                <td><span class="badge bg-warning text-dark">Medium</span></td>
+                                <td><span class="badge bg-success">Resolved</span></td>
+                                <td>Auto-resolved</td>
+                            </tr>
+                            <tr>
+                                <td>2024-01-14 09:15:45</td>
+                                <td><span class="badge bg-danger"><i class="bi bi-fire"></i> Fire</span></td>
+                                <td><span class="badge bg-danger">High</span></td>
+                                <td><span class="badge bg-success">Resolved</span></td>
+                                <td>Manual intervention</td>
+                            </tr>
+                            <tr>
+                                <td>2024-01-13 16:22:18</td>
+                                <td><span class="badge bg-warning text-dark"><i class="bi bi-people"></i> Crowd</span>
+                                </td>
+                                <td><span class="badge bg-info text-dark">Low</span></td>
+                                <td><span class="badge bg-success">Resolved</span></td>
+                                <td>Auto-resolved</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<th:block th:replace="~{fragment/fragment :: scripts}"></th:block>
+
+<script>
+    // Chart.js - Alerts Overview
+    const ctx = document.getElementById('alertsChart').getContext('2d');
+    const alertsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan 9', 'Jan 10', 'Jan 11', 'Jan 12', 'Jan 13', 'Jan 14', 'Jan 15'],
+            datasets: [
+                {
+                    label: 'Fire Alerts',
+                    data: [0, 1, 0, 0, 0, 1, 0],
+                    backgroundColor: 'rgba(255, 82, 82, 0.7)'
+                },
+                {
+                    label: 'Crowd Alerts',
+                    data: [0, 0, 1, 0, 1, 0, 1],
+                    backgroundColor: 'rgba(255, 193, 7, 0.7)'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {position: 'top'},
+                title: {display: false}
+            },
+            scales: {
+                y: {beginAtZero: true, stepSize: 1}
+            }
+        }
+    });
+</script>
+</body>
+</html>
