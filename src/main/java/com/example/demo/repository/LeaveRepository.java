@@ -38,4 +38,7 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
     Leave findByUsernameAndDateRange(@Param("username") String username,
                                      @Param("date") LocalDate date);
 
+
+    List<Leave> findByUsernameAndStatusIn(String username, List<String> pending);
+
 }

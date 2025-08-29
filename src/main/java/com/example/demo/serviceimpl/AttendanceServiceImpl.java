@@ -1453,33 +1453,40 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new IllegalArgumentException("Employee not found for username: " + dto.getUsername());
         }
 
-        // 3. Fetch all pending leaves for this user
-        List<Leave> existingLeaves = leaveRepository.findByUsernameAndStatus(dto.getUsername(), "PENDING");
+        // 3. Fetch all existing leaves for this user (exclude cancelled/rejected ones)
+        List<Leave> existingLeaves = leaveRepository.findByUsernameAndStatusIn(
+                dto.getUsername(), List.of("PENDING", "APPROVED")
+        );
 
         // 4. Check for overlapping leave dates
         for (Leave leave : existingLeaves) {
-            boolean overlaps = !(dto.getEndDate().isBefore(leave.getStartDate()) || dto.getStartDate().isAfter(leave.getEndDate()));
+            boolean overlaps = !(dto.getEndDate().isBefore(leave.getStartDate())
+                    || dto.getStartDate().isAfter(leave.getEndDate()));
             if (overlaps) {
-                throw new IllegalArgumentException("You already have a pending leave request overlapping with the selected dates");
+                throw new IllegalArgumentException(
+                        "You already have a leave request ("
+                                + leave.getStatus() + ") overlapping with the selected dates"
+                );
             }
         }
 
         // 5. Map DTO → Entity
         Leave leave = new Leave();
         leave.setUsername(dto.getUsername());
-        leave.setOfficeName(employee.getOfficeName()); // ✅ set office name from employee
+        leave.setOfficeName(employee.getOfficeName());
         leave.setStartDate(dto.getStartDate());
         leave.setEndDate(dto.getEndDate());
         leave.setLeaveType(dto.getLeaveType());
         leave.setDurationType(dto.getDurationType() != null ? dto.getDurationType() : "FULL DAY");
         leave.setReason(dto.getReason());
-        leave.setStatus("Approved"); // 👈 better default (then Admin/Manager can approve)
+        leave.setStatus("PENDING"); // 👈 set to PENDING (then Admin/Manager approves)
         leave.setAppliedOn(LocalDateTime.now());
         leave.setUpdatedOn(LocalDateTime.now());
 
         // 6. Save leave
         return leaveRepository.save(leave);
     }
+
 
 
     @Override
