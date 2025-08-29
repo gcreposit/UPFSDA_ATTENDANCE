@@ -73,6 +73,8 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new IllegalArgumentException("Username not registered");
         }
 
+        Employee employee = employeeRepository.findByUsername(userName);
+
         LocalDate today = LocalDate.now();
         Optional<Attendance> existingAttendanceOpt = attendanceRepository.findTopByUserNameAndDate(userName, today);
         Attendance attendance = existingAttendanceOpt.orElse(new Attendance());
@@ -102,6 +104,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         attendance.setUserName(userName);
         attendance.setReason(reason);
+        attendance.setOfficeName(employee.getOfficeName());
 
         OfficeTime officeTime = officeTimeRepository.getOfficeTime();
 
@@ -159,6 +162,22 @@ public class AttendanceServiceImpl implements AttendanceService {
         return filename;
     }
 
+//    @Override
+//    public Attendance getDashboardData(String userName, String date) {
+//
+//        // Validate if employee exists
+//        Employee employee = employeeRepository.findByUsername(userName);
+//        if (employee == null) {
+//            throw new IllegalArgumentException("Employee not found for username: " + userName);
+//        }
+//
+//        // Parse date string to LocalDate
+//        LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//
+//        return attendanceRepository.findByUserNameAndDate(userName, parsedDate);
+//
+//    }
+
     @Override
     public Attendance getDashboardData(String userName, String date) {
 
@@ -171,9 +190,38 @@ public class AttendanceServiceImpl implements AttendanceService {
         // Parse date string to LocalDate
         LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        return attendanceRepository.findByUserNameAndDate(userName, parsedDate);
+        // 1. Try to fetch attendance record
+        Attendance attendance = attendanceRepository.findByUserNameAndDate(userName, parsedDate);
 
+        // 2. Check if user has leave for this date
+        Leave leave = leaveRepository.findByUsernameAndDateRange(userName, parsedDate);
+
+        if (leave != null) {
+            // If leave exists, override response with ON_LEAVE
+            Attendance leaveAttendance = new Attendance();
+            leaveAttendance.setUserName(userName);
+            leaveAttendance.setDate(parsedDate);
+            leaveAttendance.setStatus("Leave");
+            leaveAttendance.setReason(leave.getReason());
+            leaveAttendance.setOfficeName(leave.getOfficeName());
+            return leaveAttendance;
+
+        }
+
+        // 3. If no leave, but attendance exists → return attendance
+        if (attendance != null) {
+            return attendance;
+        }
+
+        // 4. If neither attendance nor leave → mark absent
+        Attendance absent = new Attendance();
+        absent.setUserName(userName);
+        absent.setDate(parsedDate);
+        absent.setStatus("Absent");
+        absent.setReason("No attendance or leave record found");
+        return absent;
     }
+
 
 //    @Override
 //    @Transactional
@@ -1369,6 +1417,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public Leave applyLeaveRequest(LeaveRequestDto dto) {
 
+        // 1. Basic validations
         if (dto.getUsername() == null || dto.getUsername().isEmpty()) {
             throw new IllegalArgumentException("Username is required");
         }
@@ -1379,32 +1428,39 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new IllegalArgumentException("End date cannot be before start date");
         }
 
-        // Step 1: Fetch all pending leaves for this user
+        // 2. Check employee exists
+        Employee employee = employeeRepository.findByUsername(dto.getUsername());
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee not found for username: " + dto.getUsername());
+        }
+
+        // 3. Fetch all pending leaves for this user
         List<Leave> existingLeaves = leaveRepository.findByUsernameAndStatus(dto.getUsername(), "PENDING");
 
-        // Step 2: Check for overlapping leaves
+        // 4. Check for overlapping leave dates
         for (Leave leave : existingLeaves) {
-            if (!dto.getEndDate().isBefore(leave.getStartDate()) && !dto.getStartDate().isAfter(leave.getEndDate())) {
-                // Overlap detected
-                throw new IllegalArgumentException("You already have a leave request overlapping with the selected dates");
+            boolean overlaps = !(dto.getEndDate().isBefore(leave.getStartDate()) || dto.getStartDate().isAfter(leave.getEndDate()));
+            if (overlaps) {
+                throw new IllegalArgumentException("You already have a pending leave request overlapping with the selected dates");
             }
         }
 
-        // Step 3: Convert DTO → Entity
+        // 5. Map DTO → Entity
         Leave leave = new Leave();
         leave.setUsername(dto.getUsername());
-        leave.setOfficeName(dto.getOfficeName());
+        leave.setOfficeName(employee.getOfficeName()); // ✅ set office name from employee
         leave.setStartDate(dto.getStartDate());
         leave.setEndDate(dto.getEndDate());
         leave.setDurationType(dto.getDurationType() != null ? dto.getDurationType() : "FULL DAY");
         leave.setReason(dto.getReason());
-        leave.setStatus("APPROVED");
+        leave.setStatus("Approved"); // 👈 better default (then Admin/Manager can approve)
         leave.setAppliedOn(LocalDateTime.now());
         leave.setUpdatedOn(LocalDateTime.now());
 
-        // Step 4: Save leave
+        // 6. Save leave
         return leaveRepository.save(leave);
     }
+
 
     @Override
     public List<Leave> fetchAllLeaves() {

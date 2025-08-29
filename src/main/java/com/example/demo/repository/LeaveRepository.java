@@ -27,4 +27,15 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
 
     List<Leave> findByUsernameAndStatus(String username, String status);
 
+
+    @Query(
+            value = "SELECT * FROM leave_requests l " +
+                    "WHERE l.username = :username " +
+                    "AND :date BETWEEN l.start_date AND l.end_date " +
+                    "LIMIT 1",
+            nativeQuery = true
+    )
+    Leave findByUsernameAndDateRange(@Param("username") String username,
+                                     @Param("date") LocalDate date);
+
 }
