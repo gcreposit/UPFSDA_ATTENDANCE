@@ -16,6 +16,7 @@ public class LeaveType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "leave_type")
     private String leaveType;
 
 }

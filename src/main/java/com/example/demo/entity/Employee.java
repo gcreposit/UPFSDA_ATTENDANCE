@@ -24,28 +24,39 @@ public class Employee {
     @NotBlank
     private String name;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false,name = "identity_card_no")
     private String identityCardNo;
 
+    @Column(name = "username")
     private String username;
 
+    @Column(name = "product_type")
     private String productType;
 
+    @Column(name = "office_type")
     private String officeType;
 
+    @Column(name = "designation")
     private String designation;
 
     //    @NotBlank
     @Pattern(regexp = "\\d{2}/\\d{2}/\\d{4}", message = "Date format should be dd/MM/yyyy")
+    @Column(name = "date_of_birth")
     private String dateOfBirth;
 
+    @Column(name = "lab_name")
     private String labName;
+
+    @Column(name = "office_name")
     private String officeName;
 
+    @Column(name = "mobile_number")
     private String mobileNumber;
+
+    @Column(name = "blood_group")
     private String bloodGroup;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT",name = "office_address")
     private String officeAddress;
 
     @Column(name = "home_location")
@@ -61,10 +72,13 @@ public class Employee {
     @Column(name = "post")
     private String post;
 
+    @Column(name = "email_address")
     private String emailAddress;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT",name = "parmanent_address")
     private String permanantAddress;
+
+    @Column(name = "emergency_contact_no")
     private String emergencyContactNo;
 
     //    FACE PHOTO AND UPLOAD SIGNATURE
@@ -74,10 +88,13 @@ public class Employee {
     @Transient
     private MultipartFile uploadFacePhoto;
 
+    @Column(name = "upload_signature_img_path")
     private String uploadSignatureImgPath;
 
+    @Column(name = "upload_face_photo_img_path")
     private String uploadFacePhotoImgPath;
 
+    @Column(name = "is_active")
     private boolean isActive = false;
 
 }

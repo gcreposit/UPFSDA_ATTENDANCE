@@ -16,6 +16,7 @@ public class OfficeType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "office_type")
     private String officeType;
 
 }

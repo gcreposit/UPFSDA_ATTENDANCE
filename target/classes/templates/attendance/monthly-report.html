@@ -313,7 +313,7 @@
                     hint: 'Days employee was present'
                 },
                 {
-                    key: 'leave_days_count',
+                    key: 'leave',
                     label: 'Leaves',
                     icon: 'fa-solid fa-hand-holding-medical',
                     slug: 'leave',
@@ -455,6 +455,9 @@
         })
             .then(res => res.json())
             .then(data => {
+
+                console.log("Check Data ",data);
+
                 if (data.flag === 'success') {
                     renderCards(data.data || {});
                 } else {

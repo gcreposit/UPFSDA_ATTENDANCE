@@ -22,6 +22,7 @@ public class Leave {
     @Column(name = "username", nullable = false)
     private String username;
 
+    @Column(name = "office_name")
     private String officeName;
 
     // Leave start and end dates
@@ -35,6 +36,7 @@ public class Leave {
     @Column(name = "duration_type", nullable = false)
     private String durationType; // e.g., FULL_DAY / HALF_DAY
 
+    @Column(name = "leave_type")
     private String leaveType;
 
     // Reason for applying

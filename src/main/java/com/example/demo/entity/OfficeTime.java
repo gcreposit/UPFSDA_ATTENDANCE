@@ -17,7 +17,10 @@ public class OfficeTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "office_id")
     private Long officeId;
+
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 

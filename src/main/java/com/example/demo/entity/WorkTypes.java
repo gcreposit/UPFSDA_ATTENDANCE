@@ -16,6 +16,7 @@ public class WorkTypes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "work_type")
     private String workType;
 
 }
