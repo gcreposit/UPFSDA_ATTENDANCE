@@ -39,12 +39,12 @@
                             <thead>
                             <tr>
                                 <th>Action</th>
-                                <th>Username</th>
+                                <th hidden>Username</th>
                                 <th hidden>ID Card No</th>
                                 <th>Name</th>
                                 <th>Designation</th>
                                 <th hidden>Date of Birth</th>
-                                <th>Lab Name</th>
+                                <th hidden>Lab Name</th>
                                 <th>Office Name</th>
                                 <th>Mobile Number</th>
                                 <th hidden>Blood Group</th>
@@ -66,12 +66,12 @@
                                         Report</a>
                                 </td>
 
-                                <td th:text="${record.username}"></td>
+                                <td hidden th:text="${record.username}"></td>
                                 <td hidden th:text="${record.identityCardNo}"></td>
                                 <td th:text="${record.name}"></td>
                                 <td th:text="${record.designation}"></td>
                                 <td hidden th:text="${record.dateOfBirth}"></td>
-                                <td th:text="${record.labName}"></td>
+                                <td hidden th:text="${record.labName}"></td>
                                 <td th:text="${record.officeName}"></td>
                                 <td th:text="${record.mobileNumber}"></td>
                                 <td hidden th:text="${record.bloodGroup}"></td>

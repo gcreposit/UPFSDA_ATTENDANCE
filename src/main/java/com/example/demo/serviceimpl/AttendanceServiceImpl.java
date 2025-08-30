@@ -484,11 +484,11 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .collect(Collectors.toSet());
 
         // Fetch pending leaves for the month
-        List<Leave> pendingLeaves = leaveRepository.findByUsernameAndStatusAndDateRange(employeeId, "PENDING", ym.atDay(1), endDate);
+        List<Leave> approvedLeaves = leaveRepository.findByUsernameAndStatusAndDateRange(employeeId, "APPROVED", ym.atDay(1), endDate);
 
         // Collect all leave dates excluding holidays
         Set<LocalDate> leaveDays = new HashSet<>();
-        for (Leave leave : pendingLeaves) {
+        for (Leave leave : approvedLeaves) {
             LocalDate start = leave.getStartDate().isBefore(ym.atDay(1)) ? ym.atDay(1) : leave.getStartDate();
             LocalDate end = leave.getEndDate().isAfter(endDate) ? endDate : leave.getEndDate();
 
@@ -786,6 +786,76 @@ public class AttendanceServiceImpl implements AttendanceService {
 //        return Optional.of(data);
 //    }
 
+//    @Override
+//    public List<Attendance> getAttendanceByType(String type) {
+//
+//        LocalDate today = LocalDate.now();
+//
+//        switch (type) {
+//            case "on_time":
+//                return attendanceRepository.findOnTimeEmployees(today);
+//
+//            case "late_entry":
+//                return attendanceRepository.findLateEmployees(today);
+//
+//            case "absent":
+//
+//                // 1. Get all employee usernames in the *same format* as stored in Attendance
+//                List<String> allEmployees = employeeRepository.findAll()
+//                        .stream()
+//                        .map(e -> e.getUsername().trim().toLowerCase()) // normalize for comparison
+//                        .collect(Collectors.toList());
+//
+//                // 2. Get today's present employees (null-safe and normalized)
+//                List<String> presentEmployees = Optional.ofNullable(
+//                                attendanceRepository.findUserNamesByDate(today)
+//                        ).orElse(Collections.emptyList())
+//                        .stream()
+//                        .map(name -> name.trim().toLowerCase()) // normalize for comparison
+//                        .collect(Collectors.toList());
+//
+//                // 3. Use a Set for faster lookup
+//                Set<String> presentSet = new HashSet<>(presentEmployees);
+//
+//                // 4. Filter out absentees
+//                List<String> absentEmployees = allEmployees.stream()
+//                        .filter(emp -> !presentSet.contains(emp))
+//                        .collect(Collectors.toList());
+//
+//                // 5. Convert to Attendance objects
+//                return absentEmployees.stream()
+//                        .map(emp -> {
+//                            Attendance att = new Attendance();
+//                            att.setUserName(emp);
+//                            att.setDate(today);
+//                            att.setStatus("Absent"); // computed in code, not DB
+//                            return att;
+//                        })
+//                        .collect(Collectors.toList());
+//            case "half_day":
+//                return attendanceRepository.findHalfDayEmployees(today);
+//
+//            case "late_and_half":
+//                return attendanceRepository.findLateAndHalfDayEmployees(today);
+//
+//            case "wfh":
+//                return attendanceRepository.findWfhEmployees(today);
+//
+//            case "wff":
+//                return attendanceRepository.findWffEmployees(today);
+//
+//            case "wfo":
+//                return attendanceRepository.findWfoEmployees(today);
+//
+//            case "today_present":
+//
+//                return attendanceRepository.findTodayPresentEmployees(today);
+//
+//            default:
+//                return new ArrayList<>();
+//        }
+//    }
+
     @Override
     public List<Attendance> getAttendanceByType(String type) {
 
@@ -799,39 +869,59 @@ public class AttendanceServiceImpl implements AttendanceService {
                 return attendanceRepository.findLateEmployees(today);
 
             case "absent":
-
-                // 1. Get all employee usernames in the *same format* as stored in Attendance
                 List<String> allEmployees = employeeRepository.findAll()
                         .stream()
-                        .map(e -> e.getUsername().trim().toLowerCase()) // normalize for comparison
+                        .map(e -> e.getUsername().trim().toLowerCase())
                         .collect(Collectors.toList());
 
-                // 2. Get today's present employees (null-safe and normalized)
                 List<String> presentEmployees = Optional.ofNullable(
-                                attendanceRepository.findUserNamesByDate(today)
-                        ).orElse(Collections.emptyList())
+                                attendanceRepository.findUserNamesByDate(today))
+                        .orElse(Collections.emptyList())
                         .stream()
-                        .map(name -> name.trim().toLowerCase()) // normalize for comparison
+                        .map(name -> name.trim().toLowerCase())
                         .collect(Collectors.toList());
 
-                // 3. Use a Set for faster lookup
-                Set<String> presentSet = new HashSet<>(presentEmployees);
+                List<String> leaveEmployees = Optional.ofNullable(
+                                leaveRepository.findUserNamesOnLeave(today))
+                        .orElse(Collections.emptyList())
+                        .stream()
+                        .map(name -> name.trim().toLowerCase())
+                        .collect(Collectors.toList());
 
-                // 4. Filter out absentees
+                Set<String> excluded = new HashSet<>();
+                excluded.addAll(presentEmployees);
+                excluded.addAll(leaveEmployees);
+
                 List<String> absentEmployees = allEmployees.stream()
-                        .filter(emp -> !presentSet.contains(emp))
+                        .filter(emp -> !excluded.contains(emp))
                         .collect(Collectors.toList());
 
-                // 5. Convert to Attendance objects
                 return absentEmployees.stream()
                         .map(emp -> {
                             Attendance att = new Attendance();
                             att.setUserName(emp);
                             att.setDate(today);
-                            att.setStatus("Absent"); // computed in code, not DB
+                            att.setStatus("Absent");
                             return att;
                         })
                         .collect(Collectors.toList());
+
+            case "leave":
+                // Fetch employees on approved leave today
+                List<String> leaveToday = Optional.ofNullable(
+                                leaveRepository.findUserNamesOnLeave(today))
+                        .orElse(Collections.emptyList());
+
+                return leaveToday.stream()
+                        .map(emp -> {
+                            Attendance att = new Attendance();
+                            att.setUserName(emp);
+                            att.setDate(today);
+                            att.setStatus("Leave");
+                            return att;
+                        })
+                        .collect(Collectors.toList());
+
             case "half_day":
                 return attendanceRepository.findHalfDayEmployees(today);
 
@@ -848,13 +938,13 @@ public class AttendanceServiceImpl implements AttendanceService {
                 return attendanceRepository.findWfoEmployees(today);
 
             case "today_present":
-
                 return attendanceRepository.findTodayPresentEmployees(today);
 
             default:
                 return new ArrayList<>();
         }
     }
+
 
     @Override
     public List<Employee> fetchAllEmployeeDetails() {
@@ -983,7 +1073,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         // Step 3.5: Fetch pending leaves and exclude holidays
         List<Leave> pendingLeaves = leaveRepository.findByUsernameAndStatusAndDateRange(
-                employeeId, "PENDING", ym.atDay(1), endDate
+                employeeId, "APPROVED", ym.atDay(1), endDate
         );
 
         Set<LocalDate> leaveDays = new HashSet<>();

@@ -49,4 +49,13 @@ public interface LeaveRepository extends JpaRepository<Leave, Long> {
     long countApprovedLeavesForToday(@Param("today") LocalDate today);
 
 
+    @Query(
+            value = "SELECT username FROM leave_requests " +
+                    "WHERE :today BETWEEN start_date AND end_date " +
+                    "AND status = 'APPROVED'",
+            nativeQuery = true
+    )
+    List<String> findUserNamesOnLeave(@Param("today") LocalDate today);
+
+
 }

@@ -58,7 +58,6 @@ public class AttendanceController {
         List<Employee> records = new ArrayList<>(); // Use wildcard if mixing Employee and Attendance types
 
         List<Attendance> attendances = new ArrayList<>();
-        ; // Use wildcard if mixing Employee and Attendance types
 
         if (type.equalsIgnoreCase("total_employees")) {
             records = attendanceService.fetchAllEmployeeDetails();
