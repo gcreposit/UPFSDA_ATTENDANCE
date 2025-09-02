@@ -38,5 +38,9 @@ public interface EmployeeService {
 
     List<LeaveType> getAllLeaveTypes();
 
+    List<String> getPosts();
+
+    List<String> getAllEmployees();
+
 
 }

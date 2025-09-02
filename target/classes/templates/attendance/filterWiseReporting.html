@@ -235,15 +235,44 @@
                     </select>
                 </label>
 
-                <!-- District Dropdown -->
-                <label for="districtSelect" class="flex items-center gap-2 mr-8">
-                    <span class="font-medium">District:</span>
-                    <select id="districtSelect" class="border rounded px-3 py-2 min-w-[180px]">
-                        <th:block th:each="district : ${districts}">
-                            <option th:value="${district}" th:text="${district}"></option>
+                <!-- Product Type Dropdown -->
+                <label for="productSelect" class="flex items-center gap-2 mr-8">
+                    <span class="font-medium">Product Type:</span>
+                    <select id="productSelect" class="border rounded px-3 py-2 min-w-[180px]">
+                        <option value="Food">Food</option>
+                        <option value="Drug">Drug</option>
+                    </select>
+                </label>
+
+                <!-- Post Type Dropdown -->
+                <label for="postSelect" class="flex items-center gap-2 mr-8">
+                    <span class="font-medium">Post:</span>
+                    <select id="postSelect" class="border rounded px-3 py-2 min-w-[180px]">
+                        <th:block th:each="post : ${posts}">
+                            <option th:value="${post}" th:text="${post}"></option>
                         </th:block>
                     </select>
                 </label>
+
+                <!-- Employee Dropdown -->
+                <label for="employeeSelect" class="flex items-center gap-2 mr-8">
+                    <span class="font-medium">Post:</span>
+                    <select id="employeeSelect" class="border rounded px-3 py-2 min-w-[180px]">
+                        <th:block th:each="post : ${employees}">
+                            <option th:value="${post}" th:text="${post}"></option>
+                        </th:block>
+                    </select>
+                </label>
+
+                <!-- District Dropdown -->
+<!--                <label for="districtSelect" class="flex items-center gap-2 mr-8">-->
+<!--                    <span class="font-medium">District:</span>-->
+<!--                    <select id="districtSelect" class="border rounded px-3 py-2 min-w-[180px]">-->
+<!--                        <th:block th:each="district : ${districts}">-->
+<!--                            <option th:value="${district}" th:text="${district}"></option>-->
+<!--                        </th:block>-->
+<!--                    </select>-->
+<!--                </label>-->
 
                 <!-- From Date -->
                 <label for="fromDate" class="flex items-center gap-2 mr-8">

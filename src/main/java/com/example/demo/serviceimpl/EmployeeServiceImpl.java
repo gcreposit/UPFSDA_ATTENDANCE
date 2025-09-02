@@ -347,4 +347,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    @Override
+    public List<String> getPosts() {
+
+        return workTypesRepository.fetchAllWorkTypes();
+
+    }
+
+    @Override
+    public List<String> getAllEmployees() {
+
+        return employeeRepository.fetchEmployeesUsernames();
+
+    }
+
 }

@@ -177,11 +177,17 @@ public class AttendanceController {
 
         Map<String, Object> user = getMockUserData(usernames);
 
-        List<String> districts = attendanceService.getDistricts();
-        model.addAttribute("districts", districts);
-
         List<String> officeNames = employeeService.getOfficeNames();
         model.addAttribute("officeNames", officeNames);
+
+        List<String> posts = employeeService.getPosts();
+        model.addAttribute("posts", posts);
+
+        List<String> employees = employeeService.getAllEmployees();
+        model.addAttribute("employees", employees);
+
+        List<String> districts = attendanceService.getDistricts();
+        model.addAttribute("districts", districts);
 
         model.addAttribute("pageTitle", "Management");
         model.addAttribute("currentPage", "filterReporting");

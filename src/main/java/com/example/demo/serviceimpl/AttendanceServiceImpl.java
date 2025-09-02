@@ -1635,7 +1635,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         leave.setLeaveType(dto.getLeaveType());
         leave.setDurationType(dto.getDurationType() != null ? dto.getDurationType() : "FULL DAY");
         leave.setReason(dto.getReason());
-        leave.setStatus("PENDING"); // 👈 set to PENDING (then Admin/Manager approves)
+        leave.setStatus("APPROVED"); // 👈 set to PENDING (then Admin/Manager approves)
         leave.setAppliedOn(LocalDateTime.now());
         leave.setUpdatedOn(LocalDateTime.now());
 

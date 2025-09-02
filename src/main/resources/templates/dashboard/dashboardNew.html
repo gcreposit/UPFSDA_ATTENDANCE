@@ -51,7 +51,7 @@
                         <div class="stat-icon"><i class="fas fa-users"></i></div>
                         <div class="stat-content">
                             <div class="stat-title">Total Employees</div>
-                            <div class="stat-value" id="totalEmployeesCount">120</div>
+                            <div class="stat-value" id="totalEmployeesCount">0</div>
 
                             <!-- Breakdown Section -->
                             <div class="stat-breakdown">
@@ -454,6 +454,7 @@
         <div class="popup-content">
            <p><i class="fas fa-users"></i> <strong>Total Employees:</strong> <span id="total-employees">Loading...</span></p>
             <p><i class="fas fa-user-times"></i> <strong>Absent Today:</strong> <span id="absent-today">Loading...</span></p>
+             <p><i class="fas fa-user-times"></i> <strong>On Leave Today:</strong> <span id="leave-today">Loading...</span></p>
             <p><i class="fas fa-check-circle"></i> <strong>Present Today:</strong> <span id="present-today">Loading...</span></p>
             <p><i class="fas fa-briefcase"></i> <strong>Work From Office:</strong> <span id="work-from-office">Loading...</span></p>
             <p><i class="fas fa-home"></i> <strong>Work From Home:</strong> <span id="work-from-home">Loading...</span></p>
@@ -478,6 +479,7 @@
                 .then(data => {
                     document.getElementById('total-employees').textContent = data.data.total_employees;
                     document.getElementById('absent-today').textContent = data.data.absent_today;
+                    document.getElementById('leave-today').textContent = data.data.on_leave_today;
                     document.getElementById('present-today').textContent = data.data.present_today;
                     document.getElementById('work-from-office').textContent = data.data.total_work_from_office;
                     document.getElementById('work-from-home').textContent = data.data.total_work_from_home;
