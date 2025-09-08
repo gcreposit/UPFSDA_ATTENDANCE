@@ -38,6 +38,7 @@
                                class="datatable table table-bordered mb-0 display nowrap" style="width:100%">
                             <thead>
                             <tr>
+                                <th>Approval</th>
                                 <th>Action</th>
                                 <th hidden>Username</th>
                                 <th hidden>ID Card No</th>
@@ -60,6 +61,16 @@
                             </thead>
                             <tbody>
                             <tr th:each="record : ${records}">
+                                <td>
+                                    <button type="button"
+                                            th:attr="data-id=${record.id}"
+                                            th:classappend="${record.isApprove} ? 'btn btn-danger' : 'btn btn-success'"
+                                            th:text="${record.isApprove} ? 'Deny' : 'Approve'"
+                                            th:disabled="${record.isApprove}"
+                                            onclick="toggleApproval(this)">
+                                    </button>
+                                </td>
+
                                 <td>
                                     <a class="btn btn-primary"
                                        th:href="@{/attendance/monthly-report(username=${record.username})}">Show Monthly
@@ -294,6 +305,33 @@
             imageContainer.innerHTML = "";
         });
     });
+</script>
+
+<script>
+    function toggleApproval(button) {
+        const employeeId = button.getAttribute("data-id");
+
+        fetch(`/api/data/${employeeId}/toggle-approval`, {
+            method: "POST",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to update approval status");
+                }
+                return response.text();
+            })
+            .then(message => {
+                console.log(message);
+                // Refresh the page after update
+                window.location.reload();
+            })
+            .catch(error => {
+                alert("Error: " + error.message);
+            });
+    }
 </script>
 
 </body>

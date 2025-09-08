@@ -1,12 +1,11 @@
 package com.example.demo.service;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import com.example.demo.dto.*;
-import com.example.demo.entity.Employee;
-import com.example.demo.entity.LeaveType;
-import com.example.demo.entity.OfficeName;
-import com.example.demo.entity.OfficeType;
+import com.example.demo.entity.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EmployeeService {
     
@@ -42,5 +41,10 @@ public interface EmployeeService {
 
     List<String> getAllEmployees();
 
+    void toggleApproval(Long id);
+
+    ExtraWork applyExtraWork(ExtraWork extraWork);
+
+    Optional<Employee> getEmployeeByUsername(String username);
 
 }

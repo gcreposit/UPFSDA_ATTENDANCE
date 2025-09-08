@@ -21,6 +21,9 @@ public class OfficeTime {
     @Column(name = "office_id")
     private Long officeId;
 
+    @Column(name = "office_name")
+    private String officeName;
+
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
