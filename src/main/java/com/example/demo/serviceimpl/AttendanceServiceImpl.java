@@ -79,6 +79,10 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         Employee employee = employeeRepository.findByUsername(userName);
 
+        if (!employee.isApprove()) {
+            throw new IllegalStateException("User is not approved to mark attendance");
+        }
+
         LocalDate today = LocalDate.now();
         Optional<Attendance> existingAttendanceOpt = attendanceRepository.findTopByUserNameAndDate(userName, today);
         Attendance attendance = existingAttendanceOpt.orElse(new Attendance());
@@ -114,10 +118,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         LocalTime officeStart = officeTime.getStartTime();
         LocalTime officeEnd = officeTime.getEndTime();
-
-        // Office timing constants
-//        LocalTime officeStart = LocalTime.of(10, 0); // 10:00 AM
-//        LocalTime officeEnd = LocalTime.of(18, 0);   // 6:00 PM
 
         // Always get backend current time
         LocalDateTime currentTime = LocalDateTime.now();
