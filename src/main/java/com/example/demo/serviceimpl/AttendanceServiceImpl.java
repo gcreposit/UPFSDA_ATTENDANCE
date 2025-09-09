@@ -1,6 +1,7 @@
 package com.example.demo.serviceimpl;
 
 import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.DashboardResponse;
 import com.example.demo.dto.LeaveRequestDto;
 import com.example.demo.entity.*;
 import com.example.demo.repository.*;
@@ -45,6 +46,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private ExtraWorkRepository extraWorkRepository;
 
     @Autowired
     private WorkTypesRepository workTypesRepository;
@@ -162,25 +166,8 @@ public class AttendanceServiceImpl implements AttendanceService {
         return filename;
     }
 
-//    @Override
-//    public Attendance getDashboardData(String userName, String date) {
-//
-//        // Validate if employee exists
-//        Employee employee = employeeRepository.findByUsername(userName);
-//        if (employee == null) {
-//            throw new IllegalArgumentException("Employee not found for username: " + userName);
-//        }
-//
-//        // Parse date string to LocalDate
-//        LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-//
-//        return attendanceRepository.findByUserNameAndDate(userName, parsedDate);
-//
-//    }
-
     @Override
-    public Attendance getDashboardData(String userName, String date) {
-
+    public DashboardResponse getDashboardData(String userName, String date) {
         // 1. Validate employee exists
         Employee employee = employeeRepository.findByUsername(userName);
         if (employee == null) {
@@ -190,56 +177,130 @@ public class AttendanceServiceImpl implements AttendanceService {
         // 2. Parse date
         LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
+        Attendance attendance;
+
         // 3. Check if Sunday
         if (parsedDate.getDayOfWeek().getValue() == 7) { // 7 = Sunday
-            Attendance holidayAttendance = new Attendance();
-            holidayAttendance.setUserName(userName);
-            holidayAttendance.setDate(parsedDate);
-            holidayAttendance.setStatus("Holiday");
-            holidayAttendance.setReason("Weekend (Sunday)");
-            holidayAttendance.setOfficeName(employee.getOfficeName());
-            return holidayAttendance;
+            attendance = Attendance.builder()
+                    .userName(userName)
+                    .date(parsedDate)
+                    .status("Holiday")
+                    .reason("Weekend (Sunday)")
+                    .officeName(employee.getOfficeName())
+                    .build();
+        }
+        // 4. Check holiday in DB
+        else if (holidayRepository.findByHolidayDate(parsedDate) != null) {
+            Holidays holiday = holidayRepository.findByHolidayDate(parsedDate);
+            attendance = Attendance.builder()
+                    .userName(userName)
+                    .date(parsedDate)
+                    .status("Holiday")
+                    .reason(holiday.getName() != null ? holiday.getName() : holiday.getDescription())
+                    .officeName(employee.getOfficeName())
+                    .build();
+        }
+        // 5. Check leave
+        else if (leaveRepository.findByUsernameAndDateRange(userName, parsedDate) != null) {
+            Leave leave = leaveRepository.findByUsernameAndDateRange(userName, parsedDate);
+            attendance = Attendance.builder()
+                    .userName(userName)
+                    .date(parsedDate)
+                    .status("Leave")
+                    .reason(leave.getReason())
+                    .officeName(leave.getOfficeName())
+                    .build();
+        }
+        // 6. Check attendance
+        else if (attendanceRepository.findByUserNameAndDate(userName, parsedDate) != null) {
+            attendance = attendanceRepository.findByUserNameAndDate(userName, parsedDate);
+        }
+        // 7. Default → Absent
+        else {
+            attendance = Attendance.builder()
+                    .userName(userName)
+                    .date(parsedDate)
+                    .status("Absent")
+                    .reason("No attendance or leave record found")
+                    .officeName(employee.getOfficeName())
+                    .build();
         }
 
-        // 4. Check if holiday exists in DB
-        Holidays holiday = holidayRepository.findByHolidayDate(parsedDate);
-        if (holiday != null) {
-            Attendance holidayAttendance = new Attendance();
-            holidayAttendance.setUserName(userName);
-            holidayAttendance.setDate(parsedDate);
-            holidayAttendance.setStatus("Holiday");
-            holidayAttendance.setReason(holiday.getName() != null ? holiday.getName() : holiday.getDescription());
-            holidayAttendance.setOfficeName(employee.getOfficeName());
-            return holidayAttendance;
-        }
+        // 🔹 Fetch ExtraWork for this user on this date (nullable)
+        ExtraWork extraWork = extraWorkRepository.findByUsernameAndDate(userName, parsedDate)
+                .stream()
+                .findFirst()  // pick first if multiple
+                .orElse(null);
 
-        // 5. Try to fetch leave for this date
-        Leave leave = leaveRepository.findByUsernameAndDateRange(userName, parsedDate);
-        if (leave != null) {
-            Attendance leaveAttendance = new Attendance();
-            leaveAttendance.setUserName(userName);
-            leaveAttendance.setDate(parsedDate);
-            leaveAttendance.setStatus("Leave");
-            leaveAttendance.setReason(leave.getReason());
-            leaveAttendance.setOfficeName(leave.getOfficeName());
-            return leaveAttendance;
-        }
-
-        // 6. Try to fetch attendance
-        Attendance attendance = attendanceRepository.findByUserNameAndDate(userName, parsedDate);
-        if (attendance != null) {
-            return attendance;
-        }
-
-        // 7. If nothing found → Absent
-        Attendance absent = new Attendance();
-        absent.setUserName(userName);
-        absent.setDate(parsedDate);
-        absent.setStatus("Absent");
-        absent.setReason("No attendance or leave record found");
-        absent.setOfficeName(employee.getOfficeName());
-        return absent;
+        // 8. Build dashboard response
+        return DashboardResponse.builder()
+                .attendance(attendance)
+                .extraWork(extraWork)
+                .build();
     }
+
+//    @Override
+//    public Attendance getDashboardData(String userName, String date) {
+//
+//        // 1. Validate employee exists
+//        Employee employee = employeeRepository.findByUsername(userName);
+//        if (employee == null) {
+//            throw new IllegalArgumentException("Employee not found for username: " + userName);
+//        }
+//
+//        // 2. Parse date
+//        LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//
+//        // 3. Check if Sunday
+//        if (parsedDate.getDayOfWeek().getValue() == 7) { // 7 = Sunday
+//            Attendance holidayAttendance = new Attendance();
+//            holidayAttendance.setUserName(userName);
+//            holidayAttendance.setDate(parsedDate);
+//            holidayAttendance.setStatus("Holiday");
+//            holidayAttendance.setReason("Weekend (Sunday)");
+//            holidayAttendance.setOfficeName(employee.getOfficeName());
+//            return holidayAttendance;
+//        }
+//
+//        // 4. Check if holiday exists in DB
+//        Holidays holiday = holidayRepository.findByHolidayDate(parsedDate);
+//        if (holiday != null) {
+//            Attendance holidayAttendance = new Attendance();
+//            holidayAttendance.setUserName(userName);
+//            holidayAttendance.setDate(parsedDate);
+//            holidayAttendance.setStatus("Holiday");
+//            holidayAttendance.setReason(holiday.getName() != null ? holiday.getName() : holiday.getDescription());
+//            holidayAttendance.setOfficeName(employee.getOfficeName());
+//            return holidayAttendance;
+//        }
+//
+//        // 5. Try to fetch leave for this date
+//        Leave leave = leaveRepository.findByUsernameAndDateRange(userName, parsedDate);
+//        if (leave != null) {
+//            Attendance leaveAttendance = new Attendance();
+//            leaveAttendance.setUserName(userName);
+//            leaveAttendance.setDate(parsedDate);
+//            leaveAttendance.setStatus("Leave");
+//            leaveAttendance.setReason(leave.getReason());
+//            leaveAttendance.setOfficeName(leave.getOfficeName());
+//            return leaveAttendance;
+//        }
+//
+//        // 6. Try to fetch attendance
+//        Attendance attendance = attendanceRepository.findByUserNameAndDate(userName, parsedDate);
+//        if (attendance != null) {
+//            return attendance;
+//        }
+//
+//        // 7. If nothing found → Absent
+//        Attendance absent = new Attendance();
+//        absent.setUserName(userName);
+//        absent.setDate(parsedDate);
+//        absent.setStatus("Absent");
+//        absent.setReason("No attendance or leave record found");
+//        absent.setOfficeName(employee.getOfficeName());
+//        return absent;
+//    }
 
 
 //    @Override

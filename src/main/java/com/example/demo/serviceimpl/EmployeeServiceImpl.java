@@ -371,15 +371,38 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional
     public ExtraWork applyExtraWork(ExtraWork extraWork) {
 
-        if (extraWork.getStartTime() != null && extraWork.getEndTime() != null &&
-                extraWork.getEndTime().isBefore(extraWork.getStartTime())) {
+        // Rule 1: End time must be after start time
+        if (extraWork.getEndTime().isBefore(extraWork.getStartTime())) {
             throw new IllegalArgumentException("End time cannot be before start time");
+        }
+
+        // Rule 2: Prevent duplicate entry for same user & date
+        if (extraWorkRepository.existsByUsernameAndDate(extraWork.getUsername(), extraWork.getDate())) {
+            throw new IllegalArgumentException("You have already applied for extra work on this date.");
+        }
+
+        // Rule 3: Prevent overlapping times for same user & date
+        List<ExtraWork> existingWorks = extraWorkRepository.findByUsernameAndDate(extraWork.getUsername(), extraWork.getDate());
+
+        for (ExtraWork existing : existingWorks) {
+            boolean overlaps = !(
+                    extraWork.getEndTime().isBefore(existing.getStartTime()) ||
+                            extraWork.getStartTime().isAfter(existing.getEndTime())
+            );
+
+            if (overlaps) {
+                throw new IllegalArgumentException(
+                        "The time slot overlaps with an already submitted extra work record."
+                );
+            }
         }
 
         return extraWorkRepository.save(extraWork);
     }
+
 
     @Override
     public Optional<Employee> getEmployeeByUsername(String username) {

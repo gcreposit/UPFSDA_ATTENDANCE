@@ -324,19 +324,73 @@ public class DataApiController {
         }
     }
 
-    //Api For Fetch Dashboard Data (Today Reports)
+//    //Api For Fetch Dashboard Data (Today Reports)
+//    @PostMapping("/dashboard")
+//    public ResponseEntity<ApiResponse<Attendance>> getDashboard(
+//            @RequestParam String userName,
+//            @RequestParam String date
+//    ) {
+//        try {
+//            Attendance attendance = attendanceService.getDashboardData(userName, date);
+//
+//            if (attendance == null) {
+//                // ✅ No data found case
+//                return ResponseEntity.status(HttpStatus.OK).body(
+//                        ApiResponse.<Attendance>builder()
+//                                .message("No Data Available")
+//                                .username(userName)
+//                                .statusCode(HttpStatus.OK.value())
+//                                .data(null)
+//                                .build()
+//                );
+//            }
+//
+//            return ResponseEntity.ok(
+//                    ApiResponse.<Attendance>builder()
+//                            .message("Dashboard data fetched successfully.")
+//                            .username(userName)
+//                            .statusCode(HttpStatus.OK.value())
+//                            .data(attendance)
+//                            .build()
+//            );
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+//                    ApiResponse.<Attendance>builder()
+//                            .message(e.getMessage())
+//                            .statusCode(HttpStatus.BAD_REQUEST.value())
+//                            .data(null)
+//                            .build()
+//            );
+//        } catch (NoSuchElementException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+//                    ApiResponse.<Attendance>builder()
+//                            .message(e.getMessage())
+//                            .statusCode(HttpStatus.NOT_FOUND.value())
+//                            .data(null)
+//                            .build()
+//            );
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+//                    ApiResponse.<Attendance>builder()
+//                            .message("Internal server error: " + e.getMessage())
+//                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                            .data(null)
+//                            .build()
+//            );
+//        }
+//    }
+
     @PostMapping("/dashboard")
-    public ResponseEntity<ApiResponse<Attendance>> getDashboard(
+    public ResponseEntity<ApiResponse<DashboardResponse>> getDashboard(
             @RequestParam String userName,
             @RequestParam String date
     ) {
         try {
-            Attendance attendance = attendanceService.getDashboardData(userName, date);
+            DashboardResponse dashboard = attendanceService.getDashboardData(userName, date);
 
-            if (attendance == null) {
-                // ✅ No data found case
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        ApiResponse.<Attendance>builder()
+            if (dashboard == null) {
+                return ResponseEntity.ok(
+                        ApiResponse.<DashboardResponse>builder()
                                 .message("No Data Available")
                                 .username(userName)
                                 .statusCode(HttpStatus.OK.value())
@@ -346,16 +400,17 @@ public class DataApiController {
             }
 
             return ResponseEntity.ok(
-                    ApiResponse.<Attendance>builder()
+                    ApiResponse.<DashboardResponse>builder()
                             .message("Dashboard data fetched successfully.")
                             .username(userName)
                             .statusCode(HttpStatus.OK.value())
-                            .data(attendance)
+                            .data(dashboard)
                             .build()
             );
+
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    ApiResponse.<Attendance>builder()
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.<DashboardResponse>builder()
                             .message(e.getMessage())
                             .statusCode(HttpStatus.BAD_REQUEST.value())
                             .data(null)
@@ -363,7 +418,7 @@ public class DataApiController {
             );
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    ApiResponse.<Attendance>builder()
+                    ApiResponse.<DashboardResponse>builder()
                             .message(e.getMessage())
                             .statusCode(HttpStatus.NOT_FOUND.value())
                             .data(null)
@@ -371,7 +426,7 @@ public class DataApiController {
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    ApiResponse.<Attendance>builder()
+                    ApiResponse.<DashboardResponse>builder()
                             .message("Internal server error: " + e.getMessage())
                             .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                             .data(null)
@@ -379,6 +434,7 @@ public class DataApiController {
             );
         }
     }
+
 
     //    Api For Save Location Tracking For WFF
     @PostMapping("/location-tracking")
@@ -1282,7 +1338,18 @@ public class DataApiController {
 //    Apply For Extra Work
 
     @PostMapping("/applyExtraWork")
-    public ResponseEntity<ApiResponse> applyExtraWork(@ModelAttribute ExtraWork extraWork) {
+    public ResponseEntity<ApiResponse> applyExtraWork(@Valid @ModelAttribute ExtraWork extraWork,
+                                                      BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .message("Validation failed")
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(bindingResult.getAllErrors())
+                            .build()
+            );
+        }
+
         try {
             ExtraWork saved = employeeService.applyExtraWork(extraWork);
 
@@ -1315,6 +1382,7 @@ public class DataApiController {
             );
         }
     }
+
 
     //    For Check Username is Approved or not for python service
     @GetMapping("/admin/employees/{username}")

@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.DashboardResponse;
 import com.example.demo.dto.LeaveRequestDto;
 import com.example.demo.entity.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +20,7 @@ public interface AttendanceService {
 
     Attendance saveAttendance(String userName, MultipartFile image, String attendanceType, String reason) throws IOException;
 
-    Attendance getDashboardData(String userName, String date);
+    DashboardResponse getDashboardData(String userName, String date);
 
     ApiResponse<Object> saveLocationForTracking(String userName, String lat, String lon, String timestamp,boolean isActive);
 

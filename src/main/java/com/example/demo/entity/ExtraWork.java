@@ -24,17 +24,24 @@ public class ExtraWork {
     private Long id;
 
     @NotNull(message = "Username is required")
+    @Column(nullable = false)
     private String username;
 
-    @Column(name = "office_name")
     @NotNull(message = "Office Name is required")
+    @Column(name = "office_name", nullable = false)
     private String officeName;
 
+    @NotNull(message = "Date is required")
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    private LocalTime startTime;  // Changed from LocalDateTime
-    private LocalTime endTime;    // Changed from LocalDateTime
+    @NotNull(message = "Start time is required")
+    @Column(name = "start_time", nullable = false)
+    private LocalTime startTime;
+
+    @NotNull(message = "End time is required")
+    @Column(name = "end_time", nullable = false)
+    private LocalTime endTime;
 
     @Column(name = "reason", length = 500)
     private String reason;
