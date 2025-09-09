@@ -1,6 +1,7 @@
 package com.example.demo.serviceimpl;
 
 import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.AttendanceFilterRequest;
 import com.example.demo.dto.DashboardResponse;
 import com.example.demo.dto.LeaveRequestDto;
 import com.example.demo.entity.*;
@@ -607,7 +608,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         return response;
     }
-
 
 
 //    @Override
@@ -1705,11 +1705,17 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
 
-
     @Override
     public List<Leave> fetchAllLeaves() {
 
         return leaveRepository.findAll();
+
+    }
+
+    @Override
+    public List<Attendance> filterWiseAdvanceReporting(AttendanceFilterRequest filter) {
+        
+        return null;
 
     }
 

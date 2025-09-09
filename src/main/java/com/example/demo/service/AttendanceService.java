@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.AttendanceFilterRequest;
 import com.example.demo.dto.DashboardResponse;
 import com.example.demo.dto.LeaveRequestDto;
 import com.example.demo.entity.*;
@@ -91,6 +92,8 @@ public interface AttendanceService {
     Leave applyLeaveRequest(LeaveRequestDto leaveRequest);
 
     List<Leave> fetchAllLeaves();
+
+    List<Attendance> filterWiseAdvanceReporting(AttendanceFilterRequest filter);
 
 
 }

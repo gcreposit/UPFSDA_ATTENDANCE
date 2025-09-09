@@ -1392,4 +1392,14 @@ public class DataApiController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+
+//    For Filter Wise Reporting Advance Filter
+
+    @PostMapping("/filterWiseAdvanceReporting")
+    public List<Attendance> filterAttendance(@RequestBody AttendanceFilterRequest filter) {
+
+        return attendanceService.filterWiseAdvanceReporting(filter);
+
+    }
+
 }
