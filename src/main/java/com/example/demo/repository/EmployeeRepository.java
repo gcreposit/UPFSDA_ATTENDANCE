@@ -42,5 +42,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query(value = "SELECT DISTINCT office_name FROM employee ORDER BY office_name;", nativeQuery = true)
     List<String> findAllOfficeNames();
 
+    @Query(value = "SELECT * FROM employee e WHERE e.username = :username LIMIT 1", nativeQuery = true)
+    Optional<Employee> findEmployeeByUsername(String username);
 
 }

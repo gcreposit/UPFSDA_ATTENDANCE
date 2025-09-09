@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerAdapter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -238,13 +239,14 @@ public class DataApiController {
     }
 
     //    Api For Submit Field Image When AttendanceType is WFF
+
     @PostMapping("/attendance/field-images")
     public ResponseEntity<ApiResponse> uploadFieldImages(
             @RequestParam String username,
-            @RequestParam("fieldImage") MultipartFile fieldImage, @RequestParam("fieldImage1") MultipartFile fieldImage1) {
+            @RequestParam("fieldImage") MultipartFile fieldImage,
+            @RequestParam(value = "fieldImage1", required = false) MultipartFile fieldImage1) {
 
         try {
-
             String message = attendanceService.uploadFieldImages(username, fieldImage, fieldImage1);
 
             return ResponseEntity.ok(
@@ -278,6 +280,7 @@ public class DataApiController {
             );
         }
     }
+
 
     //Api For Fetch Work Types
     @GetMapping("/work-types")
@@ -1266,6 +1269,59 @@ public class DataApiController {
                             .build()
             );
         }
+    }
+
+    @PostMapping("/{id}/toggle-approval")
+    public ResponseEntity<String> toggleApproval(@PathVariable Long id) {
+
+        employeeService.toggleApproval(id);
+
+        return ResponseEntity.ok("Approval status updated successfully.");
+    }
+
+//    Apply For Extra Work
+
+    @PostMapping("/applyExtraWork")
+    public ResponseEntity<ApiResponse> applyExtraWork(@ModelAttribute ExtraWork extraWork) {
+        try {
+            ExtraWork saved = employeeService.applyExtraWork(extraWork);
+
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("Extra Work applied successfully")
+                            .statusCode(HttpStatus.OK.value())
+                            .data(saved)
+                            .build()
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.builder()
+                            .message(e.getMessage())
+                            .statusCode(HttpStatus.BAD_REQUEST.value())
+                            .data(null)
+                            .build()
+            );
+        } catch (Exception e) {
+            Map<String, Object> errorData = new HashMap<>();
+            errorData.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponse.builder()
+                            .message("Error while applying for extra work")
+                            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .data(errorData)
+                            .build()
+            );
+        }
+    }
+
+    //    For Check Username is Approved or not for python service
+    @GetMapping("/admin/employees/{username}")
+    public ResponseEntity<Employee> getEmployeeByUsername(@PathVariable String username) {
+        return employeeService.getEmployeeByUsername(username)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
 }

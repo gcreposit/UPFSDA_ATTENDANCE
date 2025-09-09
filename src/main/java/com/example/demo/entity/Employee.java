@@ -97,4 +97,8 @@ public class Employee {
     @Column(name = "is_active")
     private boolean isActive = false;
 
+    @Column(name = "is_approve")
+    private boolean isApprove = false;
+
+
 }

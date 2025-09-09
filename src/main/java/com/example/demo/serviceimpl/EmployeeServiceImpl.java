@@ -1,10 +1,7 @@
 package com.example.demo.serviceimpl;
 
 import com.example.demo.dto.*;
-import com.example.demo.entity.Employee;
-import com.example.demo.entity.LeaveType;
-import com.example.demo.entity.OfficeName;
-import com.example.demo.entity.OfficeType;
+import com.example.demo.entity.*;
 import com.example.demo.repository.*;
 import com.example.demo.service.EmployeeService;
 import com.example.demo.service.FileStorageService;
@@ -17,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,6 +30,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final OfficeTypeRepository officeTypeRepository;
     private final OfficeNameRepository officeNameRepository;
     private final LeaveTypeRepository leaveTypeRepository;
+    private final ExtraWorkRepository extraWorkRepository;
 
     @Override
     @Transactional
@@ -359,6 +358,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return employeeRepository.fetchEmployeesUsernames();
 
+    }
+
+    @Override
+    public void toggleApproval(Long id) {
+
+            Employee employee = employeeRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Employee not found"));
+            employee.setApprove(!employee.isApprove());
+            employeeRepository.save(employee);
+
+    }
+
+    @Override
+    public ExtraWork applyExtraWork(ExtraWork extraWork) {
+
+        if (extraWork.getStartTime() != null && extraWork.getEndTime() != null &&
+                extraWork.getEndTime().isBefore(extraWork.getStartTime())) {
+            throw new IllegalArgumentException("End time cannot be before start time");
+        }
+
+        return extraWorkRepository.save(extraWork);
+    }
+
+    @Override
+    public Optional<Employee> getEmployeeByUsername(String username) {
+
+        return employeeRepository.findEmployeeByUsername(username);
     }
 
 }
